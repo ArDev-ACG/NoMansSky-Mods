@@ -20,6 +20,33 @@ tools/
 *.mbin.PC
 BankSignatures.bin
 
+# --- Backups de partidas (datos personales, nunca a git) ---
+backups/
+
+# --- Material de referencia de terceros (NUNCA subir) ---
+# Arte de otros juegos/artbooks para inspiracion visual. Mirarlo es uso
+# normal; redistribuirlo en un repo o en un mod no lo es. Se queda en disco.
+asset/
+assets/
+referencia/
+reference/
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.bmp
+*.tif
+*.tiff
+# excepcion: capturas propias del mod para el README de Nexus
+!docs/screenshots/**
+
+# --- Archivos descargados de herramientas ---
+*.7z
+*.zip
+*.msi
+*.exe
+
 # --- Salidas de build de AMUMSS ---
 MODS/
 ModScript*.txt

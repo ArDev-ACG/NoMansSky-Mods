@@ -177,12 +177,17 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
 
 ### Fase 0 — Setup (1 sesión) ← AQUÍ ESTAMOS
 - [x] Crear estructura de carpetas + `.gitignore` + repo git.
-- [ ] Instalar .NET Desktop Runtime x64, 7-Zip, Notepad++ (o VSCode).
-- [ ] Crear excepción antivirus **antes** de descomprimir AMUMSS.
-- [ ] Instalar AMUMSS.
+- [x] Repo remoto: https://github.com/ArDev-ACG/NoMansSky-Mods
+- [x] .NET Desktop Runtime x64 — ya estaba (6.0.36 / 8.0.29 / 9.0.18).
+- [x] 7-Zip 26.02 instalado vía winget.
+- [x] Backup de saves → `backups\NMS_saves_2026-07-29_0000\` (75 archivos, 14 MB).
+- [x] AMUMSS v5.6.2.0W descargado → `tools\AMUMSS_5.6.2.0_FULL.7z` (56 MB).
+      sha256 `4a2887f739e9c1a532e73b7fc7cf86b6de87aab6a152cb68d700f2d1cfd25c18`
+- [ ] **BLOQUEANTE — excepción antivirus.** Requiere admin. Ver §10b.
+- [ ] Extraer AMUMSS a `tools\AMUMSS\` (solo tras la excepción).
 - [ ] Correr `BUILDMOD.bat` una vez, en vacío. Confirmar que baja MBINCompiler.
-- [ ] Backup de saves: `%APPDATA%\HelloGames\NMS`.
 - [ ] Vaciar `PCBANKS\MODS` de mods ajenos antes de testear (ver §10).
+- [ ] Editor de texto — opcional, Notepad++ o VSCode. No bloquea.
 - [ ] Blender + NMSDK → aplazado a Fase 3. No bloquea nada antes.
 
 **Meta:** entorno vivo. Un decompile de prueba OK.
@@ -269,6 +274,26 @@ Dos problemas:
    no cargan nada. Los `.pak` deben ir sueltos.
 2. Al testear el mod propio, mods ajenos ensucian el diagnóstico. **Vaciar MODS
    (moviendo, no borrando) antes de cada test limpio.**
+
+### 10b. Excepción antivirus — PENDIENTE, requiere admin
+
+AMUMSS y MBINCompiler generan falsos positivos en Defender. Sin excepción, Defender
+puede borrar ejecutables **a mitad de la extracción**, dejando una instalación corrupta
+que falla con errores que no apuntan a la causa real.
+
+Abrir PowerShell **como administrador** y correr:
+
+```powershell
+Add-MpPreference -ExclusionPath "C:\Users\<usuario>\NMS_MOD_ZOMBIES"
+```
+
+Verificar después (no requiere admin):
+
+```powershell
+(Get-MpPreference).ExclusionPath
+```
+
+Solo tras esto se extrae AMUMSS.
 
 ### Otros riesgos
 
