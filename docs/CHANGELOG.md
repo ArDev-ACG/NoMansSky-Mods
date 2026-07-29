@@ -42,6 +42,15 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   depredadores que cazan al jugador, no hay que crear comportamiento hostil.
 - Escrito `work/scripts/HorribleTerror_GroundDensity.lua` (x3 densidad terrestre)
   como prueba de pipeline.
+- Añadido `tools/Backup-NMSSave.ps1`: backup etiquetado de partidas con rotación
+  y aviso si el juego está abierto. Se corre antes de cada prueba.
+- Añadido `docs/FAUNA_REFERENCE.md`: referencia detallada de fauna, arquetipos,
+  roles, tablas de spawn, edificios, ruinas, naves y NPCs. Todo verificado contra
+  la instalación local.
+- Verificado que `ROLEDESCRIPTIONTABLES/` no existe en ningún pak: las 9 entradas
+  de `CREATUREROLEDESCRIPTIONTABLE` son referencias muertas.
+- Documentada la distinción `PLAYERPREDATOR` (ataca al jugador) vs `PREDATOR`
+  (caza otras criaturas) — determinante para un mod de terror.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD

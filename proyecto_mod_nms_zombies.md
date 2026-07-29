@@ -135,6 +135,10 @@ El control por planeta/bioma sí existe, pero vive en el lado de spawn
 
 ---
 
+> **Referencia completa de fauna, arquetipos, roles, edificios y naves:**
+> [`docs/FAUNA_REFERENCE.md`](docs/FAUNA_REFERENCE.md)
+> Ahí está el detalle archivo por archivo. Lo de abajo es el resumen.
+
 ## 5c. Mapa del ecosistema — VERIFICADO
 
 Todo vive en `METADATA\SIMULATION\ECOSYSTEM\`, dentro de `NMSARC.Precache.pak`.
@@ -286,7 +290,16 @@ demostrado con un cambio numérico. Todo lo demás depende de esto. Es EL hito.
 
 ## 8. Flujo de build (repetible)
 
-1. Editar textura/paleta/EXML en `work\`.
+**Paso 0 de cada prueba — backup del save.** Obligatorio, no opcional:
+
+```powershell
+.\tools\Backup-NMSSave.ps1 -Etiqueta "que-estoy-probando"
+```
+
+Crea `backups\NMS_saves_<fecha>_<etiqueta>\`, nunca sobreescribe, conserva los 15
+más recientes y avisa si NMS está abierto (un save a medio escribir no sirve de nada).
+
+1. Editar textura/paleta/MXML en `work\`.
 2. Escribir/actualizar script `.lua` en `work\scripts\`.
 3. Copiar el `.lua` a `tools\AMUMSS\ModScript\` (AMUMSS solo lee de ahí).
 4. Correr `BUILDMOD.bat` → modo **FULL**, rama **Experimental**.
