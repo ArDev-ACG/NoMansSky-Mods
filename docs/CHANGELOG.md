@@ -23,7 +23,12 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   en tiempo real desactivada). La exclusión va en McAfee.
 - Documentado que los `.bat` de AMUMSS son interactivos y dependen del directorio
   de trabajo — `BUILDMOD.bat` se corre a mano.
-- Pendiente: exclusión en McAfee y primer `BUILDMOD.bat`.
+- **Fase 0 cerrada.** `BUILDMOD.bat` en modo FULL: 0 errores, 0 warnings.
+  MBINCompiler 6.45.0.1. McAfee no interfirió — la exclusión no hizo falta.
+- Entorno: NMS rama Experimental, versión 170671.
+- Corregida la ubicación de mods: es `GAMEDATA\MODS\` con carpetas descomprimidas,
+  no `PCBANKS\MODS` con `.pak`. NMS 6.x cambió el formato.
+- Escaneo de conflictos sobre los 87 mods instalados: ninguno toca fauna.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD

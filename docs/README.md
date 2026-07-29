@@ -19,19 +19,29 @@ Solo fuentes propias:
 
 ```
 1. Editar .lua en work/scripts/
-2. Correr tools/AMUMSS/BUILDMOD.bat  (formato "combined")
-3. Copiar .pak resultante a:
-   C:\Program Files (x86)\Steam\steamapps\common\No Man's Sky\GAMEDATA\PCBANKS\MODS\
-4. Lanzar juego. Probar en save de pruebas.
-5. Si OK → releases/ + anotar en CHANGELOG.md
+2. Copiarlo a tools/AMUMSS/ModScript/   (AMUMSS solo lee de ahi)
+3. Correr tools/AMUMSS/BUILDMOD.bat     modo FULL, rama Experimental
+4. Copiar el resultado a:
+   C:\Program Files (x86)\Steam\steamapps\common\No Man's Sky\GAMEDATA\MODS\
+5. Lanzar juego. Probar en save de pruebas.
+6. Si OK → releases/ + anotar en CHANGELOG.md con la version de NMS probada
 ```
+
+## Entorno verificado
+
+| Cosa | Valor |
+|---|---|
+| NMS | rama **Experimental**, version 170671 |
+| MBINCompiler | 6.45.0.1 |
+| AMUMSS | v5.6.2.0W, modo FULL |
+| Mods instalados | 87, via Vortex, sin conflicto con fauna |
 
 ## Antes de testear
 
-- Vaciar `PCBANKS\MODS` de mods ajenos (mover, no borrar).
-- Confirmar que no existe `DISABLEMODS.TXT` en `PCBANKS`.
-- Backup de saves: `%APPDATA%\HelloGames\NMS`.
+- Backup de saves: `%APPDATA%\HelloGames\NMS` (hay uno en `backups/`).
+- Usar save de pruebas, no la partida principal.
+- Solo aislar mods si algo se comporta raro — el escaneo dio limpio.
 
 ## Estado
 
-Fase 0 — setup. Ver roadmap en el doc de diseño.
+Fase 0 cerrada. Siguiente: Fase 1 — primer `.lua` sobre `CREATUREGENERATIONDATA`.

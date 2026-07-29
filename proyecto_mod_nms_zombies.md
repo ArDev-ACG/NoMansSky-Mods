@@ -184,10 +184,11 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
 - [x] AMUMSS v5.6.2.0W descargado → `tools\AMUMSS_5.6.2.0_FULL.7z` (56 MB).
       sha256 `4a2887f739e9c1a532e73b7fc7cf86b6de87aab6a152cb68d700f2d1cfd25c18`
 - [x] AMUMSS extraído a `tools\AMUMSS\` — 714/714 archivos, íntegro.
-- [ ] **Excepción en McAfee** (no Defender — ver §10b).
-- [ ] Reiniciar si McAfee lo pide.
-- [ ] Correr `BUILDMOD.bat` a mano una vez. Baja MBINCompiler + libMBIN.
-      Repetir hasta que no ofrezca más updates (lo dice su README).
+- [x] `BUILDMOD.bat` corrido en modo FULL. **0 errores, 0 warnings.**
+      MBINCompiler 6.45.0.1 descargado. McAfee no interfirió — no hizo falta excepción.
+- [x] Análisis de conflictos con los 87 mods instalados: limpio (§10d).
+
+**FASE 0 CERRADA.** Entorno vivo y verificado.
 - [ ] Vaciar `PCBANKS\MODS` de mods ajenos antes de testear (ver §10).
 - [ ] Editor de texto — opcional, Notepad++ o VSCode. No bloquea.
 - [ ] Blender + NMSDK → aplazado a Fase 3. No bloquea nada antes.
@@ -230,12 +231,16 @@ demostrado con un cambio numérico. Todo lo demás depende de esto. Es EL hito.
 
 ## 8. Flujo de build (repetible)
 
-1. Editar textura/modelo/EXML en `work\`.
-2. Escribir/actualizar script `.lua` (Ruta AMUMSS).
-3. Correr `BUILDMOD.bat`. Formato "combined".
-4. Copiar `.pak` resultante a carpeta MODS del juego.
-5. Lanzar juego. Probar.
-6. Si OK → mover a `releases\`. Anotar en CHANGELOG.
+1. Editar textura/paleta/EXML en `work\`.
+2. Escribir/actualizar script `.lua` en `work\scripts\`.
+3. Copiar el `.lua` a `tools\AMUMSS\ModScript\` (AMUMSS solo lee de ahí).
+4. Correr `BUILDMOD.bat` → modo **FULL**, rama **Experimental**.
+5. Copiar el resultado a `GAMEDATA\MODS\` (ver §10d — no es `PCBANKS\MODS`).
+6. Lanzar juego. Probar en save de pruebas.
+7. Si OK → `releases\` + anotar en CHANGELOG con la versión de NMS probada.
+
+Verificado en la primera corrida: sin `.lua` en `ModScript\`, AMUMSS avisa
+"NO user .lua Mod Script found" y termina sin hacer nada. Comportamiento correcto.
 
 ---
 
@@ -258,24 +263,54 @@ demostrado con un cambio numérico. Todo lo demás depende de esto. Es EL hito.
 | Cosa | Estado |
 |---|---|
 | NMS instalado | ✅ `C:\Program Files (x86)\Steam\steamapps\common\No Man's Sky` |
-| Build del juego | archivos del 4 jul — reciente |
-| `GAMEDATA\PCBANKS\MODS` | ✅ ya existe |
+| **Rama del juego** | ⚠️ **EXPERIMENTAL**, versión 170671 |
+| MBINCompiler | ✅ 6.45.0.1 (el que pide Experimental) |
+| Carpeta de mods real | ✅ `GAMEDATA\MODS\` — ver §10d |
+| Mods instalados | 87 activos, gestionados por Vortex |
 | `DISABLEMODS.TXT` | ✅ ausente → carga de mods habilitada |
 | Espacio libre C: | 358 GB |
 | Ruta proyecto | ✅ sin acentos, fuera de OneDrive |
 | git | ✅ 2.50.0 |
 | gh CLI | ❌ no instalado |
 
-### ⚠️ Mods ajenos ya presentes
+### 10d. Mods instalados — CORRECCIÓN de dónde viven
 
-`PCBANKS\MODS` contiene: `Hovering\`, `No hovering\`, `_DeepSpace.pak`,
-`PortalSecret.txt`, y un `vortex.deployment...json` (Vortex se usó antes).
+Lo que decía antes (`PCBANKS\MODS`, `.pak` sueltos) es el flujo **viejo**. Corregido
+tras ver la salida real de AMUMSS y el disco.
 
-Dos problemas:
-1. NMS **ignora subcarpetas** dentro de MODS. `Hovering\` y `No hovering\` probablemente
-   no cargan nada. Los `.pak` deben ir sueltos.
-2. Al testear el mod propio, mods ajenos ensucian el diagnóstico. **Vaciar MODS
-   (moviendo, no borrando) antes de cada test limpio.**
+**La carpeta real es `GAMEDATA\MODS\`**, con 108 elementos: 87 carpetas de mod + 21
+sueltos. NMS 6.x carga mods como **carpetas descomprimidas**, no solo como `.pak`:
+
+```
+GAMEDATA\MODS\<NombreDelMod>\
+├── <NombreDelMod>.lua        # el script AMUMSS fuente, incluido por el autor
+├── GLOBALS\*.EXML
+├── METADATA\*.MBIN
+└── __folder_managed_by_vortex
+```
+
+Extensiones presentes en el árbol: 181 `.MBIN`, 102 `.EXML`, 54 `.DDS`, 38 `.lua`.
+
+Vortex gestiona la carpeta (`__folder_managed_by_vortex`). No editar a mano lo que
+Vortex controla — se lo puede llevar por delante en el siguiente deploy.
+
+Detalle útil: muchos autores **incluyen su `.lua`**. Son ejemplos reales y funcionales
+de scripts AMUMSS contra la versión actual del juego. Material de estudio gratis.
+
+### 10e. Análisis de conflictos — LIMPIO
+
+Escaneados los 87 mods buscando colisiones con el plan de fauna:
+
+- **Cero archivos** con `CREATURE`/`FAUNA` en el nombre. Nadie toca
+  `CREATUREGENERATIONDATA` ni texturas de rig.
+- 6 `.lua` mencionan las palabras, todos falsos positivos:
+  `CreaturesCanEat` (propiedad de flora), `FARMDEADCREATURE` (planta),
+  `CREATURE_FEED`/`CREATURE_FARM` (piezas de base), recompensas de escaneo.
+- Único que roza: **`True Blood 2.6 - Red`** — cambia el color de sangre de criaturas.
+  No compite; suma. Sangre roja + carne podrida van juntas.
+
+**Conclusión:** no hace falta desinstalar nada para trabajar. Si algo se comporta
+raro in-game, entonces sí se aísla moviendo mods fuera.
 
 ### 10b. Antivirus — el AV activo es McAfee, no Defender
 
@@ -319,6 +354,13 @@ sin trabajo extra, y no vale la pena para algo que se ejecuta una vez.
 
 ### Otros riesgos
 
+- **Juegas en rama EXPERIMENTAL (170671).** Dos consecuencias:
+  1. Experimental se actualiza mucho más seguido que Public. Los mods se rompen
+     más a menudo y hay que re-buildear.
+  2. **La mayoría de quien descargue en Nexus estará en Public.** Un mod construido
+     y probado solo contra Experimental puede fallarles. Antes de publicar hay que
+     verificar contra Public, o declarar en la descripción la versión exacta contra
+     la que se probó.
 - [Unverified] Compatibilidad NMSDK con versión ACTUAL de NMS y de Blender. Reportes de errores de import en foros. Probar antes de comprometer Ruta B.
 - Probar siempre en partida nueva o save de pruebas, nunca en la principal.
 - Mods pueden causar desync en multijugador. No es ban, pero cuidado si juegas online.
