@@ -253,6 +253,48 @@ SandwormPresenceChance por bioma (Dead 0.3, Swamp 0.4, Red/Green/Blue 0.5...)
 distintas. Un cambio sin acotar las toca todas. En los scripts lua hay que usar
 siempre `PRECEDING_KEY_WORDS` con el nombre de la sección.
 
+### 5c-bis. Cómo elige NMS qué fauna pone en un planeta — VERIFICADO
+
+`CREATUREGENERATIONDATA` tiene listas ponderadas de arquetipo por dominio:
+
+```
+Generic -> Ground                    <- planetas normales. LA PALANCA.
+Generic -> Air / Cave / Water
+BiomeSpecific -> <bioma> -> Ground   <- casi todas VACIAS
+PurpleSystemSpecific -> ...          <- sistemas purpura
+```
+
+**Las listas `Ground` de `BiomeSpecific` están vacías** para Lush, Toxic, Scorched,
+Radioactive, Frozen, Barren, Dead, Swamp, Lava… Es decir: los planetas normales
+caen todos en `Generic`. Las únicas con contenido son las del bioma Weird (Beam,
+Hexagon, Shards, Contour, BoneSpire, WireCell, HydroGarden…) y los sistemas púrpura.
+
+Pesos vanilla de `Generic → Ground` (suman 11):
+
+| Arquetipo | Peso | % planetas |
+|---|---:|---:|
+| `DEFAULT` | 0.00 | 0.0% — desactivado por Hello Games |
+| `BUTTERFLY` | 1.00 | 9.1% |
+| `ALIEN` | 1.50 | 13.6% |
+| **`DANGEROUS`** | **1.00** | **9.1%** ← los `PLAYERPREDATOR` |
+| `HERD` | 1.00 | 9.1% |
+| `HUNTEDHERD` | 1.00 | 9.1% |
+| `PARADISE` | 1.50 | 13.6% |
+| `EMPTY` | 1.00 | 9.1% |
+| `GIANT` | 1.00 | 9.1% |
+| `SPARSE` | 1.00 | 9.1% |
+| `BUSY` | 1.00 | 9.1% |
+
+Otros dominios, por si hacen falta: `Air` suma 21.1 (`DEFAULT` 52%),
+`Cave` suma 2 (`DEFAULT`/`EMPTY` 50/50), `Water` suma 1.05 (`DEFAULT` 95%).
+
+### ⚠️ Trampa: la propiedad se llama `"Weight "` con espacio final
+
+En el MXML es literalmente `<Property name="Weight " value="1.000000" />`.
+Typo de Hello Games en los datos del juego, no de la decompilación — el mismo caso
+que `"BiomeSpecific "`. Buscar `"Weight"` a secas puede no cazar nada. Usar el
+nombre exacto, espacio incluido.
+
 ### Arquetipos hostiles ya existentes (oro para el mod)
 
 `CREATUREGENERATIONARCHETYPES` define, entre otros:
@@ -344,6 +386,11 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
       elegir qué valores tocar.
 - [x] Mod de color archivado y retirado del juego una vez validado (§10g).
       Se sigue con densidad sola para poder leer el efecto de los cambios de rol.
+- [x] Localizada la palanca de infestación: `Generic → Ground` en
+      `CREATUREGENERATIONDATA` (§5c-bis). `DANGEROUS` es 9.1% en vanilla.
+- [x] Script escrito: `work\scripts\HorribleTerror_PredatorWorlds.lua`.
+      `DANGEROUS` peso 1 → 1000 = 99% de planetas normales infestados.
+- [ ] Construir y **confirmar in-game** que te cazan.
 - [ ] Editar rol → forzar depredador / hostil (vía arquetipo `DANGEROUS`).
 - [ ] Ajustar tamaño (más grande = más amenazante).
 - [ ] Controlar en qué planetas/biomas aparecen.

@@ -95,6 +95,21 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   distinción de rol. La proporción de depredadores se controla aparte, en
   `RoleFrequencyModifiers` y en `CREATUREGENERATIONARCHETYPES`.
 
+### Fase 1 — infestación (siguiente prueba)
+
+- Mapeada la selección de arquetipo por planeta (§5c-bis): la lista que decide es
+  `Generic → Ground`. Verificado que las listas `Ground` de `BiomeSpecific` están
+  vacías para todos los biomas normales, así que los planetas corrientes caen
+  todos en `Generic`. Solo Weird y los sistemas púrpura traen listas propias.
+- Documentados los pesos vanilla: `DANGEROUS` es 1.00 de una suma de 11 = 9.1%
+  de los planetas. `DEFAULT` viene con peso 0, desactivado por Hello Games.
+- **Trampa encontrada:** la propiedad es `"Weight "`, con espacio final. Typo en
+  los datos del juego, igual que `"BiomeSpecific "`.
+- Escrito `work/scripts/HorribleTerror_PredatorWorlds.lua`: sube `DANGEROUS` a
+  1000 → 99% de planetas infestados. Se sube un peso en vez de bajar los otros
+  diez: mismo efecto, un solo cambio, menos que romper en updates y menos choque
+  con otros mods.
+
 <!--
 ## [0.1.0] - AAAA-MM-DD
 Probado contra NMS <version>.
