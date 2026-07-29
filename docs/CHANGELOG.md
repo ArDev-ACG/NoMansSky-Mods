@@ -81,6 +81,20 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   individuales. `RedFauna` genera 47 EXML delta, 960 líneas cambiadas cada uno
   (5 paletas × 64 colores × 3 canales) — el conteo cuadra exacto.
 
+### HITO — pipeline confirmado in-game (2026-07-29)
+
+- **Ambos cambios verificados jugando**: más fauna terrestre y roja.
+  La cadena `.lua → AMUMSS → MBINCompiler → EXML delta → GAMEDATA\MODS → juego`
+  funciona de punta a punta. Fase 1 cumple su meta; Fase 2 valida su ruta barata
+  (paletas, sin Blender ni DDS).
+- `RedFauna` retirado del juego tras validarlo y archivado en
+  `build\HorribleTerror_RedFauna_VERIFICADO_2026-07-29\`; su `.lua` movido a
+  `ModScript\Disabled scripts and paks\`. Se sigue solo con densidad para poder
+  leer sin ruido el efecto de los cambios de rol.
+- Aclarado que `GroundGroupsPerKm` es densidad **total** de fauna terrestre, sin
+  distinción de rol. La proporción de depredadores se controla aparte, en
+  `RoleFrequencyModifiers` y en `CREATUREGENERATIONARCHETYPES`.
+
 <!--
 ## [0.1.0] - AAAA-MM-DD
 Probado contra NMS <version>.

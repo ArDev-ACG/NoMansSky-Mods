@@ -339,7 +339,11 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
       release — a x20 el rendimiento puede sufrir. Para el mod final: 2-4.
 - [x] Segundo script de validación: `work\scripts\HorribleTerror_RedFauna.lua`.
       Pinta de rojo carne las 5 paletas de piel en los 47 archivos de bioma (§5d).
-- [ ] **Confirmar ambos cambios in-game.** ← el hito
+- [x] **CONFIRMADO IN-GAME (2026-07-29).** Más fauna y roja. ← **EL HITO, CERRADO.**
+      El pipeline completo funciona de punta a punta. Todo lo demás ya solo es
+      elegir qué valores tocar.
+- [x] Mod de color archivado y retirado del juego una vez validado (§10g).
+      Se sigue con densidad sola para poder leer el efecto de los cambios de rol.
 - [ ] Editar rol → forzar depredador / hostil (vía arquetipo `DANGEROUS`).
 - [ ] Ajustar tamaño (más grande = más amenazante).
 - [ ] Controlar en qué planetas/biomas aparecen.
@@ -449,6 +453,25 @@ Vortex controla — se lo puede llevar por delante en el siguiente deploy.
 
 Detalle útil: muchos autores **incluyen su `.lua`**. Son ejemplos reales y funcionales
 de scripts AMUMSS contra la versión actual del juego. Material de estudio gratis.
+
+### 10g. Dónde queda un mod archivado
+
+Cuando una prueba se valida y se retira del juego, queda en tres capas:
+
+| Qué | Dónde | ¿git? |
+|---|---|---|
+| Fuente `.lua` | `work\scripts\<Mod>.lua` | ✅ sí |
+| Mod construido | `build\<Mod>_VERIFICADO_<fecha>\` | ❌ gitignored |
+| Script desactivado | `tools\AMUMSS\ModScript\Disabled scripts and paks\` | ❌ |
+
+`Disabled scripts and paks\` es carpeta nativa de AMUMSS: los `.lua` de ahí no se
+procesan en el siguiente `BUILDMOD`. Es la forma limpia de desactivar sin borrar.
+
+Para reactivar: mover el `.lua` de vuelta a `ModScript\` y rebuildear. O, más
+rápido, copiar la carpeta de `build\` directo a `GAMEDATA\MODS\` — ya está compilada.
+
+**Nota:** `tools\AMUMSS\CreatedMODS\` y `ModBackups\` NO sirven como archivo. AMUMSS
+los limpia en cada corrida. Por eso la copia va a `build\`.
 
 ### 10f. AMUMSS despliega EXML delta, no MBIN — VERIFICADO
 
