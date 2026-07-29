@@ -135,6 +135,68 @@ El control por planeta/bioma sí existe, pero vive en el lado de spawn
 
 ---
 
+## 5d. Cómo colorea NMS a las criaturas — VERIFICADO
+
+Esto desbloquea la Fase 2 entera. **No existe "la textura del bicho X"**, y tampoco
+existe "el color del bicho X". El color se resuelve en tres saltos:
+
+```
+1. TEXTURES\PLANETS\CREATURES\<RIG>\<parte>.TEXTURE.MBIN
+      <Property name="Palette"   value="Scale" />     <- nombre, no color
+      <Property name="ColourAlt" value="Primary" />
+      <Property name="Index"     value="-1" />        <- -1 = elige por semilla
+
+2. El nombre se resuelve contra el archivo de paletas del BIOMA:
+      METADATA\SIMULATION\SOLARSYSTEM\BIOMES\<X>\<X>COLOURPALETTES.MBIN
+      = cGcPaletteList con 64 paletas de 64 colores RGBA cada una
+
+3. El juego elige un color dentro de esa paleta usando la semilla de la criatura.
+```
+
+**Callejones sin salida descartados** (comprobados, no supuestos): los
+`.MATERIAL.MBIN` y `.DESCRIPTOR.MBIN` de criatura **no** contienen ninguna
+referencia a paletas — cero coincidencias en los 75 materiales y 27 descriptores
+del rig TREX. `CREATUREDATATABLE` tampoco. La única vía es la de arriba.
+
+### Qué paletas usa la fauna — medido
+
+Decompilados los **432** `.TEXTURE.MBIN` de `TEXTURES\PLANETS\CREATURES\` y contada
+cada capa:
+
+| Paleta | Usos | ¿Tocar? |
+|---|---:|---|
+| `Scale` | 1318 | ✅ |
+| `Underbelly` | 512 | ✅ |
+| `Fur` | 470 | ✅ |
+| `Rock` | 402 | ❌ compartida con el terreno |
+| `Feather` | 128 | ✅ |
+| `Paint` | 113 | ❌ compartida con naves y edificios |
+| `Undercoat` | 1 | ✅ |
+| resto (Leaf, Plant, Crystal…) | <30 c/u | ❌ marginal |
+
+Las cinco marcadas cubren ~84% de las capas de criatura y **solo** afectan a fauna.
+`Rock` y `Paint` se dejan fuera a propósito: tocarlas teñiría rocas y naves, y
+entonces no se sabría si el cambio afectó a la fauna o al mundo entero.
+
+### Cuántos archivos hay que parchear: 47
+
+Cada bioma trae su propia lista. Verificado: **los 47** `*COLOURPALETTES.MBIN` /
+`*COLOURPALETTE.MBIN` contienen las 5 paletas de fauna, todos dentro de
+`NMSARC.Precache.pak`. Parchear uno solo → fauna roja solo en ese bioma.
+
+Se excluye `METADATA\GAMESTATE\PLAYERDATA\CUSTOMISATIONCOLOURPALETTES.MBIN`: es la
+personalización del jugador, no fauna.
+
+### ⚠️ Trampa: `Underbelly` vs `BioShip_Underbelly`
+
+De los 64 nombres de paleta, `Underbelly` es el único con colisión de subcadena:
+existe también `BioShip_Underbelly` (naves vivientes). Si el match de
+`PRECEDING_KEY_WORDS` es por subcadena, cazará las dos. **Comprobar en `REPORT.lua`
+cuántas secciones `Underbelly` se tocaron por archivo** — si son 2 en vez de 1, hay
+que acotar el match. Las otras cuatro están limpias.
+
+---
+
 > **Referencia completa de fauna, arquetipos, roles, edificios y naves:**
 > [`docs/FAUNA_REFERENCE.md`](docs/FAUNA_REFERENCE.md)
 > Ahí está el detalle archivo por archivo. Lo de abajo es el resumen.
@@ -257,7 +319,11 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
       Multiplica x3 `GroundGroupsPerKm`. Copiado a `tools\AMUMSS\ModScript\`.
 - [x] `BUILDMOD.bat` corrido: 4 cambios, 0 errores, 0 warnings. Mod desplegado
       solo a `GAMEDATA\MODS\HorribleTerror_GroundDensity\` (§10f).
-- [ ] **Confirmar el cambio in-game.** ← el hito
+- [x] Subido `DENSITY_MULT` a **20** (500/1000/2000/4000). Valor de prueba, no de
+      release — a x20 el rendimiento puede sufrir. Para el mod final: 2-4.
+- [x] Segundo script de validación: `work\scripts\HorribleTerror_RedFauna.lua`.
+      Pinta de rojo carne las 5 paletas de piel en los 47 archivos de bioma (§5d).
+- [ ] **Confirmar ambos cambios in-game.** ← el hito
 - [ ] Editar rol → forzar depredador / hostil (vía arquetipo `DANGEROUS`).
 - [ ] Ajustar tamaño (más grande = más amenazante).
 - [ ] Controlar en qué planetas/biomas aparecen.
@@ -268,6 +334,8 @@ demostrado con un cambio numérico. Todo lo demás depende de esto. Es EL hito.
 **Meta ampliada:** "planeta infestado". Fauna hostil donde antes no la había.
 
 ### Fase 2 — Look zombie (era Fase 1)
+- [x] **Cadena de color de fauna resuelta** (§5d). Las paletas son la vía y está
+      mapeada: 5 paletas × 47 archivos. Sin Blender, sin DDS.
 - [ ] Primero paletas (`TkPaletteTexture`) → tonos carne/putrefacto. Sin Blender.
 - [ ] Si paletas no bastan → editar DDS del rig elegido.
 - [ ] Elegir rig objetivo (TREX / ARTHROPOD / SPIDER son los más "monstruo").

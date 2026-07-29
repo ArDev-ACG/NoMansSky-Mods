@@ -58,6 +58,23 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   496 B) en vez del MBIN completo. Verificado contra los mods instalados: formato
   válido en NMS 6.x, y reduce mucho la superficie de conflicto. Ver §10f.
 - Backup de saves previo a la prueba: `backups\NMS_saves_2026-07-29_0130_antes-densidad-x3\`.
+- `DENSITY_MULT` subido de 3 a **20** (500/1000/2000/4000). Valor de prueba
+  deliberadamente exagerado para que el cambio sea inequívoco; no es el de release.
+
+### Fase 2 — desbloqueada
+
+- **Resuelta la cadena de color de la fauna** (§5d), en tres saltos:
+  `.TEXTURE.MBIN` declara un nombre de paleta (`TkPaletteTexture`) → el nombre se
+  resuelve contra el `*COLOURPALETTES.MBIN` del bioma → el juego elige color por
+  semilla. Descartados por comprobación directa `.MATERIAL.MBIN`, `.DESCRIPTOR.MBIN`
+  y `CREATUREDATATABLE`: ninguno referencia paletas.
+- Medido qué paletas usa la fauna decompilando los 432 `.TEXTURE.MBIN` de criatura:
+  Scale 1318, Underbelly 512, Fur 470, Rock 402, Feather 128, Paint 113.
+  `Rock` y `Paint` quedan fuera por estar compartidas con terreno y naves.
+- Verificado que los 47 archivos de paletas de bioma contienen las 5 paletas de piel.
+- Detectada la colisión de subcadena `Underbelly` / `BioShip_Underbelly`.
+- Escrito `work/scripts/HorribleTerror_RedFauna.lua`: rojo carne en las 5 paletas
+  × 47 archivos, como prueba de validación visual de la ruta de paletas.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD

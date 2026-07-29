@@ -16,7 +16,12 @@
       Dense    100
       VeryDense 200
 
-  Con DENSITY_MULT = 3 quedan en 75 / 150 / 300 / 600.
+  Con DENSITY_MULT = 20 quedan en 500 / 1000 / 2000 / 4000.
+
+  AVISO: 20 es un valor de PRUEBA, deliberadamente exagerado. El objetivo
+  es que sea imposible confundirlo con la variacion normal del juego. NO es
+  el valor de release: a x20 el rendimiento puede caer bastante en planetas
+  con vida Full. Para el mod final la idea es bajarlo a algo entre 2 y 4.
 
   IMPORTANTE - por que PRECEDING_KEY_WORDS es obligatorio aqui:
   las claves Sparse/Normal/Dense/VeryDense se repiten identicas en
@@ -28,7 +33,7 @@
   Vive en NMSARC.Precache.pak
 --]]
 
-DENSITY_MULT = 3
+DENSITY_MULT = 20
 
 NMS_MOD_DEFINITION_CONTAINER =
 {
