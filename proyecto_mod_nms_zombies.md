@@ -183,9 +183,11 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
 - [x] Backup de saves → `backups\NMS_saves_2026-07-29_0000\` (75 archivos, 14 MB).
 - [x] AMUMSS v5.6.2.0W descargado → `tools\AMUMSS_5.6.2.0_FULL.7z` (56 MB).
       sha256 `4a2887f739e9c1a532e73b7fc7cf86b6de87aab6a152cb68d700f2d1cfd25c18`
-- [ ] **BLOQUEANTE — excepción antivirus.** Requiere admin. Ver §10b.
-- [ ] Extraer AMUMSS a `tools\AMUMSS\` (solo tras la excepción).
-- [ ] Correr `BUILDMOD.bat` una vez, en vacío. Confirmar que baja MBINCompiler.
+- [x] AMUMSS extraído a `tools\AMUMSS\` — 714/714 archivos, íntegro.
+- [ ] **Excepción en McAfee** (no Defender — ver §10b).
+- [ ] Reiniciar si McAfee lo pide.
+- [ ] Correr `BUILDMOD.bat` a mano una vez. Baja MBINCompiler + libMBIN.
+      Repetir hasta que no ofrezca más updates (lo dice su README).
 - [ ] Vaciar `PCBANKS\MODS` de mods ajenos antes de testear (ver §10).
 - [ ] Editor de texto — opcional, Notepad++ o VSCode. No bloquea.
 - [ ] Blender + NMSDK → aplazado a Fase 3. No bloquea nada antes.
@@ -275,25 +277,45 @@ Dos problemas:
 2. Al testear el mod propio, mods ajenos ensucian el diagnóstico. **Vaciar MODS
    (moviendo, no borrando) antes de cada test limpio.**
 
-### 10b. Excepción antivirus — PENDIENTE, requiere admin
+### 10b. Antivirus — el AV activo es McAfee, no Defender
 
-AMUMSS y MBINCompiler generan falsos positivos en Defender. Sin excepción, Defender
-puede borrar ejecutables **a mitad de la extracción**, dejando una instalación corrupta
-que falla con errores que no apuntan a la causa real.
+Verificado: `root\SecurityCenter2` lista McAfee y Windows Defender, pero
+`(Get-MpComputerStatus).RealTimeProtectionEnabled` = **False**. Windows apaga la
+protección en tiempo real de Defender cuando hay un AV de terceros.
 
-Abrir PowerShell **como administrador** y correr:
+**Consecuencia:** `Add-MpPreference` es inútil aquí. La exclusión va en McAfee.
 
-```powershell
-Add-MpPreference -ExclusionPath "C:\Users\<usuario>\NMS_MOD_ZOMBIES"
-```
+El README de AMUMSS (`README\README-AMUMSS_installation.txt`, líneas 19-23) es
+explícito en dos puntos:
+- La excepción se crea **antes** de ejecutar nada de AMUMSS.
+- Algunos AV no registran bien la exclusión hasta **reiniciar**.
 
-Verificar después (no requiere admin):
+Rutas a excluir, en orden de preferencia:
 
-```powershell
-(Get-MpPreference).ExclusionPath
-```
+1. Carpeta completa: `C:\Users\<usuario>\NMS_MOD_ZOMBIES\tools\AMUMSS`
+2. Si McAfee solo admite archivos sueltos (varias versiones lo hacen), excluir:
+   - `MODBUILDER\hgpaktool.exe`
+   - `MODBUILDER\psarc.exe`
+   - `MODBUILDER\RunThisJob.exe`
+   - `MODBUILDER\MBINCompiler.exe` ← aún no existe, se crea al primer BUILDMOD
+   - `_NMS PCBANKS Explorer.exe`
+   - `_AMM_ModScript_Manager.exe`
 
-Solo tras esto se extrae AMUMSS.
+Estado de la extracción: **limpia**. 714/714 archivos, McAfee no tocó nada.
+Mark-of-the-Web: 0 archivos marcados (curl no aplica MOTW, a diferencia del navegador).
+
+### 10c. Los .bat de AMUMSS son interactivos
+
+Aprendido a la mala. Dos reglas:
+
+- **Ejecutar cada `.bat` desde su propia carpeta.** Usan rutas relativas. Lanzar
+  `TOOLS\Test_AMUMSS_install.bat` desde la raíz produce "falta un operando" y
+  "no se encuentra la ruta" — errores que no apuntan a la causa.
+- **No redirigir stdin a `NUL`.** Los scripts esperan input; con EOF se rompen o
+  se cuelgan.
+
+Conclusión: `BUILDMOD.bat` se corre a mano, en ventana normal. No es automatizable
+sin trabajo extra, y no vale la pena para algo que se ejecuta una vez.
 
 ### Otros riesgos
 

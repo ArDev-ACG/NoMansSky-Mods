@@ -18,7 +18,12 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
 - 7-Zip 26.02 instalado.
 - Backup de saves de NMS (75 archivos, 14 MB) fuera de git.
 - AMUMSS v5.6.2.0W descargado, sha256 verificado contra la release de GitHub.
-- Pendiente bloqueante: excepción de Defender (requiere admin) antes de extraer.
+- AMUMSS extraído: 714/714 archivos, sin interferencia del antivirus.
+- Detectado que el AV activo es McAfee, no Defender (Defender tiene la protección
+  en tiempo real desactivada). La exclusión va en McAfee.
+- Documentado que los `.bat` de AMUMSS son interactivos y dependen del directorio
+  de trabajo — `BUILDMOD.bat` se corre a mano.
+- Pendiente: exclusión en McAfee y primer `BUILDMOD.bat`.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD
