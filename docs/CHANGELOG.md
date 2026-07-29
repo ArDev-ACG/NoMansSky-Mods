@@ -29,6 +29,19 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
 - Corregida la ubicación de mods: es `GAMEDATA\MODS\` con carpetas descomprimidas,
   no `PCBANKS\MODS` con `.pak`. NMS 6.x cambió el formato.
 - Escaneo de conflictos sobre los 87 mods instalados: ninguno toca fauna.
+- Rama del juego confirmada por el manifest de Steam: **Public** (buildid 24039799),
+  no Experimental. El riesgo de publicación anotado antes queda descartado.
+
+### Fase 1 — en curso
+- Indexado el contenido de los 97 `.pak` vanilla con `hgpaktool -L`.
+- Localizado `CREATUREGENERATIONDATA.MBIN` en `NMSARC.Precache.pak`, junto con
+  el resto del ecosistema de fauna. Extraído y decompilado.
+- Documentados los valores vanilla de densidad, roles y rareza.
+- Descubierto que MBINCompiler 6.45 genera `.MXML`, no `.EXML`.
+- Descubiertos los arquetipos `DANGEROUS` / `WRDROLLPRED` — el juego ya trae
+  depredadores que cazan al jugador, no hay que crear comportamiento hostil.
+- Escrito `work/scripts/HorribleTerror_GroundDensity.lua` (x3 densidad terrestre)
+  como prueba de pipeline.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD

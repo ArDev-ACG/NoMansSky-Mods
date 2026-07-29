@@ -91,7 +91,10 @@ volcar el juego a disco. `unpacked\` queda como caché puntual, no como copia to
 
 - `.pak` → paquete comprimido del juego. Se desempaca.
 - `.MBIN` → binario del juego. No editable directo.
-- `.EXML` → MBIN decompilado a xml. Editable en texto.
+- `.EXML` → MBIN decompilado a xml. Formato **antiguo**.
+- `.MXML` → **lo que genera MBINCompiler 6.45 por defecto.** Mismo rol que EXML,
+  más compacto. Verificado: decompilar un MBIN produce `.MXML`, no `.EXML`.
+  Los scripts lua usan la clave `MXML_CHANGE_TABLE`.
 - `GEOMETRY.MBIN` → contiene modelo 3D (malla).
 - `MATERIAL.MBIN` → texturas + shader del modelo.
 - `SCENE.MBIN` → contenedor. Une malla + material + comportamiento. Como "prefab".
@@ -131,6 +134,54 @@ El control por planeta/bioma sí existe, pero vive en el lado de spawn
 (`CREATUREGENERATIONDATA`), no en el lado de textura.
 
 ---
+
+## 5c. Mapa del ecosistema — VERIFICADO
+
+Todo vive en `METADATA\SIMULATION\ECOSYSTEM\`, dentro de `NMSARC.Precache.pak`.
+Extraído a `unpacked\` y decompilado con MBINCompiler 6.45.0.1.
+
+| Archivo | Para qué sirve en este mod |
+|---|---|
+| `CREATUREGENERATIONDATA` | densidad, probabilidad de vida, frecuencia de roles |
+| `CREATUREGENERATIONARCHETYPES` | arquetipos de spawn — incluye `DANGEROUS` |
+| `CREATUREROLEDESCRIPTIONTABLE` | roles por bioma |
+| `CREATUREBEHAVIOURTREES` | árboles de comportamiento |
+| `CREATUREAUDIOTABLE` | sonidos — para gruñidos zombie |
+| `CREATUREDATATABLE` | 255 KB, el grueso de los datos de fauna |
+
+### Parámetros globales de CREATUREGENERATIONDATA (valores vanilla)
+
+```
+GroundGroupsPerKm      Sparse 25   Normal 50   Dense 100   VeryDense 200
+WaterGroupsPerKm       Sparse 30   Normal 60   Dense  80   VeryDense 100
+AirGroupsPerKm         Sparse 10   Normal 20   Dense  30   VeryDense  40
+CaveGroupsPerKm        Sparse 50   Normal 100  Dense 200   VeryDense 300
+DensityModifiers       Sparse 0.5  Normal 1    Dense   2   VeryDense   4
+RoleFrequencyModifiers Never 0     Low 0.2     Normal  1   High        5
+RarityFrequencyModifiers  Common 10  Uncommon 3  Rare 1.2  SuperRare 0.9
+LifeChance             Dead 0      Low 0       Mid     0   Full        1
+LifeLevelDensityModifiers Dead 0   Low 0.4     Mid   0.7   Full      1.2
+HerdCreaturePenalty    0.5
+SandwormPresenceChance por bioma (Dead 0.3, Swamp 0.4, Red/Green/Blue 0.5...)
+```
+
+### ⚠️ Trampa: claves repetidas
+
+`Sparse`/`Normal`/`Dense`/`VeryDense` aparecen **idénticas** en cinco secciones
+distintas. Un cambio sin acotar las toca todas. En los scripts lua hay que usar
+siempre `PRECEDING_KEY_WORDS` con el nombre de la sección.
+
+### Arquetipos hostiles ya existentes (oro para el mod)
+
+`CREATUREGENERATIONARCHETYPES` define, entre otros:
+
+- `DANGEROUS` → `GROUNDTABLEPLAYERPREDATORMED.MBIN`, `GROUNDTABLEPLAYERPREDATORLARGE.MBIN`
+- `HERD` → `GROUNDTABLEPREDATORLARGE.MBIN`
+- `WRDROLLPRED`, `WRDCRYSTALPRED` → depredadores del bioma Weird
+
+Es decir: **el juego ya trae depredadores que cazan al jugador**. No hay que
+inventar comportamiento hostil, solo subir su peso en las tablas de spawn.
+Encaja perfecto con la Ruta A.
 
 ## 6. Estructura de carpetas de trabajo
 
@@ -195,10 +246,14 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
 
 **Meta:** entorno vivo. Un decompile de prueba OK.
 
-### Fase 1 — Comportamiento + spawn (núcleo, era Fase 2)
-- [ ] Localizar `CREATUREGENERATIONDATA` vía Modding Station.
-- [ ] Script lua mínimo: cambiar UN valor. Buildear. Cargar. Confirmar cambio in-game.
-- [ ] Editar rol → forzar depredador / hostil.
+### Fase 1 — Comportamiento + spawn (núcleo, era Fase 2) ← EN CURSO
+- [x] Localizado: `METADATA\SIMULATION\ECOSYSTEM\CREATUREGENERATIONDATA.MBIN`,
+      dentro de `NMSARC.Precache.pak`. Extraído y decompilado (§5c).
+- [x] Script lua escrito: `work\scripts\HorribleTerror_GroundDensity.lua`.
+      Multiplica x3 `GroundGroupsPerKm`. Copiado a `tools\AMUMSS\ModScript\`.
+- [ ] Correr `BUILDMOD.bat`. Copiar salida a `GAMEDATA\MODS\`.
+- [ ] **Confirmar el cambio in-game.** ← el hito
+- [ ] Editar rol → forzar depredador / hostil (vía arquetipo `DANGEROUS`).
 - [ ] Ajustar tamaño (más grande = más amenazante).
 - [ ] Controlar en qué planetas/biomas aparecen.
 
@@ -263,8 +318,8 @@ Verificado en la primera corrida: sin `.lua` en `ModScript\`, AMUMSS avisa
 | Cosa | Estado |
 |---|---|
 | NMS instalado | ✅ `C:\Program Files (x86)\Steam\steamapps\common\No Man's Sky` |
-| **Rama del juego** | ⚠️ **EXPERIMENTAL**, versión 170671 |
-| MBINCompiler | ✅ 6.45.0.1 (el que pide Experimental) |
+| **Rama del juego** | ✅ **PUBLIC**, versión 170671 (buildid 24039799) |
+| MBINCompiler | ✅ 6.45.0.1 — 'latest' y 'public' coinciden |
 | Carpeta de mods real | ✅ `GAMEDATA\MODS\` — ver §10d |
 | Mods instalados | 87 activos, gestionados por Vortex |
 | `DISABLEMODS.TXT` | ✅ ausente → carga de mods habilitada |
