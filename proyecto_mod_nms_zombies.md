@@ -446,6 +446,48 @@ más recientes y avisa si NMS está abierto (un save a medio escribir no sirve d
 Verificado en la primera corrida: sin `.lua` en `ModScript\`, AMUMSS avisa
 "NO user .lua Mod Script found" y termina sin hacer nada. Comportamiento correcto.
 
+### 8b. Qué contestar a los prompts de `BUILDMOD.bat`
+
+Salen siempre en este orden. Los tres primeros son fijos; **el único que se piensa
+es el último.**
+
+| # | Prompt | Respuesta | Por qué |
+|---|---|---|---|
+| 1 | `[F]ULL, [D]EV or [L]EAN mode` | **F** | FULL genera los ficheros de ayuda (MapFileTrees, ArrayInfo) que hacen falta para localizar keywords. LEAN los omite. |
+| 2 | `NMS version [P]ublic or [E]xperimental` | **P** | Confirmado por el manifest de Steam (§10). No cambiar salvo que se cambie de rama. |
+| 3 | `COMBINED[Y] or INDIVIDUAL[N]` | **N** | Solo aparece con 2+ scripts. Individual = un mod por script, se activan y desactivan por separado. Solo se combina si dos scripts tocan **el mismo** archivo y se quieren fusionar. |
+| 4 | `COPY … [Y,N]` o `[N]ot [S]ome [A]ll` | **depende** ↓ | |
+
+**La regla del prompt 4 — la única decisión real:**
+
+> **`N`** si algún script es nuevo o se tocó desde la última build.
+> **`A`** si todos los scripts ya se verificaron y no han cambiado.
+
+Con `N` el mod se queda en `tools\AMUMSS\CreatedMODS\` sin tocar el juego. Ahí se
+revisa el EXML delta y, si está bien, se copia a mano a `GAMEDATA\MODS\`.
+
+El prompt 4 cambia de forma según cuántos scripts haya: con uno es `[Y,N]`, con
+varios es `[N]ot / [S]ome / [A]ll`. `N` significa lo mismo en ambos.
+
+### 8c. "0 [ERROR] detected" NO significa que el mod esté bien
+
+Aprendido a la mala. Ese contador solo dice que el script es sintácticamente válido
+y que encontró **algo** que cambiar. No dice que cambiara lo correcto.
+
+Un script con `WHERE_IN_SECTION` mal entendido reportó `0 [ERROR]`, `0 [WARNING]` y
+`22 CHANGE(s) made` — y hacía justo lo contrario de lo pedido (§10h).
+
+**Lo que sí es prueba: el EXML delta desplegado.** Al ser un parche parcial, lista
+exactamente qué propiedades se tocaron y ninguna más. Se lee en dos segundos.
+
+Rutina de verificación, en orden de coste:
+
+1. **Conteo de cambios** en la salida (`>>>>> N CHANGE(s) made`). ¿Es el número que
+   esperabas? Si no cuadra, para aquí.
+2. **Leer el EXML delta** en `CreatedMODS\<Mod>\…\*.EXML`. ¿Solo las propiedades
+   que querías?
+3. **In-game.** Lo único que confirma que el cambio hace lo que crees.
+
 ---
 
 ## 9. Publicación Nexus
@@ -500,6 +542,50 @@ Vortex controla — se lo puede llevar por delante en el siguiente deploy.
 
 Detalle útil: muchos autores **incluyen su `.lua`**. Son ejemplos reales y funcionales
 de scripts AMUMSS contra la versión actual del juego. Material de estudio gratis.
+
+### 10h. `WHERE_IN_SECTION` filtra secciones, no localiza sub-secciones
+
+Error real, costó un mod desplegado mal. Anotado para no repetirlo.
+
+**Lo que se quería:** en `Generic → Ground`, cambiar solo el `Weight ` de la entrada
+cuyo `Archetype` es `DANGEROUS`.
+
+**Lo que se escribió:**
+```lua
+["PRECEDING_KEY_WORDS"] = {"Generic"},
+["WHERE_IN_SECTION"]    = {{"Archetype", "DANGEROUS"}},
+["VALUE_CHANGE_TABLE"]  = { {"Weight ", "1000.000000"} },
+```
+
+**Lo que pasó:** 22 cambios. Todos los pesos de `Generic` a 1000 — `Ground`(11),
+`Air`(7), `Cave`(2), `Water`(2).
+
+**Por qué:** `WIS` es un **filtro** de secciones, no un localizador. `PKW` seleccionó
+el bloque `Generic` entero; `WIS` preguntó "¿este bloque contiene
+`Archetype=DANGEROUS`?" → sí → sección válida → y el VCT reescribió **todos** los
+`Weight ` de dentro.
+
+Peor aún, el efecto era silencioso: todos los pesos iguales = reparto plano.
+`DANGEROUS` se quedaba en el mismo 9.1% de vanilla, y de paso aplastaba `Air`
+(`DEFAULT` del 52% al 14%). Un mod que parecía funcionar y empeoraba el juego.
+
+**Lo correcto — `SKW` con dos pares:**
+```lua
+["SPECIAL_KEY_WORDS"] =
+{
+  "Generic",   "GcCreatureGenerationWeightedList",  -- fija la seccion
+  "Archetype", "DANGEROUS",                         -- localiza la linea
+},
+["REPLACE_TYPE"]       = "ONCE",
+["VALUE_CHANGE_TABLE"] = { {"Weight ", "1000.000000"} },
+```
+Resultado: 1 cambio, línea 646, `_index="3"`. Verificado en el EXML delta.
+
+**Regla general:** para bajar a un hermano concreto dentro de una lista, `SKW` con
+pares encadenados. `WIS` solo sirve para *descartar* secciones enteras.
+
+Localizar por nombre de arquetipo y no por `_index` es deliberado: si NMS reordena
+la lista en un update, el script sigue apuntando bien.
 
 ### 10g. Dónde queda un mod archivado
 

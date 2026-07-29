@@ -109,6 +109,17 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   1000 → 99% de planetas infestados. Se sube un peso en vez de bajar los otros
   diez: mismo efecto, un solo cambio, menos que romper en updates y menos choque
   con otros mods.
+- **Bug corregido antes de llegar al juego** (§10h): la primera versión usaba
+  `WHERE_IN_SECTION` y puso a 1000 los 22 pesos de `Generic`, no solo el de
+  `DANGEROUS`. `WIS` filtra secciones enteras, no localiza sub-secciones. La
+  versión buena usa `SPECIAL_KEY_WORDS` con dos pares encadenados: 1 cambio.
+- Documentado que `0 [ERROR] detected` no prueba nada sobre la corrección del mod
+  (§8c). El bug de arriba reportó 0 errores y 0 warnings. Lo que sí prueba es leer
+  el EXML delta, que al ser parche parcial lista exactamente lo que se tocó.
+- Añadida al doc la guía de respuestas a los prompts de `BUILDMOD.bat` (§8b), con
+  la regla del prompt de copiar: `N` si algún script cambió, `A` si ya se verificó.
+- Desplegados `HorribleTerror_PredatorWorlds` y `HorribleTerror_GroundDensity`
+  tras verificar el delta de ambos.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD
