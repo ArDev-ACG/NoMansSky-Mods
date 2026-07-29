@@ -1,0 +1,56 @@
+# ---------------------------------------------------------------
+# NMS_MOD_ZOMBIES — .gitignore
+#
+# Regla base: al repo solo van FUENTES PROPIAS (scripts lua, docs).
+# NUNCA van assets del juego. Son propiedad de Hello Games; subirlos
+# a un repo publico es redistribucion no autorizada.
+# ---------------------------------------------------------------
+
+# --- Assets del juego / binarios pesados (NUNCA subir) ---
+unpacked/
+build/
+tools/
+*.pak
+*.mbin
+*.MBIN
+*.exml
+*.EXML
+*.dds
+*.DDS
+*.mbin.PC
+BankSignatures.bin
+
+# --- Salidas de build de AMUMSS ---
+MODS/
+ModScript*.txt
+REPORT.txt
+*.log
+
+# --- Trabajo pesado local (opt-in manual si lo quieres versionar) ---
+work/models/
+work/textures/
+*.blend
+*.blend1
+*.psd
+*.xcf
+
+# --- Releases empaquetados (van a Nexus, no a git) ---
+releases/*
+!releases/.gitkeep
+
+# --- Config local de herramientas ---
+.claude/settings.local.json
+
+# --- Sistema / editor ---
+Thumbs.db
+desktop.ini
+Desktop.ini
+*.tmp
+*.bak
+~$*
+.vscode/
+.idea/
+
+# --- Excepciones: esto SI se versiona ---
+!.gitignore
+!.gitkeep
