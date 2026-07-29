@@ -187,13 +187,29 @@ Cada bioma trae su propia lista. Verificado: **los 47** `*COLOURPALETTES.MBIN` /
 Se excluye `METADATA\GAMESTATE\PLAYERDATA\CUSTOMISATIONCOLOURPALETTES.MBIN`: es la
 personalización del jugador, no fauna.
 
-### ⚠️ Trampa: `Underbelly` vs `BioShip_Underbelly`
+### `Underbelly` vs `BioShip_Underbelly` — falsa alarma, RESUELTO
 
 De los 64 nombres de paleta, `Underbelly` es el único con colisión de subcadena:
-existe también `BioShip_Underbelly` (naves vivientes). Si el match de
-`PRECEDING_KEY_WORDS` es por subcadena, cazará las dos. **Comprobar en `REPORT.lua`
-cuántas secciones `Underbelly` se tocaron por archivo** — si son 2 en vez de 1, hay
-que acotar el match. Las otras cuatro están limpias.
+existe también `BioShip_Underbelly` (naves vivientes). Se temía que
+`PRECEDING_KEY_WORDS` cazara las dos.
+
+**No ocurre.** Verificado sobre el EXML desplegado: el delta contiene exactamente
+las 5 paletas pedidas y `BioShip_Underbelly` no aparece. `PRECEDING_KEY_WORDS`
+empareja por **nombre exacto de sección**, no por subcadena.
+
+Dato útil para futuros scripts: no hace falta blindar los PKW contra nombres de
+propiedad que sean prefijo/sufijo de otros.
+
+### Cómo verificar que un cambio de paletas salió bien
+
+El conteo tiene que cuadrar exacto. Por archivo de bioma:
+
+```
+5 paletas x 64 colores x 3 canales (R,G,B) = 960 lineas '!# CHANGED'
+```
+
+Si sale más, el match se fue de sección. Si sale menos, alguna paleta no se
+encontró. El alpha (`A`) no se toca nunca y no entra en la cuenta.
 
 ---
 

@@ -72,9 +72,14 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   Scale 1318, Underbelly 512, Fur 470, Rock 402, Feather 128, Paint 113.
   `Rock` y `Paint` quedan fuera por estar compartidas con terreno y naves.
 - Verificado que los 47 archivos de paletas de bioma contienen las 5 paletas de piel.
-- Detectada la colisión de subcadena `Underbelly` / `BioShip_Underbelly`.
+- Detectada la colisión de subcadena `Underbelly` / `BioShip_Underbelly`, y
+  descartada tras la build: `PRECEDING_KEY_WORDS` empareja por nombre exacto de
+  sección, no por subcadena. Las naves vivientes no se ven afectadas.
 - Escrito `work/scripts/HorribleTerror_RedFauna.lua`: rojo carne en las 5 paletas
   × 47 archivos, como prueba de validación visual de la ruta de paletas.
+- Build de los dos mods: 0 errores, 0 warnings, 51 s. Desplegados como mods
+  individuales. `RedFauna` genera 47 EXML delta, 960 líneas cambiadas cada uno
+  (5 paletas × 64 colores × 3 canales) — el conteo cuadra exacto.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD
