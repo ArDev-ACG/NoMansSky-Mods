@@ -77,14 +77,46 @@
   ------------------------------------------------------------------
   COMO SE ACOTA EL CAMBIO
   ------------------------------------------------------------------
-  DANGEROUS aparece dos veces en el archivo: en 'Generic' y en
-  'PurpleSystemSpecific'. Se usa PKW = {"Generic"} para quedarse solo con
-  la primera. WHERE_IN_SECTION localiza la entrada por su Archetype, asi
-  no hace falta LINE_OFFSET ni depender del _index -- si NMS reordena la
-  lista en un update, el script sigue funcionando.
+  Cada entrada de la lista es un bloque con dos hijos:
 
-  --> COMPROBAR EN REPORT.lua que se hizo 1 cambio, no 2.
+      <Property name="Ground" value="GcCreature...DomainEntry" _index="3">
+          <Property name="Weight " value="1.000000" />
+          <Property name="Archetype" value="DANGEROUS" />
+      </Property>
+
+  Hay que cambiar el hermano ANTERIOR del Archetype que nos interesa. Se
+  usa SPECIAL_KEY_WORDS con dos pares:
+
+      par 1: ("Generic","GcCreatureGenerationWeightedList")  -> fija la seccion
+      par 2: ("Archetype","DANGEROUS")                       -> la linea exacta
+
+  El primer par es imprescindible: DANGEROUS aparece dos veces en el
+  archivo, en 'Generic' y en 'PurpleSystemSpecific'. Sin el, se tocarian
+  las dos.
+
+  Localizar por Archetype y no por _index es a proposito: si NMS reordena
+  la lista en un update, el script sigue apuntando al sitio correcto.
+
+  ------------------------------------------------------------------
+  INTENTO FALLIDO - NO VOLVER A ESTA VIA
+  ------------------------------------------------------------------
+  Primera version uso PKW = {"Generic"} + WHERE_IN_SECTION con el par
+  ("Archetype","DANGEROUS"). Resultado: 22 cambios en vez de 1. Puso a
+  1000 TODOS los pesos de Generic -- Ground(11) + Air(7) + Cave(2) +
+  Water(2).
+
+  Motivo: WHERE_IN_SECTION es un FILTRO de secciones, no un localizador
+  de sub-seccion. PKW selecciono el bloque 'Generic' entero, WIS comprobo
+  "¿contiene Archetype=DANGEROUS?" -> si -> y el VCT reescribio todos los
+  "Weight " de dentro.
+
+  Efecto real de aquel bug: todos los pesos iguales = reparto plano.
+  DANGEROUS se quedaba en 9.1%, igual que vanilla, y encima aplastaba Air
+  (DEFAULT del 52% al 14%). Peor que no tocar nada.
+
+  --> COMPROBAR EN REPORT.lua que se hace 1 cambio, no 22 ni 2.
       Si son 2, se colo el de PurpleSystemSpecific.
+      Construir con [N] (no copiar) hasta que el conteo sea 1.
 
   Archivo objetivo: METADATA\SIMULATION\ECOSYSTEM\CREATUREGENERATIONDATA.MBIN
 --]]
@@ -111,10 +143,14 @@ NMS_MOD_DEFINITION_CONTAINER =
           ["MXML_CHANGE_TABLE"] =
           {
             {
-              ["COMMENT"]             = "Generic/Ground: DANGEROUS 1.0 -> "..DANGEROUS_WEIGHT,
-              ["PRECEDING_KEY_WORDS"] = {"Generic"},
-              ["WHERE_IN_SECTION"]    = {{"Archetype", "DANGEROUS"}},
-              ["VALUE_CHANGE_TABLE"]  =
+              ["COMMENT"]            = "Generic/Ground: DANGEROUS 1.0 -> "..DANGEROUS_WEIGHT,
+              ["SPECIAL_KEY_WORDS"]  =
+              {
+                "Generic",   "GcCreatureGenerationWeightedList",
+                "Archetype", "DANGEROUS",
+              },
+              ["REPLACE_TYPE"]       = "ONCE",
+              ["VALUE_CHANGE_TABLE"] =
               {
                 {"Weight ", DANGEROUS_WEIGHT},
               }
