@@ -255,7 +255,8 @@ Se empieza por lo textual: valida el pipeline completo en una tarde, sin tocar a
       dentro de `NMSARC.Precache.pak`. Extraído y decompilado (§5c).
 - [x] Script lua escrito: `work\scripts\HorribleTerror_GroundDensity.lua`.
       Multiplica x3 `GroundGroupsPerKm`. Copiado a `tools\AMUMSS\ModScript\`.
-- [ ] Correr `BUILDMOD.bat`. Copiar salida a `GAMEDATA\MODS\`.
+- [x] `BUILDMOD.bat` corrido: 4 cambios, 0 errores, 0 warnings. Mod desplegado
+      solo a `GAMEDATA\MODS\HorribleTerror_GroundDensity\` (§10f).
 - [ ] **Confirmar el cambio in-game.** ← el hito
 - [ ] Editar rol → forzar depredador / hostil (vía arquetipo `DANGEROUS`).
 - [ ] Ajustar tamaño (más grande = más amenazante).
@@ -364,6 +365,34 @@ Vortex controla — se lo puede llevar por delante en el siguiente deploy.
 
 Detalle útil: muchos autores **incluyen su `.lua`**. Son ejemplos reales y funcionales
 de scripts AMUMSS contra la versión actual del juego. Material de estudio gratis.
+
+### 10f. AMUMSS despliega EXML delta, no MBIN — VERIFICADO
+
+Sorpresa útil de la primera build real. AMUMSS 5.6.2.0w compila el MBIN completo,
+pero **lo que copia a `GAMEDATA\MODS\` es un EXML parcial** con solo las propiedades
+tocadas:
+
+```xml
+<Data template="cGcCreatureGenerationData">
+  <Property name="GroundGroupsPerKm">
+    <Property name="Sparse" value="75.000000" /> !# CHANGED
+    ...
+```
+
+496 bytes frente a los ~90 KB de la tabla entera. El MBIN completo queda en
+`tools\AMUMSS\ModBackups\` y `MODBUILDER\MOD\`, sin desplegar.
+
+**No es un fallo.** Comprobado contra los 87 mods instalados: 21 usan el mismo
+formato y dos de ellos (`10x_Industrial_Waste_Spawn`, `Exocraft Inventory Improved`)
+shippean EXML-delta **sin MBIN alguno**. NMS 6.x lee overlays parciales desde la
+carpeta de mods.
+
+**Consecuencia para el proyecto:** el mod solo reclama las 4 propiedades que cambia,
+no la tabla completa. Otro mod que toque `CREATUREGENERATIONDATA` en otra sección
+puede convivir. Mucho mejor de cara a Nexus que shippear el MBIN entero.
+
+El `.pak` empaquetado sí existe (`ModBackups\________________BuildHistory\`) por si
+hace falta la vía clásica.
 
 ### 10e. Análisis de conflictos — LIMPIO
 

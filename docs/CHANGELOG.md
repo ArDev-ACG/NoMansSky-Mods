@@ -51,6 +51,13 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   de `CREATUREROLEDESCRIPTIONTABLE` son referencias muertas.
 - Documentada la distinción `PLAYERPREDATOR` (ataca al jugador) vs `PREDATOR`
   (caza otras criaturas) — determinante para un mod de terror.
+- **Primera build real del mod.** `BUILDMOD.bat` sobre
+  `HorribleTerror_GroundDensity.lua`: 4 cambios aplicados, 0 errores, 0 warnings,
+  4 segundos. Desplegado a `GAMEDATA\MODS\HorribleTerror_GroundDensity\`.
+- Descubierto que AMUMSS despliega un **EXML delta** (solo las propiedades tocadas,
+  496 B) en vez del MBIN completo. Verificado contra los mods instalados: formato
+  válido en NMS 6.x, y reduce mucho la superficie de conflicto. Ver §10f.
+- Backup de saves previo a la prueba: `backups\NMS_saves_2026-07-29_0130_antes-densidad-x3\`.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD
