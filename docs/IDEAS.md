@@ -1,0 +1,339 @@
+# Ideas y mapa de spawn — Horrible Terror
+
+Documento de trabajo. Todo lo de aquí está **verificado contra la instalación local**
+(NMS 170671, MBINCompiler 6.45.0.1) salvo donde diga `[Inferencia]` o `[Sin probar]`.
+
+Sirve para dos cosas: decidir qué tocar a continuación, y no volver a investigar lo
+mismo dentro de un mes.
+
+---
+
+## 0. Estado actual del mod
+
+| Cambio | Dónde | Estado |
+|---|---|---|
+| Densidad terrestre x20 | `CREATUREGENERATIONDATA` → `GroundGroupsPerKm` | ✅ probado in-game |
+| `DANGEROUS` peso 1→1000 | `CREATUREGENERATIONDATA` → `Generic/Ground` | ✅ probado in-game |
+| Paletas de piel en rojo | 47 × `*COLOURPALETTES` | ✅ probado, archivado |
+
+Los dos primeros viven ahora en un solo script, `HorribleTerror_Ecosystem.lua`.
+
+**Regla dura aprendida:** dos mods nuestros nunca pueden escribir el mismo archivo.
+Escribieron los dos `CREATUREGENERATIONDATA.EXML` y el resultado fue planetas sin
+fauna. Todo lo que toque ese archivo va en el script unificado.
+
+---
+
+## 1. LO MÁS IMPORTANTE: hay DOS caminos de spawn, no uno
+
+Hasta ahora solo hemos usado el primero. El segundo es el que abre casi todo lo que
+pediste.
+
+### Camino A — Ecosistema procedural (arquetipos)
+
+```
+CREATUREGENERATIONDATA
+   Generic -> Ground        lista ponderada de arquetipos
+        v
+CREATUREGENERATIONARCHETYPES
+   DANGEROUS -> lista de tablas de spawn
+        v
+ECOSYSTEM/GROUND/GROUNDTABLE*.MBIN
+   roles, tamaños, tamaño de grupo, densidad
+        v
+   criatura procedural generada por semilla del planeta
+```
+
+- **Alcance:** planeta entero, uniforme.
+- **Criaturas:** procedurales, distintas en cada planeta.
+- **Control de sitio:** ninguno. No puedes decir "aquí sí, allí no".
+- **Es lo que ya tocamos.**
+
+### Camino B — Objetos de bioma (colocación directa) ← SIN EXPLORAR
+
+```
+BIOMES/<X>/<X>OBJECTS*.MBIN   (y BIOMES/OBJECTS/RARE/*.MBIN)
+   cGcExternalObjectList
+        v
+   GcEnvironmentSpawnData
+        +-- Objects        <- rocas, plantas, props
+        +-- Creatures      <- CRIATURAS. Aquí está la clave.
+        +-- Landmarks
+        +-- DistantObjects
+```
+
+`GcEnvironmentSpawnData.Creatures` es una lista de `GcCreatureSpawnData`: criaturas
+colocadas **junto a la colocación de objetos**, no por el ecosistema.
+
+**Ejemplo real y funcional:** `biomes/rocky/rockobjectsfull.MBIN` coloca pájaros así:
+
+```xml
+<Property name="Creatures">
+  <Property name="Creatures" value="GcCreatureSpawnData" _index="0">
+    <Property name="Filename" value="MODELS/PLANETS/CREATURES/SMALLBIRD/BIRD.SCENE.MBIN" />
+    <Property name="CreatureID" value="BIRD" />
+    <Property name="CreatureRole" value="Bird" />
+    <Property name="CreatureMinGroupSize" value="1" />
+    <Property name="CreatureMaxGroupSize" value="10" />
+    <Property name="CreatureGroupsPerSquareKm" value="50.000000" />
+    <Property name="CreatureSpawnDistance" value="25.000000" />
+    <Property name="CreatureDespawnDistance" value="30.000000" />
+    <Property name="CreatureActiveInDayChance" value="1.000000" />
+    <Property name="CreatureActiveInNightChance" value="1.000000" />
+    <Property name="HemiSphere" value="Any" />
+    ...
+```
+
+**Por qué importa esto para el mod:**
+
+- Permite **criatura concreta**, no procedural. Un bicho fijo, siempre igual.
+- Permite **convivir** con el ecosistema: los depredadores del camino A siguen
+  saliendo, y encima añades los tuyos.
+- Es el camino para "más de una clase por planeta" — que es exactamente lo que
+  preguntaste. Los arquetipos te dan UNA lista por planeta; los objetos de bioma se
+  suman por encima.
+- Es la vía más cercana a "manadas que se acercan a los edificios" (§4).
+
+**Lo que NO sabemos todavía** `[Sin probar]`: si `Creatures` respeta `LifeChance` del
+planeta o ignora el ecosistema por completo. Solo un pájaro vanilla lo usa, así que
+hay poco precedente del que copiar. Merece una prueba dedicada.
+
+---
+
+## 2. Los monstruos de los edificios: se llaman FIEND
+
+Identificados. En el juego son los "Horrores Biológicos"; en los archivos, **FIEND**.
+
+### Assets
+
+| Qué | Ruta |
+|---|---|
+| **Rig** | `MODELS/PLANETS/CREATURES/SPIDERRIG/` — reusa el rig de araña |
+| Animaciones | `SPIDERRIG/ANIM/FIENDATTACK{,2,3}`, `FIENDBURY`, `FIENDDEATH01`, `FIENDEAT`, `FIENDFASTWALK` |
+| **Huevo** | `MODELS/PLANETS/BIOMES/COMMON/RARERESOURCE/GROUND/FIENDEGG.SCENE.MBIN` |
+| Anims del huevo | `FIENDEGG_HATCH`, `FIENDEGG_IDLE`, `FIENDEGG_NEARIDLE` |
+| Proyectil | `MODELS/COMMON/PROJECTILES/FIENDSPITBALL.SCENE.MBIN` |
+| Efectos | `FIENDBLOODSPLAT`, `FIENDDEATH`, `FIENDEXPLODE`, `FIENDDEBRIS` |
+| Variantes | `ARTHROPOD/BUGFIEND`, `FISH/FISHFIEND`, `FISH/FISHFIENDSMALL` |
+
+### Spawn — NO usa el ecosistema
+
+Esto es lo importante y es contraintuitivo:
+
+```
+METADATA/SIMULATION/SOLARSYSTEM/BIOMES/OBJECTS/RARE/FIENDEGGS.MBIN
+METADATA/SIMULATION/SOLARSYSTEM/BIOMES/OBJECTS/RARE/INFESTATION.MBIN
+```
+
+Son listas de **objetos de bioma** (camino B), no tablas de fauna. El huevo se coloca
+como si fuera una planta y el bicho sale de ahí.
+
+`GROUNDTABLEFIEND.MBIN` existe pero está en `ECOSYSTEM/DEPRECATE/` — vía muerta, no
+perder tiempo ahí.
+
+**`INFESTATION.MBIN`** es oro puro para este mod. Coloca:
+- `FIENDEGG.SCENE.MBIN` ×2 (dos entradas con densidades distintas)
+- `SANDWORMMINI/GROUNDWORMSPAWNER.SCENE.MBIN`
+
+Densidades vanilla en `FIENDEGGS.MBIN`: `Coverage 0.1`, `FlatDensity 0.005`,
+`Placement FLORACLUMP`, `MaxScale 1.7`. Son valores **muy bajos** — por eso los
+huevos son raros.
+
+### Comportamiento — `GcCreatureFiendAttackData`, 39 campos
+
+Los más jugosos:
+
+| Campo | Vanilla | Para qué sirve |
+|---|---|---|
+| `NearDist` / `FarDist` | 6 / 10 | distancias de decisión de ataque |
+| `AllowPounce` | `true` | salto sobre el jugador |
+| `DelayBetweenPounceAttacks` | 2.0 | cadencia del salto |
+| `AllowSpit` | `true` | escupitajo a distancia |
+| `AOESpitAttack` | `false` | escupitajo en área |
+| `AllowSpitAlways` | `false` | escupir sin condiciones |
+| `DelayBetweenSpitAttacks` | 1.0 | cadencia |
+| **`AllowSpawnBrood`** | **`false`** | **el bicho engendra crías** |
+| `SpawnBroodID` / `SpawnBroodTimer` | vacío / 0 | qué engendra y cada cuánto |
+| `AllowPushBackAttack` | `false` | empujón |
+| `PushBackRange` | 5.0 | alcance |
+| `MinFlurryHits` / `MaxFlurryHits` | 2 / 4 | golpes por ráfaga |
+
+`AllowSpawnBrood = false` es la línea más interesante del archivo entero. Está
+implementado y apagado. Encenderlo daría bichos que se multiplican mientras luchas.
+`[Sin probar]` — hay que averiguar qué acepta `SpawnBroodID`.
+
+Existe además `GcCreatureSpookFiendAttackData`, una variante aparte. Sin explorar.
+
+---
+
+## 3. Manadas: qué se puede configurar
+
+No hay "un" sistema de manada. Hay **cuatro**, en capas distintas.
+
+### 3.1 Tamaño de grupo — en las tablas de spawn
+
+`ECOSYSTEM/GROUND/GROUNDTABLE*.MBIN`, dentro de `GcCreatureRoleDescription`:
+
+| Campo | En `PLAYERPREDATORMED` | Qué hace |
+|---|---|---|
+| `MinGroupSize` / `MaxGroupSize` | **1 / 1** | ← depredadores van SOLOS |
+| `Density` | `Normal` | multiplicador dentro de la tabla |
+| `MinSize` / `MaxSize` | `Medium` / `Medium` | clase de tamaño |
+| `ActiveTime` | `AnyTime` | día / noche / siempre |
+| `ProbabilityOfBeingEnabled` | 1.0 | probabilidad de que la entrada exista |
+| `IncreasedSpawnDistance` | 1.0 | a qué distancia aparece |
+| `CreatureRole` | `PlayerPredator` | rol de comportamiento |
+| `LifeLevel` | `Full` | nivel de vida mínimo del planeta |
+
+**`MinGroupSize = MaxGroupSize = 1` es el hallazgo accionable más directo.** Los
+depredadores que cazan al jugador salen de uno en uno por diseño. Subir esto a 3-5
+convierte cada encuentro en una jauría. Un cambio, efecto enorme.
+
+### 3.2 Freno global de manada
+
+`CREATUREGENERATIONDATA` → `HerdCreaturePenalty = 0.5`. Las criaturas de manada
+cuentan doble contra el presupuesto de densidad. Subirlo a 1.0 permite manadas más
+grandes sin tocar nada más.
+
+### 3.3 Movimiento en grupo — `CREATUREDATATABLE`
+
+Dos estructuras según el tipo de bicho:
+
+**`GcCreatureFlockMovementData`** (24 campos) — bandadas, aves:
+
+```
+MinFlockMembers 7      MaxFlockMembers 12
+FlockCohere 3.0        FlockSeperate 7.0      FlockAlign 0.1
+FlockSeperateMinDist 2.0    FlockSeperateMaxDist 6.0
+FlockAvoidPredators 10.0    MinDist 20.0   MaxDist 40.0
+FlockAvoidPredatorsSpeedBoost 0.3
+FlockMoveSpeed 0.7     FlockTurnAngle 7.0     FlockHysteresis 0.5
+```
+
+**`GcCreatureSwarmData`** (57 campos) — enjambres:
+
+```
+MinCount 3   MaxCount 7
+SwarmMovementSpeed 1.0   SwarmMovementRadius 40.0   SwarmMovementType Random
+Coherence 0.5   Alignment 0.1   SeparateStrength 0.5   Spacing 2.0
+Follow 1.0      AlignTime 0.5   AttractedToBait false
+```
+
+`AttractedToBait` engancha con el sistema de cebo del jugador. Sin explorar.
+
+Además hay un booleano suelto `Herd` (vanilla `false` en las entradas vistas).
+
+### 3.4 Comportamiento — `CREATUREBEHAVIOURTREES`
+
+**8 árboles:** `MELEE`, `RANGED_SPIT`, `RANGED_FIRE`, `IDLE`, `HERBIVORE`, `FLYING`,
+`CRASHY`, `COOLDOWN`.
+
+Son árboles de comportamiento completos, con nodos anidados. El de `MELEE`:
+
+```
+CheckDeath -> Appear(GRNDAPPEAR) -> MELEE
+   RegisterAttacker(TARGET)
+   MOVE_CLOSE: GetTarget -> MoveToTarget
+        ArriveDist 1.0   BehaviourMoveSpeed Normal
+        DynamicMoveSlowdownDistMul 4.0   SpeedModifier 1.0
+        AvoidCreaturesStrength 0.0
+   ATTACK: FaceTarget(ArriveAngle 5.0) -> HIT -> ...
+```
+
+Editable, pero es la capa más frágil y la más costosa. **No empezar por aquí.**
+`AvoidCreaturesStrength = 0` es curioso: los atacantes no se esquivan entre sí, lo
+que significa que una jauría se amontonaría. Relevante si subimos el tamaño de grupo.
+
+---
+
+## 4. Tus preguntas, con opciones
+
+### "¿Podemos poner más de una clase por planeta, no solo depredadores?"
+
+**Sí, y hay tres formas.** De menos a más trabajo:
+
+**Opción 1 — Añadir tablas al arquetipo `DANGEROUS`.** Es la más barata. El
+arquetipo ya tiene `AdditionalTables` con `MaxTablesToAdd = 1`. Subir ese número y
+añadir tablas mete más variedad en el mismo planeta.
+*Coste: bajo. Riesgo: bajo. Efecto: variedad, pero sigue siendo procedural.*
+
+**Opción 2 — Crear un arquetipo propio.** En vez de reutilizar `DANGEROUS`, añadir
+`HT_INFESTED` con la mezcla exacta que quieras y darle el peso. Más limpio de cara a
+Nexus: no pisas un arquetipo vanilla, añades el tuyo.
+*Coste: medio. Riesgo: medio (hay que añadir sección entera, no solo cambiar valores).
+Efecto: control total del reparto.* ← **mi recomendación**
+
+**Opción 3 — Camino B, criaturas por objeto de bioma.** Criaturas fijas encima del
+ecosistema. Es la única que da criaturas *idénticas* en todos los planetas.
+*Coste: alto. Riesgo: alto ([Sin probar]). Efecto: el más potente.*
+
+### "¿Que las manadas se acerquen a los edificios?"
+
+Honestamente: **no hay una palanca directa para "ir hacia los edificios".** El árbol
+de comportamiento persigue `TARGET`, y `TARGET` es el jugador o una presa, no una
+estructura. Hacer que la fauna patrulle POIs querría nodos de comportamiento nuevos,
+que es territorio de Ruta C (bloqueado).
+
+Lo que **sí** se puede hacer, y da la misma sensación:
+
+**Opción A — Densidad ligada al objeto.** Camino B: las criaturas de
+`GcEnvironmentSpawnData` se colocan con la misma pasada que los objetos de esa lista.
+Si metes criaturas en la lista de objetos que acompaña a un tipo de edificio, salen
+*cerca* de él. No es que "vayan" — es que nacen ahí.
+*Es la aproximación realista, y visualmente indistinguible del resultado que quieres.*
+
+**Opción B — Vía huevos.** Subir la densidad de `FIENDEGGS` / `INFESTATION` y hacer
+que aparezcan en más biomas. Los huevos ya generan Fiends al acercarte. Es un
+spawner por proximidad **que ya funciona en vanilla**, gratis.
+*Coste: bajísimo — son dos números, `Coverage` y `FlatDensity`.* ← **empezar por aquí**
+
+**Opción C — Aceptar que no y compensar.** Densidad global alta + depredadores.
+Ya lo tienes. Si hay bichos por todas partes, también los hay junto a los edificios.
+
+### "¿Spawn por bioma o por building?"
+
+- **Por bioma: sí, y de dos maneras.** `BiomeSpecific → <bioma> → Ground` en
+  `CREATUREGENERATIONDATA` (hoy vacío para los biomas normales — se puede rellenar), y
+  las listas `<X>OBJECTS*.MBIN` de cada bioma.
+- **Por edificio: no directamente** `[Inferencia]`. Los edificios se colocan por otro
+  sistema. Lo más cercano es la Opción A de arriba: ligar criaturas a la lista de
+  objetos del bioma donde aparece ese edificio.
+
+---
+
+## 5. Cola de trabajo propuesta
+
+Ordenada por relación efecto/coste. Los tres primeros son cambios de un número.
+
+| # | Idea | Archivo | Coste | Efecto |
+|---|---|---|---|---|
+| 1 | `MinGroupSize`/`MaxGroupSize` 1→3-5 en `PLAYERPREDATOR*` | `GROUND/GROUNDTABLEPLAYERPREDATOR{MED,LARGE}` | bajo | **jaurías en vez de bichos sueltos** |
+| 2 | Subir `Coverage`/`FlatDensity` de `FIENDEGGS` | `OBJECTS/RARE/FIENDEGGS` | bajo | Horrores Biológicos habituales |
+| 3 | `HerdCreaturePenalty` 0.5→1.0 | `CREATUREGENERATIONDATA` | bajo | manadas más grandes |
+| 4 | Meter `INFESTATION` en más biomas | listas `<X>OBJECTS*` | medio | zonas infestadas |
+| 5 | `AllowSpawnBrood = true` en Fiends | `CREATUREDATATABLE` | medio | bichos que se multiplican |
+| 6 | Arquetipo propio `HT_INFESTED` | `CREATUREGENERATIONARCHETYPES` | medio | control total del reparto |
+| 7 | `MaxTablesToAdd` en `DANGEROUS` | `CREATUREGENERATIONARCHETYPES` | bajo | más variedad por planeta |
+| 8 | Criaturas fijas vía camino B | `<X>OBJECTS*` | alto | criatura firma del mod |
+| 9 | Retoques de `MELEE` | `CREATUREBEHAVIOURTREES` | alto | agresividad fina |
+
+**Siguiente paso recomendado: la 1.** `MinGroupSize = MaxGroupSize = 1` es la razón
+de que los depredadores se sientan poca cosa pese al x20 de densidad — hay mucha
+fauna, pero los que te atacan van de uno en uno. Es un cambio de dos números en dos
+archivos y cambia por completo la sensación del mod.
+
+Ojo: esos archivos son **nuevos** (`GROUNDTABLEPLAYERPREDATOR*`), no
+`CREATUREGENERATIONDATA`. Pueden ir en un script aparte sin riesgo de colisión.
+
+---
+
+## 6. Preguntas abiertas
+
+- `[Sin probar]` ¿`GcEnvironmentSpawnData.Creatures` respeta `LifeChance` del planeta?
+- `[Sin probar]` ¿Qué acepta `SpawnBroodID`? ¿Un `CreatureID`, un archivo, un rol?
+- `[Sin probar]` ¿Qué es `GcCreatureSpookFiendAttackData` y quién lo usa?
+- `[Sin probar]` ¿`AttractedToBait` funciona con el cebo del jugador?
+- `[Inferencia]` ¿Rellenar `BiomeSpecific → Lush → Ground` anula `Generic` para ese
+  bioma, o se suman? `OverrideAllDomains = true` sugiere que anula — sin confirmar.
+- ¿Hay límite duro de criaturas simultáneas? Relevante antes de subir grupos y
+  densidad a la vez.

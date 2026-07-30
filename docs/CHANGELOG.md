@@ -120,6 +120,40 @@ los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
   la regla del prompt de copiar: `N` si algún script cambió, `A` si ya se verificó.
 - Desplegados `HorribleTerror_PredatorWorlds` y `HorribleTerror_GroundDensity`
   tras verificar el delta de ambos.
+- **Confirmado in-game:** la densidad se ve, hay más depredadores y atacan.
+
+### Fase 1 — colisión de mods y unificación
+
+- **Bug: planetas sin fauna.** Causa: los dos mods escribían la misma ruta
+  `CREATUREGENERATIONDATA.EXML`, justo lo que AMUMSS avisa en el prompt de
+  COMBINED/INDIVIDUAL. Corregida la regla del §8b: `INDIVIDUAL` solo vale si los
+  scripts tocan archivos distintos (§10i).
+- Fusionados los dos scripts en `work/scripts/HorribleTerror_Ecosystem.lua`.
+  Los antiguos pasan a `Disabled scripts and paks/`.
+- Verificado que en vanilla **solo los planetas de vida `Full` tienen fauna
+  terrestre**: `LifeChance` es `Dead 0 / Low 0 / Mid 0 / Full 1`, y las 21 tablas
+  de spawn terrestre exigen `LifeLevel = Full` salvo `groundtablealien` (`Mid`).
+  Los planetas pelados que se veían antes del mod eran normales.
+
+### Investigación — mapa de spawn (docs/IDEAS.md)
+
+- **Descubierto un segundo camino de spawn**: `GcEnvironmentSpawnData.Creatures`
+  dentro de las listas de objetos de bioma. Permite criaturas fijas ligadas a la
+  colocación de objetos, en paralelo al ecosistema procedural. Ejemplo vanilla
+  funcional en `biomes/rocky/rockobjectsfull`.
+- **Identificados los monstruos de edificios: `FIEND`.** Usan el `SPIDERRIG`. No
+  salen del ecosistema sino de objetos de bioma:
+  `BIOMES/OBJECTS/RARE/FIENDEGGS.MBIN` e `INFESTATION.MBIN`.
+  `GROUNDTABLEFIEND` está en `DEPRECATE/`, es vía muerta.
+- Mapeados los cuatro sistemas de manada: tamaño de grupo en las tablas de spawn,
+  `HerdCreaturePenalty` global, `GcCreatureFlockMovementData` (24 campos) y
+  `GcCreatureSwarmData` (57), y los 8 árboles de `CREATUREBEHAVIOURTREES`.
+- **Hallazgo accionable:** `PLAYERPREDATORMED`/`LARGE` tienen
+  `MinGroupSize = MaxGroupSize = 1`. Los depredadores que cazan al jugador salen
+  solos por diseño. Es la razón de que se sientan poca cosa pese al x20.
+- Documentado `GcCreatureFiendAttackData` (39 campos), con `AllowSpawnBrood`
+  implementado pero apagado en vanilla.
+- Creado `docs/IDEAS.md` con el mapa completo y la cola de trabajo priorizada.
 
 <!--
 ## [0.1.0] - AAAA-MM-DD

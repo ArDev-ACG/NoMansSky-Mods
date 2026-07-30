@@ -216,6 +216,10 @@ encontró. El alpha (`A`) no se toca nunca y no entra en la cuenta.
 > **Referencia completa de fauna, arquetipos, roles, edificios y naves:**
 > [`docs/FAUNA_REFERENCE.md`](docs/FAUNA_REFERENCE.md)
 > Ahí está el detalle archivo por archivo. Lo de abajo es el resumen.
+>
+> **Mapa de spawn, manadas, Fiends y cola de ideas:** [`docs/IDEAS.md`](docs/IDEAS.md)
+> Incluye el segundo camino de spawn (objetos de bioma), los monstruos de edificios
+> y la lista priorizada de qué tocar a continuación.
 
 ## 5c. Mapa del ecosistema — VERIFICADO
 
@@ -455,7 +459,7 @@ es el último.**
 |---|---|---|---|
 | 1 | `[F]ULL, [D]EV or [L]EAN mode` | **F** | FULL genera los ficheros de ayuda (MapFileTrees, ArrayInfo) que hacen falta para localizar keywords. LEAN los omite. |
 | 2 | `NMS version [P]ublic or [E]xperimental` | **P** | Confirmado por el manifest de Steam (§10). No cambiar salvo que se cambie de rama. |
-| 3 | `COMBINED[Y] or INDIVIDUAL[N]` | **N** | Solo aparece con 2+ scripts. Individual = un mod por script, se activan y desactivan por separado. Solo se combina si dos scripts tocan **el mismo** archivo y se quieren fusionar. |
+| 3 | `COMBINED[Y] or INDIVIDUAL[N]` | **N**, pero ver §10i | Solo aparece con 2+ scripts. `N` **solo si los scripts tocan archivos distintos**. Si dos tocan el mismo archivo, INDIVIDUAL los rompe — hay que fusionarlos o usar COMBINED. |
 | 4 | `COPY … [Y,N]` o `[N]ot [S]ome [A]ll` | **depende** ↓ | |
 
 **La regla del prompt 4 — la única decisión real:**
@@ -542,6 +546,42 @@ Vortex controla — se lo puede llevar por delante en el siguiente deploy.
 
 Detalle útil: muchos autores **incluyen su `.lua`**. Son ejemplos reales y funcionales
 de scripts AMUMSS contra la versión actual del juego. Material de estudio gratis.
+
+### 10i. ⚠️ REGLA: dos mods nuestros nunca escriben el mismo archivo
+
+Costó una sesión de juego con planetas vacíos.
+
+`HorribleTerror_GroundDensity` y `HorribleTerror_PredatorWorlds` se construyeron como
+mods **individuales** y los dos escribían la misma ruta:
+
+```
+METADATA/SIMULATION/ECOSYSTEM/CREATUREGENERATIONDATA.EXML
+```
+
+Síntoma in-game: **planetas sin fauna ninguna**. AMUMSS avisa de esto literalmente en
+el prompt de COMBINED/INDIVIDUAL:
+
+> *"If they modify the same original EXML files, the last one loaded will win and the
+> other changes will be lost"*
+
+[Inferencia] El mecanismo exacto no se pudo verificar desde fuera. Lo más probable es
+que el merge de dos parches parciales sobre el mismo archivo deje el
+`CREATUREGENERATIONDATA` inservible y el juego caiga a valores por defecto. Lo
+comprobado: con un mod tocando ese archivo funcionaba; con dos, se rompió.
+
+**Consecuencia para la regla del prompt 3 (§8b):** no es "siempre INDIVIDUAL". Es
+**INDIVIDUAL solo si los scripts tocan archivos distintos.** Si dos scripts tocan el
+mismo archivo: o se fusionan en un `.lua`, o se construyen en modo COMBINED.
+
+Decisión del proyecto: **fusionar**. Todo lo que toque `CREATUREGENERATIONDATA` vive
+en `work\scripts\HorribleTerror_Ecosystem.lua`. Es además lo correcto para Nexus —
+el usuario instala un mod, no tres que se pisan.
+
+**Antes de cada build con varios scripts, comprobar solapes:**
+```powershell
+Get-ChildItem "$env:ProgramFiles(x86)\Steam\steamapps\common\No Man's Sky\GAMEDATA\MODS" -Recurse -Filter *.EXML |
+  Group-Object { $_.FullName -replace '.*MODS\\[^\\]+\\','' } | Where-Object Count -gt 1
+```
 
 ### 10h. `WHERE_IN_SECTION` filtra secciones, no localiza sub-secciones
 
