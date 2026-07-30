@@ -252,3 +252,20 @@ Probado contra NMS <version>.
 - Añadido `docs/NEXUS.md`: guía de publicación con la checklist previa, la
   estructura de página (un mod con 4 Main Files, no 4 mods), los pasos de subida y
   los textos de título, resumen y descripción en BBCode listos para pegar.
+- **Verificada la compatibilidad con Vortex** sobre los 79 zips de Nexus descargados:
+  ninguno usa FOMOD y el layout dominante es una sola carpeta raíz con el nombre del
+  mod. Vortex copia el contenido del zip tal cual al staging y lo despliega a
+  `GAMEDATA\MODS\`, así que el formato que ya genera `Package-Release.ps1` funciona
+  sin añadir nada. El único error posible sería dejar los EXML en la raíz del zip.
+- Decidido publicar **cerrado**: los `.lua` fuente no se suben (`Package-Release.ps1`
+  ya los excluye salvo `-IncluirLua`) y los permisos de Nexus van todos en "No". Los
+  EXML son texto plano y siguen siendo editables por quien los descargue — lo que se
+  protege es la lógica de los scripts y el derecho a republicar, no los números.
+
+### Verificación in-game — 2026-07-30
+
+- **Las 4 configuraciones probadas a mano, una por una**, con la carpeta de mods
+  **limpia** de los otros 87. Funcionan.
+- Versión de NMS de la prueba: **170671** (`Binaries\NMS.exe`), rama Public.
+- Con esto queda cerrada la checklist previa de `docs/NEXUS.md` salvo las capturas,
+  que es lo único que falta antes de subir.

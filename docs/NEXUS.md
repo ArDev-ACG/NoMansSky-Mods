@@ -9,15 +9,18 @@ pegar en la página de Nexus.
 
 Lista de comprobación. **Cada punto se ha roto al menos una vez en este proyecto.**
 
-- [ ] **Probado in-game.** No "construido sin errores" — jugado. `0 [ERROR] detected`
+- [x] **Probado in-game.** No "construido sin errores" — jugado. `0 [ERROR] detected`
       no prueba que el mod haga lo correcto; ya nos pasó (§8c del doc de proyecto).
-- [ ] **Cada configuración probada por separado**, o al menos Fácil y Hardcore, que
-      son los extremos.
-- [ ] Anotada la **versión exacta de NMS** contra la que se probó. Sin ese dato no se
-      puede diagnosticar nada cuando el juego se actualice.
-- [ ] Probado con la carpeta de mods **limpia** de los otros 87, para descartar que
+- [x] **Cada configuración probada por separado.** Las cuatro, no solo los extremos.
+- [x] Anotada la **versión exacta de NMS** contra la que se probó: **170671**
+      (leída de `Binaries\NMS.exe`), rama Public. Sin ese dato no se puede
+      diagnosticar nada cuando el juego se actualice.
+- [x] Probado con la carpeta de mods **limpia** de los otros 87, para descartar que
       algo funcione por accidente gracias a otro mod.
 - [ ] Capturas hechas. Nexus sin imágenes no lo descarga nadie.
+
+**Estado (2026-07-30):** las 4 configuraciones verificadas a mano, en limpio, sobre
+NMS 170671. Solo faltan las capturas.
 
 ---
 
@@ -48,9 +51,40 @@ versión de AMUMSS, que al jugador no le aportan nada.
 
 ---
 
+## Compatibilidad con Vortex — VERIFICADO
+
+**No hay que hacer nada.** El layout de arriba ya es el que Vortex espera.
+
+Comprobado sobre los 79 zips de Nexus descargados en
+`%APPDATA%\Vortex\downloads\nomanssky\`:
+
+| Comprobación | Resultado |
+|---|---|
+| Zips que usan instalador FOMOD | **0 de 79** |
+| Zips con `.pak` dentro | 2 de 79, ambos de 2019 (flujo viejo) |
+| Layout dominante | **una sola carpeta raíz = la carpeta del mod** |
+
+Y en `%APPDATA%\Vortex\nomanssky\mods\` se ve qué hace Vortex con ellos: copia el
+contenido del zip **tal cual** al staging y lo despliega a `GAMEDATA\MODS\`. De ahí
+salen los `__folder_managed_by_vortex` que hay en la carpeta del juego (§10d del doc
+de proyecto).
+
+O sea: si el zip lleva la carpeta del mod en la raíz, Vortex acierta solo. No hace
+falta ni `fomod\ModuleConfig.xml`, ni `Vortex.deployment.json`, ni nada. Un zip que
+funciona a mano funciona en Vortex.
+
+Lo único a no hacer: **poner los EXML en la raíz del zip** sin carpeta que los
+envuelva. Ahí Vortex desplegaría `GAMEDATA\MODS\GLOBALS\…` y NMS no lo carga.
+
+`[Inferencia]` El botón "Mod Manager Download" sale automáticamente porque NMS es un
+juego soportado por Vortex; no parece haber forma de desactivarlo desde la página. No
+importa — con este layout funciona.
+
+---
+
 ## Estructura de la página: 4 archivos, no 4 mods
 
-Un solo mod con **cuatro Main Files**. No cuatro páginas.
+Un solo mod con **cuatro Main Files**. No cuatro páginas, y sin optional files.
 
 | Nexus File | Archivo |
 |---|---|
@@ -58,14 +92,17 @@ Un solo mod con **cuatro Main Files**. No cuatro páginas.
 | Main File — 2. Normal | `HorribleTerror_Predators_2-Normal_v1.0.0.zip` |
 | Main File — 3. Difícil | `HorribleTerror_Predators_3-Dificil_v1.0.0.zip` |
 | Main File — 4. Hardcore | `HorribleTerror_Predators_4-Hardcore_v1.0.0.zip` |
-| Optional — Scripts AMUMSS | los 4 `.lua`, para otros modders |
+
+**Los `.lua` fuente no se suben.** `Package-Release.ps1` ya los excluye por defecto
+(solo entran con `-IncluirLua`, que no se usa). Muchos mods de NMS sí los incluyen —
+Asteroid Ribbons, Better Scan Rewards, 10x Industrial Waste, etc. — pero es opcional,
+no un requisito del formato.
 
 En la descripción de cada archivo, poner en la **primera línea** que solo se instala
 uno. Es el error de instalación más probable.
 
-`[Inferencia]` Nexus tiene instaladores FOMOD para elegir variante, pero están
-pensados para Bethesda y no está claro que funcionen con NMS. Cuatro Main Files es lo
-que hacen los mods de NMS con variantes, así que es el camino seguro.
+FOMOD descartado: **ningún** mod de NMS de los 79 revisados lo usa. Cuatro Main Files
+es la convención del juego, así que es el camino seguro.
 
 ---
 
@@ -183,8 +220,10 @@ frame rate drops, that's the one — step down a tier.
 mod — barren planets stay barren.
 [*]Existing planets you've already visited may keep their assigned archetype. Warp
 somewhere new to see the change.
-[*]Made with AMUMSS. The source .lua scripts are in the optional files — take them
-apart, they're heavily commented.
+[*][b]Vortex users:[/b] install one file through Vortex as usual. If you already have
+another tier installed, remove it in Vortex first — Vortex will warn you about the
+file conflict otherwise.
+[*]Built with AMUMSS and MBINCompiler.
 [/list]
 ```
 
@@ -200,9 +239,30 @@ toda la comunidad de NMS (los 87 mods instalados localmente funcionan así).
 - AMUMSS — HolterPhylo
 - MBINCompiler — monkeyman192
 
-**Permisos a conceder:** conviene ser permisivo. Sugerencia: permitir uso en otros
-mods y traducciones con crédito. Es un mod de valores numéricos, no de arte —
-bloquearlo no protege nada y solo molesta.
+### Decisión: se publica cerrado, no editable
+
+No se suben los `.lua` y los permisos van restrictivos. En el formulario de permisos
+de Nexus (sección *Permissions and credits* de la página del mod), poner:
+
+| Campo de Nexus | Valor |
+|---|---|
+| Others can upload this file to other sites | **No** |
+| Others can convert this file to work on other games | **No** |
+| Others can modify my files and release bug fixes / improvements | **No** |
+| Others can use assets from this file without permission | **No** |
+| Others can use assets in files that are being sold | **No** |
+| Others can earn Donation Points from this file | **No** |
+
+**Límite honesto de esto.** Los EXML son texto plano: quien descargue el mod puede
+abrirlo en un editor y cambiar los números en treinta segundos. No se puede impedir, y
+ningún formato de NMS lo impediría. Lo que se consigue con lo de arriba es:
+
+1. No regalar los `.lua`, que son el trabajo de verdad — la lógica, los comentarios y
+   el saber qué propiedad toca cambiar.
+2. Dejar por escrito que no hay permiso para republicar ni derivar. Es la parte que
+   Nexus hace cumplir: si alguien sube un fork, se reporta y lo bajan.
+
+O sea, "no editable" = no reutilizable ni republicable, no "imposible de tocar".
 
 ---
 
