@@ -139,6 +139,39 @@ Densidades vanilla en `FIENDEGGS.MBIN`: `Coverage 0.1`, `FlatDensity 0.005`,
 `Placement FLORACLUMP`, `MaxScale 1.7`. Son valores **muy bajos** — por eso los
 huevos son raros.
 
+#### Inventario completo — verificado 2026-07-30 (NMS 170671, MBINCompiler 6.45.0.1)
+
+Extraídos de `NMSARC.Precache.pak`. Los dos archivos son `cGcExternalObjectList`.
+
+**`FIENDEGGS.MBIN`** — 2 objetos, los dos `FIENDEGG.SCENE`:
+
+| Objeto | Placement | FlatDensity | SlopeDensity | Coverage |
+|---|---|---|---|---|
+| `Objects[0]` | `FLORACLUMP` | 0.005 | 0.005 | 0.1 |
+| `DetailObjects[0]` | `RAREX` | 0.005 | 0.005 | 2.0 |
+
+**`INFESTATION.MBIN`** — 3 objetos:
+
+| Objeto | Modelo | Placement | FlatDensity | SlopeDensity | Coverage |
+|---|---|---|---|---|---|
+| `WORMSPAWNER` | `GROUNDWORMSPAWNER` | `WORDSTONE` | 0.025 | 0.030 | 1.0 |
+| `FIENDEGGS` | `FIENDEGG` | `FLORACLUMP` | 0.005 | 0.005 | 0.1 |
+| (sin nombre) | `FIENDEGG` | `RAREX` | 0.005 | 0.005 | 2.0 |
+
+#### ⚠️ Trampa: cada objeto lleva DOS bloques de densidad
+
+El bueno es `QualityVariants` — valores reales, distintos por objeto. Debajo hay otro
+llamado **`QualityVariantData`** con `Coverage 0.2` / `FlatDensity 0.5`, **idéntico en
+los cinco objetos de los dos archivos**. Tiene pinta de struct inicializado por
+defecto, no de dato real.
+
+Multiplicar `FlatDensity` a secas toca los dos. La vía correcta es `VALUE_MATCH`, que
+acota el cambio a las ocurrencias cuyo valor actual es el de vanilla del bloque bueno.
+
+`Coverage` conviene **no tocarlo**: los valores reales son 0.1, 1.0 y 2.0 y no se
+conoce el rango válido del campo — ×20 sobre 2.0 podría salirse.
+`FlatDensity`/`SlopeDensity` son la palanca de densidad de verdad.
+
 ### Comportamiento — `GcCreatureFiendAttackData`, 39 campos
 
 Los más jugosos:
@@ -163,6 +196,14 @@ implementado y apagado. Encenderlo daría bichos que se multiplican mientras luc
 `[Sin probar]` — hay que averiguar qué acepta `SpawnBroodID`.
 
 Existe además `GcCreatureSpookFiendAttackData`, una variante aparte. Sin explorar.
+
+**Ubicación confirmada 2026-07-30:** `GcCreatureFiendAttackData` vive en
+`METADATA/SIMULATION/ECOSYSTEM/CREATUREDATATABLE.MBIN`, con **8 bloques** repartidos
+entre las entradas `FIEND`, `BUGFIEND`, `MINIFIEND`, `FIENDFISHSMALL` y
+`FIENDFISHBIG`, más 2 de `GcCreatureSpookFiendAttackData`. Un `REPLACE_TYPE = "ALL"`
+sobre `MinFlurryHits` los tocaría los diez, peces incluidos.
+
+La ruta está **libre** en los 87 mods instalados.
 
 ---
 

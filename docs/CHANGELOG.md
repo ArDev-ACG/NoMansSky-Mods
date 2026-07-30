@@ -262,6 +262,40 @@ Probado contra NMS <version>.
   EXML son texto plano y siguen siendo editables por quien los descargue — lo que se
   protege es la lógica de los scripts y el derecho a republicar, no los números.
 
+### Mod 2 — Infestación 0.1.0 (en curso)
+
+- **Decisión de producto:** el mod de monstruos es un **mod aparte** con su propia
+  página y su propio versionado, empezando en **0.1.0**. No es un 1.1 del mod de
+  depredadores: son dos mods distintos. El mod 2 **contiene** al mod 1 (mismos
+  archivos, misma calibración por tier), así que se instala uno o el otro, nunca los
+  dos.
+- El motivo técnico de fundirlos en vez de publicarlos como mods compatibles: los
+  globales de Fiend (`FiendMaxAttackers`, `FiendMaxEngaged`, `MaxFiendsToSpawn`,
+  `FiendAggroTime`) viven en `GLOBALS\GCCREATUREGLOBALS.MBIN`, que el mod 1 ya
+  escribe. Dos mods sobre la misma ruta = un cambio perdido en silencio.
+- **Escaneo de conflictos** sobre los 87 mods de terceros instalados: `FIENDEGGS`,
+  `INFESTATION` y `CREATUREDATATABLE` están libres. `GCCREATUREGLOBALS` solo lo
+  disputa nuestro propio mod 1.
+- **Descartado "que las manadas se acerquen a los edificios abandonados".** No existe
+  la palanca: el árbol de comportamiento persigue `TARGET`, que es el jugador o una
+  presa, nunca una estructura, y los edificios se colocan por otro sistema. La vía
+  real para el mismo efecto es sembrar huevos de Fiend por el terreno (§2).
+- Añadido `work/scripts/infestacion/` con los 4 tiers y su `README.md`.
+- Palancas nuevas por tier: densidad de huevos ×2/×5/×20/×20, `FiendMaxAttackers`
+  2/3/4/6, `FiendMaxEngaged` 6/8/10/12, `MaxFiendsToSpawn` 6/8/10/12 y
+  `FiendAggroTime` 45/60/90/120. Fácil no escribe ningún global de Fiend a propósito:
+  coinciden con vanilla y ensuciarían el EXML delta.
+- **Trampa nueva documentada:** cada objeto de `FIENDEGGS`/`INFESTATION` lleva dos
+  bloques de densidad. El bueno es `QualityVariants`; debajo hay un
+  `QualityVariantData` con `Coverage 0.2`/`FlatDensity 0.5` idéntico en los cinco
+  objetos de los dos archivos. Los scripts usan `VALUE_MATCH` para no tocarlo.
+  `Coverage` se deja intacto: rango válido desconocido.
+- Aplazado a 0.2.0: `CREATUREDATATABLE` (`MinFlurryHits`, `DelayBetweenPounceAttacks`)
+  y `AllowSpawnBrood`, que sigue sin verificar qué acepta `SpawnBroodID`.
+- Lint con `selene`: 0 errores en los 4 scripts. Los warnings son los mismos que
+  produce el mod 1 (variables globales y rutas con `\`), convención de AMUMSS.
+- **Sin construir ni probar todavía.** Falta correr `BUILDMOD.bat` por tier.
+
 ### Verificación in-game — 2026-07-30
 
 - **Las 4 configuraciones probadas a mano, una por una**, con la carpeta de mods
