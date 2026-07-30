@@ -436,6 +436,14 @@ demostrado con un cambio numérico. Todo lo demás depende de esto. Es EL hito.
 .\tools\Backup-NMSSave.ps1 -Etiqueta "que-estoy-probando"
 ```
 
+Dos detalles operativos:
+
+- **Cerrar NMS antes.** El script avisa si el juego está abierto, porque un save a
+  medio escribir no sirve como respaldo.
+- **NMS solo carga mods al arrancar.** Un mod copiado a `GAMEDATA\MODS\` con el
+  juego abierto no estará activo hasta reiniciarlo. Vale la pena decirlo porque
+  invita a concluir que "el mod no funciona".
+
 Crea `backups\NMS_saves_<fecha>_<etiqueta>\`, nunca sobreescribe, conserva los 15
 más recientes y avisa si NMS está abierto (un save a medio escribir no sirve de nada).
 
