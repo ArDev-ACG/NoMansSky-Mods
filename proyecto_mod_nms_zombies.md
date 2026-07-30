@@ -217,6 +217,9 @@ encontró. El alpha (`A`) no se toca nunca y no entra en la cuenta.
 > [`docs/FAUNA_REFERENCE.md`](docs/FAUNA_REFERENCE.md)
 > Ahí está el detalle archivo por archivo. Lo de abajo es el resumen.
 >
+> **Mod de depredadores y sus 4 configuraciones:**
+> [`work/scripts/dificultad/README.md`](work/scripts/dificultad/README.md)
+>
 > **Mapa de spawn, manadas, Fiends y cola de ideas:** [`docs/IDEAS.md`](docs/IDEAS.md)
 > Incluye el segundo camino de spawn (objetos de bioma), los monstruos de edificios
 > y la lista priorizada de qué tocar a continuación.
@@ -328,6 +331,7 @@ C:\Users\<usuario>\NMS_MOD_ZOMBIES\
 │   ├── models\          [no-git] blend + exports
 │   ├── palettes\        [git] paletas editadas — ruta barata al look zombie
 │   └── scripts\         [git] .lua para AMUMSS ← el corazón del mod
+│       └── dificultad\  [git] las 4 configuraciones del mod de depredadores
 ├── build\               [no-git] salida .pak de prueba
 ├── releases\            [no-git] versiones limpias para Nexus
 └── docs\                [git]

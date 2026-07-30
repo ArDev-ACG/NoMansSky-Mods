@@ -465,15 +465,27 @@ Ordenada por relación efecto/coste. Los tres primeros son cambios de un número
 | 15 | Criaturas fijas vía camino B | `<X>OBJECTS*` | alto | criatura firma del mod |
 | 16 | `AvoidCreaturesStrength` en `MOVE_CLOSE` | `CREATUREBEHAVIOURTREES` | alto | solo si las jaurías se amontonan |
 
-### Estado de los tres mods activos
+### Estado: los tres mods se fundieron en UNO con 4 configuraciones
 
-| Mod | Archivo que toca | Contenido |
-|---|---|---|
-| `HorribleTerror_Ecosystem` | `CREATUREGENERATIONDATA` | densidad x20, `DANGEROUS` 99% |
-| `HorribleTerror_PredatorPacks` | `GROUNDTABLEPLAYERPREDATOR{MED,LARGE}` | manadas 3-5 |
-| `HorribleTerror_PredatorSenses` | `GCCREATUREGLOBALS` | percepción 60, sin huida, 100% hostiles, tope 60 |
+`Ecosystem` + `PredatorPacks` + `PredatorSenses` eran tres mods que había que
+instalar juntos para tener la experiencia completa. Ahora son **un solo mod de
+dificultad** con cuatro variantes, de las que se instala una:
 
-Cuatro rutas distintas, cero solapes. `INDIVIDUAL` es seguro con estos tres.
+```
+work/scripts/dificultad/
+    HorribleTerror_Predators_1-Facil.lua
+    HorribleTerror_Predators_2-Normal.lua
+    HorribleTerror_Predators_3-Dificil.lua      <- equivale a los 3 mods viejos
+    HorribleTerror_Predators_4-Hardcore.lua
+```
+
+Cada uno toca las mismas 4 rutas y produce un mod completo. Detalle y tabla
+comparativa en [`work/scripts/dificultad/README.md`](../work/scripts/dificultad/README.md).
+
+**Consecuencia para el mod de monstruos:** esta configuración es la base. El mod de
+Fiends/monstruos irá **aparte**, tocando rutas distintas
+(`OBJECTS/RARE/FIENDEGGS`, `CREATUREDATATABLE`, listas de bioma), para que se pueda
+combinar con cualquiera de los cuatro niveles sin colisión.
 
 **⚠️ Estos cambios se multiplican, no se suman.** Si queda injugable, el orden para
 aflojar es: `PercentagePlayerPredators` primero, luego el tamaño de manada, y la

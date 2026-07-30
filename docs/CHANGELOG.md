@@ -216,3 +216,26 @@ Probado contra NMS <version>.
   normal. La regla de no solapar rutas se mantiene, pero por otro motivo: un
   cambio perdido sin aviso es peor que un fallo ruidoso cuando se afina por
   prueba y error.
+
+### Reestructuración — mod de dificultad con 4 configuraciones
+
+- Los tres mods (`Ecosystem`, `PredatorPacks`, `PredatorSenses`) se funden en **un
+  solo mod de dificultad** con cuatro variantes en `work/scripts/dificultad/`:
+  Fácil, Normal, Difícil y Hardcore. Se instala una sola.
+- La configuración **Difícil** equivale exactamente a lo que había: densidad ×20,
+  `DANGEROUS` 1000, manadas 3-5, percepción 60, sin huida, 100% hostiles, tope 60.
+- **Hardcore** añade manadas 5-7, percepción 80, tope 70 y sube
+  `PlayerPredatorBoredomDistance` de 80 a 150 — el único tier que lo toca, para que
+  escapar cueste de verdad.
+- **Fácil** y **Normal** rebajan todos los ejes de forma proporcional: ×2/×5 de
+  densidad, 23%/50% de planetas hostiles, manadas 1-2 y 2-3, y conservan la huida
+  por vida baja (30%/15%) que Difícil y Hardcore eliminan.
+- Verificado que AMUMSS **no** genera variantes desde un solo script: no existe
+  `AUTO_OPTIONS`, y `MOD_BATCHNAME` sirve para combinar, no para variar. De ahí que
+  sean cuatro `.lua` independientes, que además es el patrón habitual en Nexus.
+- Retirados del árbol de trabajo los scripts superados (`GroundDensity`,
+  `PredatorWorlds`, `Ecosystem`, `PredatorPacks`, `PredatorSenses`); quedan en el
+  historial de git. `RedFauna` se conserva como feature aparte.
+- Añadido `work/scripts/dificultad/README.md` con la tabla comparativa, el
+  procedimiento para cambiar de configuración, el conteo de cambios esperado por
+  tier y el orden recomendado para aflojar la dificultad.
