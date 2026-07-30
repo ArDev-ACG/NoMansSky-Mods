@@ -205,3 +205,14 @@ Probado contra NMS <version>.
   depredadores permanentes sobre la base propia cansan y generan quejas.
 - Verificado que los tres mods activos tocan cuatro rutas distintas — sin solapes,
   `INDIVIDUAL` es seguro.
+- Build de los tres mods: 0 errores. Conteos correctos (4 / 4 / 5) y deltas
+  verificados propiedad por propiedad antes de desplegar. El entero
+  `MaxEcosystemCreaturesNormal` se mantuvo sin decimales en el EXML generado.
+- **Corregido el diagnóstico de los planetas vacíos** (§10i). Un escaneo encontró
+  11 colisiones de ruta ya existentes entre los 87 mods de terceros instalados, y
+  conviven sin romper nada: una colisión hace que un cambio se pierda en silencio,
+  no que el juego falle. Sumado a que en vanilla solo los planetas `Full` tienen
+  fauna terrestre, lo más probable es que no hubiera bug — era comportamiento
+  normal. La regla de no solapar rutas se mantiene, pero por otro motivo: un
+  cambio perdido sin aviso es peor que un fallo ruidoso cuando se afina por
+  prueba y error.

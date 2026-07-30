@@ -564,10 +564,31 @@ el prompt de COMBINED/INDIVIDUAL:
 > *"If they modify the same original EXML files, the last one loaded will win and the
 > other changes will be lost"*
 
-[Inferencia] El mecanismo exacto no se pudo verificar desde fuera. Lo más probable es
-que el merge de dos parches parciales sobre el mismo archivo deje el
-`CREATUREGENERATIONDATA` inservible y el juego caiga a valores por defecto. Lo
-comprobado: con un mod tocando ese archivo funcionaba; con dos, se rompió.
+**⚠️ CORRECCIÓN POSTERIOR — el diagnóstico inicial era exagerado.**
+
+Se atribuyeron los planetas vacíos a esta colisión. Dos datos posteriores lo
+desmienten:
+
+1. Un escaneo de los 87 mods instalados encontró **11 colisiones de ruta ya
+   existentes** entre mods de terceros, y esos mods conviven sin romper el juego.
+   O sea: colisión ≠ catástrofe. Pasa lo que dice AMUMSS — gana el último y el otro
+   cambio se pierde en silencio. Eso habría dado *o* densidad *o* depredadores, no
+   cero fauna.
+2. `LifeChance` es `Dead 0 / Low 0 / Mid 0 / Full 1`, y las 21 tablas de spawn
+   terrestre exigen `LifeLevel = Full`. **En vanilla solo los planetas de vida
+   `Full` tienen fauna terrestre.** Los planetas pelados son normales, y el usuario
+   ya los veía antes de instalar nada.
+
+**Conclusión: lo más probable es que no hubiera bug.** Los planetas vacíos eran
+comportamiento vanilla.
+
+Aun así la regla se mantiene, por un motivo distinto y real: **una colisión hace que
+un cambio se pierda sin avisar.** No rompe el juego, pero te deja creyendo que un
+ajuste está activo cuando no lo está — que en un mod que se afina por prueba y error
+es peor que un fallo ruidoso.
+
+Lección de método, más valiosa que el bug: antes de culpar al mod, comprobar cuál es
+el comportamiento vanilla. Aquí se saltó ese paso.
 
 **Consecuencia para la regla del prompt 3 (§8b):** no es "siempre INDIVIDUAL". Es
 **INDIVIDUAL solo si los scripts tocan archivos distintos.** Si dos scripts tocan el
