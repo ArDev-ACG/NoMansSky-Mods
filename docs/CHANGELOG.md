@@ -163,3 +163,29 @@ Probado contra NMS <version>.
 ### Changed
 ### Fixed
 -->
+
+### Fase 1 — manadas y sensores
+
+- Escrito `work/scripts/HorribleTerror_PredatorPacks.lua`: `MinGroupSize`/
+  `MaxGroupSize` de 1/1 a 3/5 en `GROUNDTABLEPLAYERPREDATOR{MED,LARGE}`.
+  Script aparte porque toca archivos distintos de `CREATUREGENERATIONDATA`.
+- **Verificado que no hay fuego amigo**: el nodo de daño del árbol `MELEE` es
+  `GcBehaviourApplyDamageData` con `PlayerDamageType = FIEND_DMG` y radio 1.0, es
+  decir daño al jugador, no un área que alcance a otras criaturas. Subir el tamaño
+  de manada es seguro.
+- Riesgo anotado, no corregido: el nodo `MOVE_CLOSE` del `MELEE` pisa la evitación
+  global con `AvoidCreaturesStrength = 0`, así que mientras cargan no se esquivan.
+  Puede haber amontonamiento con manadas de 5. Se decide tras verlo in-game.
+- **Descubierto `GLOBALS/GCCREATUREGLOBALS.MBIN`**, donde vive todo lo de percepción
+  y agro: `PredatorPerceptionDistance` 40, `PlayerPredatorBoredomDistance` 80,
+  `PredatorRunAwayHealthPercent` 40, `PercentagePlayerPredators` 0.5,
+  `PredatorStealthDist` 11, `AlertDistance` 50.
+- **Tope duro encontrado:** `MaxEcosystemCreaturesNormal = 40`. Explica por qué el
+  x20 de densidad no revienta el juego, y que subirla más ya no aporta nada.
+- **`SpawnsAvoidBaseMultiplier = 3`**: las criaturas evitan las bases del jugador a
+  propósito. Es la palanca para spawn cerca de asentamientos.
+- Confirmado que las criaturas **no atacan estructuras** en ningún caso: el árbol
+  `MELEE` solo persigue `TARGET`, que es el jugador o una presa. No hay que
+  desactivar nada para conseguirlo.
+- Anotadas como features las fragatas abandonadas (los archivos las llaman
+  "dungeon") y los Fiends de interiores.

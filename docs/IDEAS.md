@@ -301,34 +301,183 @@ Ya lo tienes. Si hay bichos por todas partes, también los hay junto a los edifi
 
 ---
 
+## 4-bis. `GCCREATUREGLOBALS.MBIN` — la mina de los sensores
+
+`GLOBALS\GCCREATUREGLOBALS.MBIN`. No lo habíamos mirado y es donde vive casi todo lo
+de percepción, agro y combate. **Archivo distinto de todo lo demás → sin riesgo de
+colisión.**
+
+### Sensores hacia el jugador
+
+| Parámetro | Vanilla | Qué hace |
+|---|---:|---|
+| **`PredatorPerceptionDistance`** | **40** | radio al que el depredador te detecta |
+| `PredatorFishPerceptionDistance` | 60 | igual, bajo el agua |
+| `PredatorStealthDist` | 11 | dentro de esto te ve aunque vayas agachado `[Inferencia]` |
+| `PredatorNoticePauseTime` | 1.5 | pausa dramática antes de lanzarse |
+| `CreatureSightRange` | 100 | vista genérica |
+| `CreatureHearingRange` | 10 | oído genérico |
+| `AlertDistance` | 50 | radio de contagio de alerta entre bichos |
+| `AlertTable` | — | `HearingRange`/`SightRange`/`SightAngle`/`FleeRange` por par de tipos |
+
+`SightAngle = 60` en las entradas de `AlertTable`: cono de visión, no 360°. Se les
+puede escapar por detrás.
+
+### Persistencia de la persecución
+
+| Parámetro | Vanilla | Qué hace |
+|---|---:|---|
+| `PlayerPredatorBoredomDistance` | 80 | te alejas 80 m y se aburre |
+| `PlayerPredatorRegainInterestTime` | 30 | segundos hasta que vuelve a interesarse |
+| `PredatorApproachTime` | 4 | tiempo acechando antes de cargar |
+| `PredatorChargeDist` | 7 | distancia a la que arranca la carga |
+
+Subir `PerceptionDistance` y `BoredomDistance` a la vez = depredadores que te
+detectan de lejos y **no te sueltan**. Probablemente el cambio más "de terror" de
+toda la lista, y son dos números.
+
+### Combate y huida
+
+| Parámetro | Vanilla |
+|---|---:|
+| `PredatorRunAwayHealthPercent` | 40 — huyen al 40% de vida |
+| `PredatorRunAwayDist` | 5 |
+| `PlayerPredatorHealthModifier` | 1.3 |
+| `PredatorSpeedMultiplier` | 1.1 |
+| Velocidades Walk/Trot/Run | 1 / 3 / 6 |
+| Vida Small/Med/Large/Huge | 400 / 1400 / 3000 / 3500 |
+| `PredatorRoarProbAfterHit` / `AfterMiss` | 0.6 / 0.7 |
+
+**`PredatorRunAwayHealthPercent = 40` a 0** = depredadores que pelean hasta morir.
+Nada de zombie huye herido.
+
+### Topes duros — leer antes de subir números
+
+| Parámetro | Vanilla | Implicación |
+|---|---:|---|
+| **`MaxEcosystemCreaturesNormal`** | **40** | tope de criaturas cargadas a la vez |
+| `MaxEcosystemCreaturesLow` | 20 | idem en calidad baja |
+| `PercentagePlayerPredators` | 0.5 | mitad de los depredadores son PlayerPredator |
+| `MaxBirdsProportion` | 0.15 | |
+| `FriendlyCreatureLimit` | 4 | |
+
+**El tope de 40 explica por qué el x20 no revienta el juego.** También significa que
+subir densidad más allá de cierto punto no hace nada: ya estás tocando techo. Si
+quieres más amenaza, `PercentagePlayerPredators` rinde más que la densidad.
+
+### Fiends — parámetros propios
+
+| Parámetro | Vanilla |
+|---|---:|
+| `FiendsCanAttack` | `true` |
+| `FiendAggroTime` | 45 |
+| `FiendMaxAttackers` | 2 — solo 2 te atacan a la vez |
+| `FiendMaxEngaged` | 6 |
+| `MaxFiendsToSpawn` | 6 |
+| `MaxFiendsToSpawnCarnage` | 10 ← existe un modo "carnage" |
+| `FiendAggroIncreaseDamageEgg` / `DestroyEgg` | 1.0 / 1.0 |
+| `GroundWormSpawnMax` | 3 |
+
+`MaxFiendsToSpawnCarnage = 10` sugiere un estado de "matanza" ya implementado.
+`[Sin probar]` — averiguar qué lo dispara.
+
+### ⚠️ `SpawnsAvoidBaseMultiplier = 3`
+
+**Las criaturas evitan activamente las bases del jugador.** Multiplicador 3 sobre el
+radio de exclusión. Es exactamente el obstáculo para lo que pediste de asentamientos:
+bajarlo a 1 (o a 0) es lo que permitiría que la fauna se acerque a tu base.
+
+---
+
+## 4-ter. POIs, edificios y asentamientos — qué se puede hacer
+
+Pediste: bichos **cerca** de los POIs, sin que ataquen las estructuras.
+
+Buena noticia: **no atacar estructuras es el comportamiento por defecto.** El árbol
+`MELEE` solo persigue `TARGET`, que es el jugador o una presa. Las criaturas no
+tienen ningún nodo que ataque edificios. No hay que desactivar nada.
+
+### Asentamientos y bases del jugador
+
+**Palanca directa: `SpawnsAvoidBaseMultiplier`.** De 3 a 1 o 0. Es literalmente el
+parámetro que mantiene la fauna lejos de tu base. Un número, un archivo, y es el
+único cambio de esta sección que está confirmado que existe.
+*Coste: mínimo. Riesgo: bajo. Ojo: puede molestar en la base propia — es un
+candidato claro a opción configurable en la release de Nexus.*
+
+### Estaciones abandonadas y corvetas abandonadas
+
+Anotado como feature. Lo que sé por ahora:
+
+```
+METADATA/SIMULATION/FREIGHTERBASES/ABANDONEDFREIGHTERBASE{,A,B,C,S}.MBIN
+MODELS/COMMON/SPACECRAFT/COMMONPARTS/ABANDONEDPARTS/DUNGEONENTRANCE...
+MODELS/EFFECTS/ABANDONEDFREIGHTER/...
+```
+
+El interior de fragata abandonada es un **"dungeon"** — así lo llaman los propios
+archivos (`DUNGEONENTRANCE`). Es contenido colocado a mano, no procedural, así que
+probablemente los Fiends de ahí se colocan como entidades del layout y no por
+ecosistema. `[Sin investigar]` — merece su propia sesión.
+
+Es la ubicación **más prometedora** para el mod: espacio cerrado, oscuro, sin
+vehículo al que huir, y ya tiene monstruos de serie. Encaja con Dead Space mejor que
+cualquier superficie planetaria.
+
+### POIs de superficie (edificios abandonados, ruinas)
+
+Ya cubierto en §4: no hay forma de que las manadas "vayan hacia" un edificio, pero
+sí de que **nazcan cerca** vía camino B, o de sembrar huevos de Fiend con
+`FIENDEGGS` / `INFESTATION`.
+
+---
+
 ## 5. Cola de trabajo propuesta
 
 Ordenada por relación efecto/coste. Los tres primeros son cambios de un número.
 
 | # | Idea | Archivo | Coste | Efecto |
 |---|---|---|---|---|
-| 1 | `MinGroupSize`/`MaxGroupSize` 1→3-5 en `PLAYERPREDATOR*` | `GROUND/GROUNDTABLEPLAYERPREDATOR{MED,LARGE}` | bajo | **jaurías en vez de bichos sueltos** |
-| 2 | Subir `Coverage`/`FlatDensity` de `FIENDEGGS` | `OBJECTS/RARE/FIENDEGGS` | bajo | Horrores Biológicos habituales |
-| 3 | `HerdCreaturePenalty` 0.5→1.0 | `CREATUREGENERATIONDATA` | bajo | manadas más grandes |
-| 4 | Meter `INFESTATION` en más biomas | listas `<X>OBJECTS*` | medio | zonas infestadas |
-| 5 | `AllowSpawnBrood = true` en Fiends | `CREATUREDATATABLE` | medio | bichos que se multiplican |
-| 6 | Arquetipo propio `HT_INFESTED` | `CREATUREGENERATIONARCHETYPES` | medio | control total del reparto |
-| 7 | `MaxTablesToAdd` en `DANGEROUS` | `CREATUREGENERATIONARCHETYPES` | bajo | más variedad por planeta |
-| 8 | Criaturas fijas vía camino B | `<X>OBJECTS*` | alto | criatura firma del mod |
-| 9 | Retoques de `MELEE` | `CREATUREBEHAVIOURTREES` | alto | agresividad fina |
+| ✅1 | `MinGroupSize`/`MaxGroupSize` 1→3/5 en `PLAYERPREDATOR*` | `GROUND/GROUNDTABLEPLAYERPREDATOR{MED,LARGE}` | bajo | **jaurías en vez de bichos sueltos** |
+| 2 | `PredatorPerceptionDistance` 40→70 + `BoredomDistance` 80→150 | `GCCREATUREGLOBALS` | bajo | **te detectan lejos y no te sueltan** |
+| 3 | `PredatorRunAwayHealthPercent` 40→0 | `GCCREATUREGLOBALS` | bajo | pelean hasta morir |
+| 4 | `PercentagePlayerPredators` 0.5→0.8 | `GCCREATUREGLOBALS` | bajo | más hostiles sin más densidad |
+| 5 | `SpawnsAvoidBaseMultiplier` 3→1 | `GCCREATUREGLOBALS` | bajo | fauna cerca de bases/asentamientos |
+| 6 | Subir `Coverage`/`FlatDensity` de `FIENDEGGS` | `OBJECTS/RARE/FIENDEGGS` | bajo | Horrores Biológicos habituales |
+| 7 | `HerdCreaturePenalty` 0.5→1.0 | `CREATUREGENERATIONDATA` | bajo | manadas más grandes |
+| 8 | `FiendMaxAttackers` 2→4 | `GCCREATUREGLOBALS` | bajo | más Fiends encima a la vez |
+| 9 | Meter `INFESTATION` en más biomas | listas `<X>OBJECTS*` | medio | zonas infestadas |
+| 10 | `AllowSpawnBrood = true` en Fiends | `CREATUREDATATABLE` | medio | bichos que se multiplican |
+| 11 | Arquetipo propio `HT_INFESTED` | `CREATUREGENERATIONARCHETYPES` | medio | control total del reparto |
+| 12 | Fragatas abandonadas como escenario | `FREIGHTERBASES/ABANDONED*` | alto | **la feature con más potencial** |
+| 13 | Criaturas fijas vía camino B | `<X>OBJECTS*` | alto | criatura firma del mod |
+| 14 | `AvoidCreaturesStrength` en `MOVE_CLOSE` | `CREATUREBEHAVIOURTREES` | alto | solo si las jaurías se amontonan |
 
-**Siguiente paso recomendado: la 1.** `MinGroupSize = MaxGroupSize = 1` es la razón
-de que los depredadores se sientan poca cosa pese al x20 de densidad — hay mucha
-fauna, pero los que te atacan van de uno en uno. Es un cambio de dos números en dos
-archivos y cambia por completo la sensación del mod.
+**Nota sobre el orden:** las ideas 2-5 y 8 viven todas en `GCCREATUREGLOBALS`, así
+que van juntas en **un solo script** — mismo archivo, mismo mod (§10i). Es el
+siguiente bloque natural después de las manadas, y es donde está la mejor relación
+efecto/coste de toda la tabla.
 
-Ojo: esos archivos son **nuevos** (`GROUNDTABLEPLAYERPREDATOR*`), no
-`CREATUREGENERATIONDATA`. Pueden ir en un script aparte sin riesgo de colisión.
+**Sobre la 2:** subir percepción y aburrimiento a la vez es probablemente el cambio
+que más "terror" añade por línea tocada. Un depredador que te ve a 70 m y te sigue
+150 m cambia el juego más que cualquier número de densidad.
+
+**Sobre la densidad:** con `MaxEcosystemCreaturesNormal = 40` ya estamos tocando
+techo con x20. Subirla más no hará nada. Para más amenaza, la palanca es la 4
+(`PercentagePlayerPredators`), no la densidad.
 
 ---
 
 ## 6. Preguntas abiertas
 
+- `[Sin investigar]` **Fragatas abandonadas.** Los archivos las llaman "dungeon"
+  (`DUNGEONENTRANCE`). ¿Los Fiends de dentro se colocan como entidades del layout o
+  por ecosistema? Es el escenario que mejor encaja con Dead Space: cerrado, oscuro,
+  sin nave a la que huir, y ya trae monstruos.
+- `[Sin probar]` ¿Qué dispara `MaxFiendsToSpawnCarnage = 10`? Hay un modo "carnage"
+  implementado.
+- `[Sin probar]` ¿`PredatorStealthDist = 11` es "te ve aunque vayas agachado" o al
+  revés? El nombre admite las dos lecturas.
 - `[Sin probar]` ¿`GcEnvironmentSpawnData.Creatures` respeta `LifeChance` del planeta?
 - `[Sin probar]` ¿Qué acepta `SpawnBroodID`? ¿Un `CreatureID`, un archivo, un rol?
 - `[Sin probar]` ¿Qué es `GcCreatureSpookFiendAttackData` y quién lo usa?
