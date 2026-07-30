@@ -239,3 +239,16 @@ Probado contra NMS <version>.
 - Añadido `work/scripts/dificultad/README.md` con la tabla comparativa, el
   procedimiento para cambiar de configuración, el conteo de cambios esperado por
   tier y el orden recomendado para aflojar la dificultad.
+
+### Preparación de release
+
+- **Verificado el formato de distribución para NMS 6.x:** se distribuye la carpeta,
+  no un `.pak`. Los paks vanilla son `HGPAK`, los que AMUMSS deja en
+  `ModBackups\BuildHistory\` son `PSAR` (PSARC, formato antiguo), y los 87 mods
+  instalados son carpetas sin un solo `.pak`. Los paks de AMUMSS son residuo legacy.
+- Añadido `tools/Package-Release.ps1`: genera un zip por configuración desde
+  `CreatedMODS\`, con la carpeta del mod dentro para que se extraiga directamente en
+  `GAMEDATA\MODS\`. Excluye el `.lua` fuente y el txt de versión de AMUMSS.
+- Añadido `docs/NEXUS.md`: guía de publicación con la checklist previa, la
+  estructura de página (un mod con 4 Main Files, no 4 mods), los pasos de subida y
+  los textos de título, resumen y descripción en BBCode listos para pegar.
