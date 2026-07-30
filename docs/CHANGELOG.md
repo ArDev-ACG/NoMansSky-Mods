@@ -189,3 +189,19 @@ Probado contra NMS <version>.
   desactivar nada para conseguirlo.
 - Anotadas como features las fragatas abandonadas (los archivos las llaman
   "dungeon") y los Fiends de interiores.
+- Escrito `work/scripts/HorribleTerror_PredatorSenses.lua` sobre
+  `GLOBALS/GCCREATUREGLOBALS.MBIN`: `PredatorPerceptionDistance` 40→60,
+  `PredatorRunAwayHealthPercent` 40→0 (pelean hasta morir),
+  `PercentagePlayerPredators` 0.5→1.0 (todos hostiles),
+  `MaxEcosystemCreaturesNormal` 40→60.
+- `PlayerPredatorBoredomDistance` se deja sin tocar: ya vale 80 en vanilla, así
+  que escribirlo sería un cambio nulo que solo ensucia el EXML delta.
+- Anotada la interacción percepción/aburrimiento: con 60 y 80, el margen para
+  escapar baja de 40 m a 20 m. Si escapar resulta imposible, la corrección es subir
+  `BoredomDistance`, no bajar la percepción.
+- **Trampa:** `MaxEcosystemCreaturesNormal` es entero (`40`, sin decimales) mientras
+  que los otros cuatro son floats. Hay que escribir `60`, no `60.000000`.
+- `SpawnsAvoidBaseMultiplier` aplazado a propósito como feature de evento/horda:
+  depredadores permanentes sobre la base propia cansan y generan quejas.
+- Verificado que los tres mods activos tocan cuatro rutas distintas — sin solapes,
+  `INDIVIDUAL` es seguro.

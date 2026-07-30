@@ -397,13 +397,23 @@ Buena noticia: **no atacar estructuras es el comportamiento por defecto.** El á
 `MELEE` solo persigue `TARGET`, que es el jugador o una presa. Las criaturas no
 tienen ningún nodo que ataque edificios. No hay que desactivar nada.
 
-### Asentamientos y bases del jugador
+### Asentamientos y bases del jugador — 🕒 APLAZADO, feature futura
 
 **Palanca directa: `SpawnsAvoidBaseMultiplier`.** De 3 a 1 o 0. Es literalmente el
-parámetro que mantiene la fauna lejos de tu base. Un número, un archivo, y es el
-único cambio de esta sección que está confirmado que existe.
-*Coste: mínimo. Riesgo: bajo. Ojo: puede molestar en la base propia — es un
-candidato claro a opción configurable en la release de Nexus.*
+parámetro que mantiene la fauna lejos de tu base. Un número, un archivo, confirmado
+que existe.
+
+**Decisión: no tocarlo todavía.** Tener depredadores permanentemente encima de la
+base cansa rápido y es el tipo de cosa que genera quejas en Nexus. Se reserva para
+una feature de **evento / horda**: infestación temporal en vez de estado permanente.
+
+`[Sin investigar]` Para que sea un evento y no un valor fijo haría falta un
+disparador. Candidatos a explorar: el sistema de tormentas, los ataques de
+centinelas, o algún flag de misión. Ninguno confirmado.
+
+Recordar que **no atacarían la estructura** en ningún caso — el árbol `MELEE` solo
+persigue `TARGET`, y `TARGET` nunca es un edificio. Rondar cerca sí; destrozar la
+base no. Eso ya está garantizado por diseño.
 
 ### Estaciones abandonadas y corvetas abandonadas
 
@@ -439,19 +449,36 @@ Ordenada por relación efecto/coste. Los tres primeros son cambios de un número
 | # | Idea | Archivo | Coste | Efecto |
 |---|---|---|---|---|
 | ✅1 | `MinGroupSize`/`MaxGroupSize` 1→3/5 en `PLAYERPREDATOR*` | `GROUND/GROUNDTABLEPLAYERPREDATOR{MED,LARGE}` | bajo | **jaurías en vez de bichos sueltos** |
-| 2 | `PredatorPerceptionDistance` 40→70 + `BoredomDistance` 80→150 | `GCCREATUREGLOBALS` | bajo | **te detectan lejos y no te sueltan** |
-| 3 | `PredatorRunAwayHealthPercent` 40→0 | `GCCREATUREGLOBALS` | bajo | pelean hasta morir |
-| 4 | `PercentagePlayerPredators` 0.5→0.8 | `GCCREATUREGLOBALS` | bajo | más hostiles sin más densidad |
-| 5 | `SpawnsAvoidBaseMultiplier` 3→1 | `GCCREATUREGLOBALS` | bajo | fauna cerca de bases/asentamientos |
-| 6 | Subir `Coverage`/`FlatDensity` de `FIENDEGGS` | `OBJECTS/RARE/FIENDEGGS` | bajo | Horrores Biológicos habituales |
-| 7 | `HerdCreaturePenalty` 0.5→1.0 | `CREATUREGENERATIONDATA` | bajo | manadas más grandes |
-| 8 | `FiendMaxAttackers` 2→4 | `GCCREATUREGLOBALS` | bajo | más Fiends encima a la vez |
-| 9 | Meter `INFESTATION` en más biomas | listas `<X>OBJECTS*` | medio | zonas infestadas |
-| 10 | `AllowSpawnBrood = true` en Fiends | `CREATUREDATATABLE` | medio | bichos que se multiplican |
-| 11 | Arquetipo propio `HT_INFESTED` | `CREATUREGENERATIONARCHETYPES` | medio | control total del reparto |
-| 12 | Fragatas abandonadas como escenario | `FREIGHTERBASES/ABANDONED*` | alto | **la feature con más potencial** |
-| 13 | Criaturas fijas vía camino B | `<X>OBJECTS*` | alto | criatura firma del mod |
-| 14 | `AvoidCreaturesStrength` en `MOVE_CLOSE` | `CREATUREBEHAVIOURTREES` | alto | solo si las jaurías se amontonan |
+| ✅2 | `PredatorPerceptionDistance` 40→60 | `GCCREATUREGLOBALS` | bajo | te detectan de más lejos |
+| ✅3 | `PredatorRunAwayHealthPercent` 40→0 | `GCCREATUREGLOBALS` | bajo | pelean hasta morir |
+| ✅4 | `PercentagePlayerPredators` 0.5→1.0 | `GCCREATUREGLOBALS` | bajo | todos los depredadores son hostiles |
+| ✅5 | `MaxEcosystemCreaturesNormal` 40→60 | `GCCREATUREGLOBALS` | bajo | +50% de criaturas a la vez |
+| 🕒6 | `SpawnsAvoidBaseMultiplier` 3→1 | `GCCREATUREGLOBALS` | bajo | aplazado: feature de evento/horda |
+| 7 | Subir `Coverage`/`FlatDensity` de `FIENDEGGS` | `OBJECTS/RARE/FIENDEGGS` | bajo | Horrores Biológicos habituales |
+| 8 | `HerdCreaturePenalty` 0.5→1.0 | `CREATUREGENERATIONDATA` | bajo | manadas más grandes |
+| 9 | `FiendMaxAttackers` 2→4 | `GCCREATUREGLOBALS` | bajo | más Fiends encima a la vez |
+| 10 | `PlayerPredatorBoredomDistance` 80→150 | `GCCREATUREGLOBALS` | bajo | **solo si escapar resulta demasiado fácil** |
+| 11 | Meter `INFESTATION` en más biomas | listas `<X>OBJECTS*` | medio | zonas infestadas |
+| 12 | `AllowSpawnBrood = true` en Fiends | `CREATUREDATATABLE` | medio | bichos que se multiplican |
+| 13 | Arquetipo propio `HT_INFESTED` | `CREATUREGENERATIONARCHETYPES` | medio | control total del reparto |
+| 14 | Fragatas abandonadas como escenario | `FREIGHTERBASES/ABANDONED*` | alto | **la feature con más potencial** |
+| 15 | Criaturas fijas vía camino B | `<X>OBJECTS*` | alto | criatura firma del mod |
+| 16 | `AvoidCreaturesStrength` en `MOVE_CLOSE` | `CREATUREBEHAVIOURTREES` | alto | solo si las jaurías se amontonan |
+
+### Estado de los tres mods activos
+
+| Mod | Archivo que toca | Contenido |
+|---|---|---|
+| `HorribleTerror_Ecosystem` | `CREATUREGENERATIONDATA` | densidad x20, `DANGEROUS` 99% |
+| `HorribleTerror_PredatorPacks` | `GROUNDTABLEPLAYERPREDATOR{MED,LARGE}` | manadas 3-5 |
+| `HorribleTerror_PredatorSenses` | `GCCREATUREGLOBALS` | percepción 60, sin huida, 100% hostiles, tope 60 |
+
+Cuatro rutas distintas, cero solapes. `INDIVIDUAL` es seguro con estos tres.
+
+**⚠️ Estos cambios se multiplican, no se suman.** Si queda injugable, el orden para
+aflojar es: `PercentagePlayerPredators` primero, luego el tamaño de manada, y la
+densidad **la última** — ya está topada por `MaxEcosystemCreatures` y bajarla hará
+menos de lo que parece.
 
 **Nota sobre el orden:** las ideas 2-5 y 8 viven todas en `GCCREATUREGLOBALS`, así
 que van juntas en **un solo script** — mismo archivo, mismo mod (§10i). Es el
