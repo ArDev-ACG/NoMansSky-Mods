@@ -296,6 +296,39 @@ Probado contra NMS <version>.
   produce el mod 1 (variables globales y rutas con `\`), convención de AMUMSS.
 - **Sin construir ni probar todavía.** Falta correr `BUILDMOD.bat` por tier.
 
+### Mod 2 — build de los 4 tiers (2026-08-01)
+
+- **Los cuatro tiers construidos.** 0 errores, 0 warnings, 0 notices. Conteos
+  23 / 27 / 27 / 28, exactamente los previstos. Deltas verificados propiedad por
+  propiedad: densidades, pesos, manadas, globales de depredador y los 4 globales de
+  Fiend, con los enteros (`FiendMaxAttackers`, `FiendMaxEngaged`, `MaxFiendsToSpawn`,
+  `MaxEcosystemCreaturesNormal`) escritos sin decimales.
+- **Bug encontrado y corregido: cascada de reglas** (§10j). Las reglas de un mismo
+  archivo se aplican en secuencia, así que en `INFESTATION` la regla de huevos subía
+  `0.005 → 0.025` y la del gusano (`VALUE_MATCH "0.025000"`) los volvía a multiplicar.
+  `FlatDensity` de los huevos quedaba en 0.125 = **×25** en vez de ×5, y el `REPORT`
+  daba 29 cambios en vez de 27.
+  - **Solo se manifestaba en Normal.** Con ×2 (0.010) y ×20 (0.100) no había colisión:
+    Fácil, Difícil y Hardcore daban el conteo correcto con el mismo script defectuoso.
+    Queda como regla que el conteo se comprueba en las cuatro configuraciones.
+  - Arreglado invirtiendo el orden: el gusano va primero y los huevos últimos. La
+    salida del gusano (`0.025·M` / `0.030·M`) no puede valer 0.005 para ningún M ≥ 1.
+- **`BUILDMOD.bat` sí es automatizable** (§10c corregido). Acepta cada prompt como
+  flag, así que los 4 tiers se construyen en bucle. Tres requisitos que costaron
+  encontrar: `chcp 850` (con 65001 aborta por "Bad Active Code Page"), borrar
+  `NoDefaultCurrentDirectoryInExePath` del entorno (si está, `cmd.exe` no resuelve
+  ejecutables por nombre desnudo y la build muere con un `[BUG]` de Lua que no apunta
+  a la causa), y que ningún proceso tenga el cwd dentro de `CreatedMODS`.
+- Anotado que **AMUMSS vacía `CreatedMODS` en cada build**: construir los 4 seguidos
+  deja solo el último, hay que archivar cada salida.
+- `MODBUILDER\MBINCompiler.exe` y `libMBIN.dll` habían desaparecido; restaurados
+  copiando las variantes `.public`. Versión sin cambios: 6.45.0.1.
+- Re-escaneo de conflictos sobre los mods instalados: `FIENDEGGS`, `INFESTATION` y
+  `CREATUREDATATABLE` siguen libres. `NoDerelictMiniHorrors`, pese al nombre, solo
+  toca modelos de slime de fragatas derelictas — sin solape. El único choque sigue
+  siendo el mod 1, ahora instalado en su tier Hardcore.
+- **Pendiente: prueba in-game.** Es lo único que falta para cerrar 0.1.0.
+
 ### Verificación in-game — 2026-07-30
 
 - **Las 4 configuraciones probadas a mano, una por una**, con la carpeta de mods

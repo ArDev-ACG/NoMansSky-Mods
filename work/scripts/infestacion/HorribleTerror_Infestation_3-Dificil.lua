@@ -99,6 +99,14 @@
     sabemos el rango valido del campo; x20 sobre 2.0 podria salirse.
     FlatDensity/SlopeDensity son la palanca de densidad de verdad.
 
+  * TRAMPA DE ORDEN (encontrada al construir, 2026-08-01): las reglas de un
+    mismo archivo se aplican EN SECUENCIA, asi que un valor ya escrito puede
+    encajar en el VALUE_MATCH de una regla posterior. Con EGG_MULT = 5 los
+    huevos pasaban a 0.025 y la regla del gusano (VALUE_MATCH 0.025) los
+    volvia a multiplicar: FlatDensity 0.125 = x25 en vez de x5, y 29 cambios
+    en vez de 27. Por eso en INFESTATION el gusano va primero y los huevos
+    ultimos.
+
   * FiendMaxAttackers, FiendMaxEngaged y MaxFiendsToSpawn son ENTEROS
     en el MXML (value="2"), como MaxEcosystemCreaturesNormal. Escribir
     "4", no "4.000000". FiendAggroTime si es float.
@@ -254,21 +262,16 @@ NMS_MOD_DEFINITION_CONTAINER =
           }
         },
         -- ---------- Densidad de huevos y gusanos: INFESTATION ----------
+        -- EL ORDEN DE ESTAS TRES REGLAS IMPORTA. Se aplican en secuencia
+        -- sobre el mismo MXML, asi que un valor ya escrito puede encajar en
+        -- el VALUE_MATCH de una regla posterior. El gusano va PRIMERO: su
+        -- salida es 0.025*M / 0.030*M, que para cualquier M >= 1 nunca vale
+        -- 0.005, asi que no puede contaminar la regla de los huevos. La de
+        -- los huevos va ULTIMA por lo mismo.
         {
           ["MBIN_FILE_SOURCE"] = "METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\INFESTATION.MBIN",
           ["MXML_CHANGE_TABLE"] =
           {
-            {
-              ["COMMENT"]            = "Huevos de Fiend x"..EGG_MULT,
-              ["MATH_OPERATION"]     = "*",
-              ["REPLACE_TYPE"]       = "ALL",
-              ["VALUE_MATCH"]        = "0.005000",
-              ["VALUE_CHANGE_TABLE"] =
-              {
-                {"FlatDensity",  EGG_MULT},
-                {"SlopeDensity", EGG_MULT},
-              }
-            },
             {
               ["COMMENT"]            = "Gusano de arena (WORMSPAWNER) x"..EGG_MULT.." - llano",
               ["MATH_OPERATION"]     = "*",
@@ -282,6 +285,17 @@ NMS_MOD_DEFINITION_CONTAINER =
               ["REPLACE_TYPE"]       = "ALL",
               ["VALUE_MATCH"]        = "0.030000",
               ["VALUE_CHANGE_TABLE"] = { {"SlopeDensity", EGG_MULT} }
+            },
+            {
+              ["COMMENT"]            = "Huevos de Fiend x"..EGG_MULT,
+              ["MATH_OPERATION"]     = "*",
+              ["REPLACE_TYPE"]       = "ALL",
+              ["VALUE_MATCH"]        = "0.005000",
+              ["VALUE_CHANGE_TABLE"] =
+              {
+                {"FlatDensity",  EGG_MULT},
+                {"SlopeDensity", EGG_MULT},
+              }
             },
           }
         },

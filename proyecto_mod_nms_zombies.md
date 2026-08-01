@@ -504,6 +504,24 @@ Rutina de verificación, en orden de coste:
    que querías?
 3. **In-game.** Lo único que confirma que el cambio hace lo que crees.
 
+**El conteo hay que comprobarlo en las CUATRO configuraciones, no en una.** El bug de
+cascada del mod 2 (§10j) solo se manifestaba en Normal: Fácil y Difícil/Hardcore daban
+el número correcto con el mismo script defectuoso. Verificar un tier y extrapolar
+habría dejado pasar el fallo.
+
+### 10j. Las reglas de un archivo se aplican en secuencia
+
+Un valor que ya escribió una regla puede encajar en el `VALUE_MATCH` de una regla
+posterior del mismo archivo, y volver a cambiarse.
+
+Caso real (mod 2, `INFESTATION.MBIN`, ×5): la regla de huevos subía `0.005 → 0.025` y
+la del gusano (`VALUE_MATCH "0.025000"`) los multiplicaba otra vez. `FlatDensity` de
+los huevos acabó en 0.125 = ×25 en vez de ×5, y el conteo dio 29 en vez de 27.
+
+**Regla:** al usar `VALUE_MATCH` con `MATH_OPERATION`, ordenar las reglas de forma que
+ninguna salida coincida con el `VALUE_MATCH` de una regla posterior. En la práctica:
+primero las que multiplican los valores más altos.
+
 ---
 
 ## 9. Publicación Nexus
@@ -759,8 +777,39 @@ Aprendido a la mala. Dos reglas:
 - **No redirigir stdin a `NUL`.** Los scripts esperan input; con EOF se rompen o
   se cuelgan.
 
-Conclusión: `BUILDMOD.bat` se corre a mano, en ventana normal. No es automatizable
-sin trabajo extra, y no vale la pena para algo que se ejecuta una vez.
+**Corregido el 2026-08-01: sí es automatizable.** `BUILDMOD.bat` acepta cada prompt
+como flag (ver `README\README-OPTIONS_DEFINITIONS.txt`), así que no hace falta
+contestar a mano. La línea que equivale a `F / P / N / N` es:
+
+```
+BUILDMOD.bat -DEV_MODE F -GameVersion P -CombineModPak N -CopyToGamefolder NONE ^
+             -UseExtraFilesInPAK N -UseLuaScriptInPak N -SOUND N -UseColors N ^
+             -AutoUpdateMBinCompiler N
+```
+
+Con eso se pueden construir los 4 tiers de un mod en un bucle. Tres condiciones que
+costaron encontrar:
+
+- **`chcp 850` antes de llamarlo.** Con la página de códigos en 65001 (UTF-8) AMUMSS
+  aborta con "Bad Active Code Page Detected" y no hace nada.
+- **Borrar `NoDefaultCurrentDirectoryInExePath` del entorno.** Si está definida,
+  `cmd.exe` se niega a resolver ejecutables por nombre desnudo desde el directorio
+  actual, y AMUMSS invoca *todo* así (`MBINCompiler.exe`, `PSARC_LIST_PAKS.BAT`,
+  `selene.exe`, `CleanMod.bat`). El síntoma no apunta a la causa: la build muere con
+  `[BUG] LoadAndExecuteModScript.lua:14200: attempt to compare nil with number`,
+  porque sin poder ejecutar MBINCompiler la versión sale vacía y `H.nV` queda nil.
+- **Ningún proceso puede tener el cwd dentro de `CreatedMODS`.** AMUMSS vacía esa
+  carpeta al empezar cada build; si no puede, aborta con "Problem Cleaning folder
+  'CreatedMods'".
+
+Y dos notas de operación:
+
+- **AMUMSS vacía `CreatedMODS` en cada build.** Construir 4 tiers seguidos deja solo
+  el último. Hay que archivar la salida de cada uno si se quieren los cuatro a la vez.
+- **`MODBUILDER\MBINCompiler.exe` y `libMBIN.dll` pueden desaparecer.** El
+  descargador los repone desde la web, pero si falla se restauran a mano copiando
+  `MBINCompiler.public.exe` → `MBINCompiler.exe` y `libMBIN.public.dll` →
+  `libMBIN.dll`. Es exactamente lo que hace el descargador.
 
 ### Otros riesgos
 

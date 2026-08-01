@@ -57,6 +57,10 @@ Si `REPORT` no da estos números, algo no encajó y **no se despliega**.
 Hardcore lleva un global de más porque es el único tier que toca
 `PlayerPredatorBoredomDistance`.
 
+**Construidos y verificados el 2026-08-01** contra NMS 170671 / MBINCompiler 6.45.0.1:
+los cuatro dan 23 / 27 / 27 / 28 con 0 errores, 0 warnings y 0 notices, y los deltas
+se comprobaron propiedad por propiedad contra la tabla de configuraciones.
+
 ---
 
 ## Rutas que toca
@@ -93,6 +97,27 @@ del bloque bueno.
 `Coverage` **no se toca**. Los valores reales son 0.1, 1.0 y 2.0, y no sabemos el
 rango válido del campo — ×20 sobre 2.0 podría salirse.
 `FlatDensity`/`SlopeDensity` son la palanca de densidad de verdad.
+
+---
+
+## La trampa de orden (encontrada al construir, 2026-08-01)
+
+Las reglas de un mismo archivo se aplican **en secuencia** sobre el MXML, así que un
+valor ya escrito puede encajar en el `VALUE_MATCH` de una regla posterior.
+
+En Normal (`EGG_MULT = 5`) pasó exactamente eso: la regla de huevos subía
+`0.005 → 0.025`, y la del gusano (`VALUE_MATCH 0.025`) los volvía a multiplicar.
+`FlatDensity` de los huevos acabó en **0.125 = ×25** en vez de ×5, y el `REPORT` dio
+**29** cambios en vez de 27.
+
+Fácil (×2 → 0.010) y Difícil/Hardcore (×20 → 0.100) no colisionaban: el bug solo
+aparecía en Normal. Un conteo por tier es lo que lo delató.
+
+**El arreglo:** en `INFESTATION` el gusano va **primero** y los huevos **últimos**. La
+salida del gusano es `0.025·M` / `0.030·M`, que para cualquier M ≥ 1 nunca vale 0.005,
+así que no puede contaminar la regla de los huevos; y la de los huevos, al ir última,
+no contamina nada. Si algún día se añade una cuarta regla a este archivo, hay que
+comprobar que su `VALUE_MATCH` no coincida con ninguna salida de las anteriores.
 
 ---
 
