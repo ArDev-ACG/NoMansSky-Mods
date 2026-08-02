@@ -327,6 +327,18 @@ Probado contra NMS <version>.
   `CREATUREDATATABLE` siguen libres. `NoDerelictMiniHorrors`, pese al nombre, solo
   toca modelos de slime de fragatas derelictas — sin solape. El único choque sigue
   siendo el mod 1, ahora instalado en su tier Hardcore.
+- Añadido `tools/Build-Tiers.ps1`: construye las 4 configuraciones de un mod en una
+  pasada, una a la vez, y archiva cada salida en `build\<carpeta>_<fecha>\` con su log
+  y su `REPORT`. Imprime el conteo por archivo y el total de cada tier para comparar
+  contra la tabla del README. Lleva dentro los tres requisitos de entorno.
+  - Resuelve además un hueco de `Package-Release.ps1`: lee de `CreatedMODS`, que
+    AMUMSS vacía en cada build, así que con builds tier a tier nunca había más de una
+    configuración empaquetable.
+- **Desplegado `HorribleTerror_Infestation_4-Hardcore`** para la prueba: 6 EXML delta,
+  sin `.lua` ni txt de AMUMSS. El mod 1 se retiró a
+  `backups\retirado_2026-08-01_HorribleTerror_Predators_4-Hardcore\` (está empaquetado
+  en `releases/1.0.0`, así que volver atrás es copiar y reiniciar).
+  Backup de partidas previo: `NMS_saves_2026-08-01_1704_antes-mod2-infestacion-hardcore`.
 - **Pendiente: prueba in-game.** Es lo único que falta para cerrar 0.1.0.
 
 ### Verificación in-game — 2026-07-30
