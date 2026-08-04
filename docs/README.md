@@ -5,6 +5,16 @@ Destino: Nexus Mods, categoría Creatures.
 
 Doc de diseño y roadmap: [`../proyecto_mod_nms_zombies.md`](../proyecto_mod_nms_zombies.md)
 
+| Doc | Para qué |
+|---|---|
+| [`MODIFICACIONES.md`](MODIFICACIONES.md) | **Tabla viva**: cada campo que toca el mod, qué hace y sobre qué monstruo |
+| [`IDEAS.md`](IDEAS.md) | Mapa de spawn y cola de trabajo |
+| [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) | Conducta: percepción, acecho, ataques, cadencia, separación |
+| [`FAUNA_REFERENCE.md`](FAUNA_REFERENCE.md) | Referencia de fauna, arquetipos y tablas |
+| [`NEXUS.md`](NEXUS.md) | Publicación y textos de la página |
+| [`CHANGELOG.md`](CHANGELOG.md) | Historial del proyecto y del mod 1 |
+| [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) | Historial del mod 2 (Infestation), versionado aparte |
+
 ## Qué hay en este repo
 
 Solo fuentes propias:

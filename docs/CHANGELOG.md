@@ -1,6 +1,10 @@
-# Changelog
+# Changelog — proyecto y mod 1
 
 Formato: [Keep a Changelog](https://keepachangelog.com/). Versionado: SemVer.
+
+> 📘 **El mod 2 (Infestation) tiene su propio changelog:**
+> [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md). Se versiona aparte del mod 1 y arrancó en
+> 0.1.0. Lo que quede aquí de mod 2 es histórico, hasta la separación del 2026-08-04.
 
 Cada entrada de release debe anotar la **versión de NMS** contra la que se probó —
 los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
@@ -340,6 +344,100 @@ Probado contra NMS <version>.
   en `releases/1.0.0`, así que volver atrás es copiar y reiniciar).
   Backup de partidas previo: `NMS_saves_2026-08-01_1704_antes-mod2-infestacion-hardcore`.
 - **Pendiente: prueba in-game.** Es lo único que falta para cerrar 0.1.0.
+
+### Mod 1 — 1.1.0, repaquetado (2026-08-03)
+
+- El zip de cada configuración pasa a llevar cuatro cosas: la **carpeta del mod**, el
+  **`.pak`** de AMUMSS, una carpeta **`Source\` con los 4 `.lua`** y un **`README.txt`**
+  generado. Sin cambios de gameplay: los EXML son idénticos a los de 1.0.0.
+- `tools/Package-Release.ps1` reescrito. Parámetros nuevos: `-Origen` (permite
+  empaquetar desde un archivado de `build\`, no solo desde `CreatedMODS`, que AMUMSS
+  vacía), `-Fuentes`, `-Paks`, `-SinPak` y `-TituloMod`. Desaparece `-IncluirLua`: el
+  fuente ahora va siempre, pero en `Source\` y no dentro de la carpeta instalable.
+- El `README.txt` se escribe en **ASCII a propósito**: `Set-Content -Encoding utf8` de
+  PowerShell 5.1 mete BOM, que en un `.txt` se ve como basura en algunos editores.
+- **Confirmado por magic bytes que el `.pak` de AMUMSS no es el formato del juego:**
+  `50 53 41 52` (`PSAR`, PSARC) frente a `48 47 50 41` (`HGPA`) de los paks vanilla de
+  NMS 6.45. Se incluye igualmente por decisión de producto; el `README.txt` y la
+  descripción de Nexus dicen que lo que se instala es la carpeta. Para omitirlo:
+  `-SinPak`.
+- **Eliminadas todas las referencias a `DISABLEMODS.TXT`**: el paso de instalación de
+  la descripción de Nexus y la fila de la tabla de verificación de entorno de
+  `proyecto_mod_nms_zombies.md` (sustituida por «Carga de mods ✅ habilitada»).
+- `docs/NEXUS.md` actualizado: contenido del zip, pasos de instalación sin
+  `DISABLEMODS.TXT`, sección nueva de código fuente incluido, y la decisión de
+  permisos revisada — 1.0.0 se publicó cerrado, 1.1.0 incluye los `.lua`, así que la
+  única protección que queda es la que Nexus hace cumplir.
+
+### Investigación — eclosión por proximidad (2026-08-03)
+
+- Pregunta: que los Fiend salgan del huevo **sin romperlo**, a ~5 m. **En vanilla no
+  existe.** El huevo salvaje eclosiona solo al destruirse: la eclosión *es* la
+  destrucción (`GcDestructableComponentData.Explosion = FIENDHATCH`).
+- El huevo salvaje (`RARERESOURCE\GROUND\FIENDEGG.ENTITY`) tiene 4 componentes:
+  scannable, shootable, destructable y física estática. **Ni animación, ni disparador,
+  ni percepción.** No hay radio de proximidad que tocar.
+- **Encontrado el molde:** el huevo **construible** (`BUILDABLEPARTS\SPACEBASE\FIENDEGG`)
+  tiene 7 componentes, incluidos `TkAnimationComponentData` con la animación
+  **`IDLENEAR`** — el estado «el jugador está cerca» existe y está animado — y
+  `GcAntagonistComponentData` con una percepción `HIVE_MIND` de **`Range 6.0`,
+  `XFOV 360`, `Raycast false`**, que es la forma exacta de una proximidad pura.
+  `Enemies.Player.Perceptions` está **vacío**: ese es el hueco donde engancharía.
+- **Ruta barata que sí funciona hoy:** `GroundWormSpawnerActivateRadius = 100` es un
+  spawner activado por cercanía sin romper nada, y el `WORMSPAWNER` ya lo coloca
+  `INFESTATION.MBIN`, o sea que ya está dentro del mod 2. Bajarlo a 5-10 da la mecánica
+  pedida, con gusano en vez de Fiend. Añadido como punto 5b de la cola de 0.2.0.
+- Copiar el componente antagonista al huevo salvaje queda como sesión propia: sería el
+  primer `.ENTITY.MBIN` que tocamos y el primer componente que **añadimos** en vez de
+  editar un valor, con dos incógnitas (si percibir dispara la eclosión, y que sin
+  componente de animación no habría animación de apertura).
+- Todo en `docs/COMPORTAMIENTO.md` §8.
+
+### Investigación — comportamiento de las criaturas (2026-08-03)
+
+- Añadido `docs/COMPORTAMIENTO.md`: mapa profundo de las palancas de conducta —
+  percepción, acecho, ataques, cadencia y separación entre criaturas. Cubre los 4
+  archivos que la gobiernan, los 8 árboles de comportamiento nodo a nodo y una cola
+  de trabajo priorizada para 0.2.0.
+- **Trampa nueva: los backups de AMUMSS no son vanilla.**
+  `tools\AMUMSS\ModBackups\<mod>\*.MBIN` guarda el archivo **ya modificado**. Se
+  detectó al leer allí `PredatorPerceptionDistance = 80`, que es nuestro Hardcore.
+  Los valores vanilla hay que sacarlos del `.pak` con `hgpaktool`.
+  `GCCREATUREGLOBALS` vive en `NMSARC.globals.pak`, no en `NMSARC.Precache.pak`.
+- **Dos errores corregidos en `IDEAS.md`:**
+  - `AlertTable` no es un sensor hacia el jugador. Sus 4 entradas son
+    criatura↔criatura (`Prey←Predator`, `Prey←Drone`…) y ninguna menciona al jugador.
+  - Los dueños de `GcCreatureFiendAttackData` no son los que decía. Son `FIEND`,
+    `BUGFIEND`, `BUGQUEEN`, `SCUTTLER`, **`SCUTTLER_PET`**, `SLUG`, `MINIFIEND` y
+    `MINIDRONE`. No hay ningún bloque de pez. `SCUTTLER_PET` es la mascota del
+    jugador: un `REPLACE_TYPE = "ALL"` la tocaría.
+- **Resuelta una pregunta abierta: `SpawnBroodID` acepta un ID de grupo.** `BUGQUEEN`
+  lo usa en vanilla con `BUGFIENDS` / timer 30 / anim `BIRTHING`. Deja de ser
+  especulación y pasa a ser copiar un patrón que el juego ya ejecuta.
+- Hallazgos accionables nuevos, todos en `GCCREATUREGLOBALS`: `FiendOnscreenMarkers`
+  (marcador de UI sobre el bicho), `FiendPerceptionDistance` 60 (campo aparte del de
+  depredador — hoy en Hardcore el Fiend te ve más tarde), `FiendZigZagSpeed`/
+  `Strength` a 0 con el Scuttler como referencia funcional, y
+  `FiendMinSpawnTime`/`MaxSpawnTime` 0.25/3.0 como ritmo de eclosión.
+- Causa del amontonamiento de manadas localizada: `AvoidCreaturesStrength = 0.0` en
+  el nodo `MOVE_CLOSE` de los árboles terrestres. Los voladores lo tienen a 1.0, así
+  que es deliberado de HG y solo se nota desde que subimos el tamaño de grupo.
+- Re-escaneo de conflictos: `CREATUREBEHAVIOURTREES`, `CREATUREDATATABLE`,
+  `GCCREATUREGLOBALS` y `CREATUREGENERATIONDATA` siguen sin tocarlas ningún mod de
+  terceros.
+
+### Mod 2 — verificación in-game, 0.1.0 cerrada (2026-08-02)
+
+- **Tier Hardcore probado a mano.** Los 13 cambios confirmados jugando:
+  - Los 5 nuevos de Fiend: densidad de huevos ×20, densidad del `WORMSPAWNER` ×20,
+    `FiendMaxAttackers` 6, `FiendMaxEngaged`/`MaxFiendsToSpawn` 12 y
+    `FiendAggroTime` 120 s.
+  - Los 8 heredados del mod 1 siguen funcionando dentro del mod 2: densidad ×20,
+    `DANGEROUS` 1000, manadas 5-7, percepción 80, sin huida, 100% hostiles, tope 70
+    y aburrimiento a 150 m.
+- Con esto **0.1.0 queda cerrada por el lado técnico**. Falta solo el material de
+  publicación (capturas propias del mod 2 y su página de Nexus).
+- Sin regresiones observadas al convivir con los 87 mods de terceros reinstalados.
 
 ### Verificación in-game — 2026-07-30
 

@@ -193,15 +193,26 @@ Los más jugosos:
 
 `AllowSpawnBrood = false` es la línea más interesante del archivo entero. Está
 implementado y apagado. Encenderlo daría bichos que se multiplican mientras luchas.
-`[Sin probar]` — hay que averiguar qué acepta `SpawnBroodID`.
+
+🔓 **Resuelto el 2026-08-03: `SpawnBroodID` acepta un ID de grupo, y hay ejemplo
+vanilla.** `BUGQUEEN` lo usa funcionando: `AllowSpawnBrood true`,
+`SpawnBroodID BUGFIENDS`, `SpawnBroodTimer 30`, `SpawnBroodAnim BIRTHING`. Ya no hay
+que adivinar el formato, solo comprobar si `BUGFIENDS` resuelve fuera del contexto de
+la reina. `[Sin probar]`
 
 Existe además `GcCreatureSpookFiendAttackData`, una variante aparte. Sin explorar.
 
 **Ubicación confirmada 2026-07-30:** `GcCreatureFiendAttackData` vive en
-`METADATA/SIMULATION/ECOSYSTEM/CREATUREDATATABLE.MBIN`, con **8 bloques** repartidos
-entre las entradas `FIEND`, `BUGFIEND`, `MINIFIEND`, `FIENDFISHSMALL` y
-`FIENDFISHBIG`, más 2 de `GcCreatureSpookFiendAttackData`. Un `REPLACE_TYPE = "ALL"`
-sobre `MinFlurryHits` los tocaría los diez, peces incluidos.
+`METADATA/SIMULATION/ECOSYSTEM/CREATUREDATATABLE.MBIN`, con **8 bloques**, más 2 de
+`GcCreatureSpookFiendAttackData`.
+
+⚠️ **Corregidos los dueños el 2026-08-03.** Antes decía `FIEND`, `BUGFIEND`,
+`MINIFIEND`, `FIENDFISHSMALL` y `FIENDFISHBIG`. Los reales son **`FIEND`, `BUGFIEND`,
+`BUGQUEEN`, `SCUTTLER`, `SCUTTLER_PET`, `SLUG`, `MINIFIEND` y `MINIDRONE`**, y los 2
+`SpookFiend` son de `JELLYBOSS_BROOD` y `LAND_SQUID`. No hay ningún bloque de pez.
+Importa porque un `REPLACE_TYPE = "ALL"` tocaría **`SCUTTLER_PET`, que es la mascota
+del jugador**, y `BUGQUEEN`, que es un jefe con valores calibrados aparte. Hay que
+acotar por `SPECIAL_KEY_WORDS` con el `Id` de la entrada.
 
 La ruta está **libre** en los 87 mods instalados.
 
@@ -265,6 +276,10 @@ Follow 1.0      AlignTime 0.5   AttractedToBait false
 Además hay un booleano suelto `Herd` (vanilla `false` en las entradas vistas).
 
 ### 3.4 Comportamiento — `CREATUREBEHAVIOURTREES`
+
+> 📘 Mapeado a fondo el 2026-08-03 en [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md):
+> los 8 árboles nodo a nodo, las tres capas de cadencia de ataque, el porqué del
+> amontonamiento de manadas y la cola de trabajo de 0.2.0.
 
 **8 árboles:** `MELEE`, `RANGED_SPIT`, `RANGED_FIRE`, `IDLE`, `HERBIVORE`, `FLYING`,
 `CRASHY`, `COOLDOWN`.
@@ -359,10 +374,15 @@ colisión.**
 | `CreatureSightRange` | 100 | vista genérica |
 | `CreatureHearingRange` | 10 | oído genérico |
 | `AlertDistance` | 50 | radio de contagio de alerta entre bichos |
-| `AlertTable` | — | `HearingRange`/`SightRange`/`SightAngle`/`FleeRange` por par de tipos |
+| `FiendPerceptionDistance` | 60 | **percepción de los Fiend, campo aparte** (2026-08-03) |
 
-`SightAngle = 60` en las entradas de `AlertTable`: cono de visión, no 360°. Se les
-puede escapar por detrás.
+⚠️ **Corregido el 2026-08-03: `AlertTable` no es un sensor hacia el jugador.** Estaba
+en esta tabla por error. Sus 4 entradas son `Prey←Predator`, `FishPrey←FishPredator`,
+`Prey←Drone` y `Passive←Drone`: **ninguna menciona al jugador ni a `PlayerPredator`.**
+Es propagación de alerta *entre criaturas* — la presa que ve un depredador huye.
+El `SightAngle = 60` es el cono con que una criatura ve a otra, no el tuyo. Tocarlo
+cambia cómo reacciona la fauna pacífica, no cómo te detectan a ti.
+Detalle en [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) §1.
 
 ### Persistencia de la persecución
 

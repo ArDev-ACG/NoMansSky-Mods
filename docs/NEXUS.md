@@ -17,10 +17,24 @@ Lista de comprobación. **Cada punto se ha roto al menos una vez en este proyect
       diagnosticar nada cuando el juego se actualice.
 - [x] Probado con la carpeta de mods **limpia** de los otros 87, para descartar que
       algo funcione por accidente gracias a otro mod.
-- [ ] Capturas hechas. Nexus sin imágenes no lo descarga nadie.
+- [x] Capturas hechas. Nexus sin imágenes no lo descarga nadie.
+      3 en `Capturas Mod 1\` (fuera de git: `.gitignore` excluye `*.png`).
 
-**Estado (2026-07-30):** las 4 configuraciones verificadas a mano, en limpio, sobre
-NMS 170671. Solo faltan las capturas.
+**Estado (2026-08-03):** las 4 configuraciones verificadas a mano, en limpio, sobre
+NMS 170671. Capturas hechas y zips verificados. **Listo para subir.**
+
+### Las capturas que hay
+
+| Archivo | Resolución | Qué demuestra |
+|---|---|---|
+| `Cap1.png` | 1786×1109 | Densidad y planetas hostiles: ~14 iconos de pata roja de golpe |
+| `Cap2.png` | 1920×1200 | Varias especies a la vez con la nave de referencia de escala |
+| `Cap3.png` | 1920×1200 | Manada: iconos apilados en columna y un depredador cargando |
+
+Las tres valen y sirven para publicar. Limitaciones anotadas para una tanda futura:
+mismo planeta (Xoust) y misma paleta naranja en las tres, ninguna en combate real,
+y el HUD del manipulador de terreno metido en la esquina. `Cap1` va a 1786 px de
+ancho, así que **no** se usa de imagen principal: esa debe ir a 1920×1080.
 
 ---
 
@@ -34,7 +48,22 @@ NMS 170671. Solo faltan las capturas.
 | `.pak` que genera AMUMSS en `ModBackups\BuildHistory\` | `PSAR` (PSARC, **antiguo**) |
 | Los 87 mods instalados en `GAMEDATA\MODS\` | **carpetas. Cero `.pak`.** |
 
-Los `.pak` de AMUMSS son un residuo del flujo pre-6.x. No sirven.
+Los `.pak` de AMUMSS son un residuo del flujo pre-6.x. **No los carga NMS 6.45.**
+
+Comprobado por magic bytes el 2026-08-03:
+
+| Archivo | Primeros 4 bytes | Formato |
+|---|---|---|
+| `NMSARC.globals.pak` (vanilla) | `48 47 50 41` | **HGPA** |
+| `HorribleTerror_Predators_4-Hardcore.pak` (AMUMSS) | `50 53 41 52` | **PSAR** (PSARC) |
+
+Son formatos distintos, no dos variantes del mismo.
+
+**Aun así, desde 1.1.0 el `.pak` se incluye en el zip** por decisión de producto. Va
+suelto en la raíz, junto a la carpeta, y tanto el `README.txt` como la descripción de
+Nexus dicen que lo que se instala es **la carpeta**. Riesgo residual asumido: que
+alguien meta el `.pak` en `PCBANKS\MODS`, no vea ningún efecto y lo reporte como que el
+mod no funciona. Para quitarlo: `Package-Release.ps1 -SinPak`.
 
 El zip debe contener la **carpeta del mod con su nombre dentro**, para que el usuario
 extraiga en `GAMEDATA\MODS\` y quede colocada sola:
@@ -88,15 +117,14 @@ Un solo mod con **cuatro Main Files**. No cuatro páginas, y sin optional files.
 
 | Nexus File | Archivo |
 |---|---|
-| Main File — 1. Fácil | `HorribleTerror_Predators_1-Facil_v1.0.0.zip` |
-| Main File — 2. Normal | `HorribleTerror_Predators_2-Normal_v1.0.0.zip` |
-| Main File — 3. Difícil | `HorribleTerror_Predators_3-Dificil_v1.0.0.zip` |
-| Main File — 4. Hardcore | `HorribleTerror_Predators_4-Hardcore_v1.0.0.zip` |
+| Main File — 1. Fácil | `HorribleTerror_Predators_1-Facil_v1.1.0.zip` |
+| Main File — 2. Normal | `HorribleTerror_Predators_2-Normal_v1.1.0.zip` |
+| Main File — 3. Difícil | `HorribleTerror_Predators_3-Dificil_v1.1.0.zip` |
+| Main File — 4. Hardcore | `HorribleTerror_Predators_4-Hardcore_v1.1.0.zip` |
 
-**Los `.lua` fuente no se suben.** `Package-Release.ps1` ya los excluye por defecto
-(solo entran con `-IncluirLua`, que no se usa). Muchos mods de NMS sí los incluyen —
-Asteroid Ribbons, Better Scan Rewards, 10x Industrial Waste, etc. — pero es opcional,
-no un requisito del formato.
+**Desde 1.1.0 los `.lua` fuente sí se suben**, en `Source\`, y los cuatro en cada zip.
+Es el patrón de muchos mods de NMS (Asteroid Ribbons, Better Scan Rewards, 10x
+Industrial Waste). Ver la sección de permisos al final: cambia la decisión de 1.0.0.
 
 En la descripción de cada archivo, poner en la **primera línea** que solo se instala
 uno. Es el error de instalación más probable.
@@ -180,16 +208,32 @@ Loses interest at (m)       80       80       80       80      150
 [b]3. Hard[/b] — almost every planet, packs of 3-5, and they never run.
 [b]4. Hardcore[/b] — packs of 5-7, spotted at 80 m, chased to 150 m.
 
+[size=5]What is in the download[/size]
+
+[code]
+HorribleTerror_Predators_<tier>\   <- the mod. This is what you install.
+HorribleTerror_Predators_<tier>.pak   legacy single-file build (not needed on 6.x)
+Source\                               the .lua build scripts for all four tiers
+README.txt                            install notes
+[/code]
+
 [size=5]Installation[/size]
 
 [list=1]
-[*]Extract [b]one[/b] zip into [code]No Man's Sky\GAMEDATA\MODS\[/code]
-[*]You should end up with [code]GAMEDATA\MODS\HorribleTerror_Predators_<tier>\[/code]
-[*]Make sure [code]GAMEDATA\DISABLEMODS.TXT[/code] does not exist
+[*]Open [b]one[/b] zip and take the folder [code]HorribleTerror_Predators_<tier>\[/code]
+[*]Drop it into [code]No Man's Sky\GAMEDATA\MODS\[/code]
+[*]You should end up with [code]GAMEDATA\MODS\HorribleTerror_Predators_<tier>\GLOBALS\[/code]
 [*]Restart the game — mods only load on startup
 [/list]
 
 To switch difficulty, [b]delete the old folder first[/b], then extract the new one.
+
+[size=5]Source included[/size]
+
+Every download now ships a [code]Source\[/code] folder with the [b].lua build script
+for all four configurations[/b]. If you want to see exactly which values are changed,
+or build your own numbers, drop one script into AMUMSS's [code]ModScript\[/code]
+folder and run [code]BUILDMOD.bat[/code] in FULL mode.
 
 [size=5]Compatibility[/size]
 
@@ -227,6 +271,29 @@ file conflict otherwise.
 [/list]
 ```
 
+## CHANGELOG de Nexus — 1.1.0
+
+Para el campo *Changelog* de la página. Packaging only, sin cambios de gameplay.
+
+```bbcode
+[b]1.1.0[/b]
+[list]
+[*]Added [b]Source\[/b] to every download: the .lua build scripts for all four
+configurations, so you can see exactly what is changed or build your own numbers.
+[*]Added a README.txt with install notes.
+[*]Added the AMUMSS .pak build for reference. You do [b]not[/b] need it — NMS 6.x
+loads the unpacked folder, which is what you install.
+[*]Cleaned up the install instructions.
+[/list]
+[i]No gameplay changes. The mod files are identical to 1.0.0 — you only need to update
+if you want the source scripts.[/i]
+
+[b]1.0.0[/b]
+[list]
+[*]Initial release. Four difficulty configurations, tested in-game on NMS 170671.
+[/list]
+```
+
 ---
 
 ## Permisos y créditos
@@ -239,10 +306,18 @@ toda la comunidad de NMS (los 87 mods instalados localmente funcionan así).
 - AMUMSS — HolterPhylo
 - MBINCompiler — monkeyman192
 
-### Decisión: se publica cerrado, no editable
+### Decisión: código incluido, permisos restrictivos (cambiado en 1.1.0)
 
-No se suben los `.lua` y los permisos van restrictivos. En el formulario de permisos
-de Nexus (sección *Permissions and credits* de la página del mod), poner:
+**1.0.0 se publicó cerrado.** Desde **1.1.0 los `.lua` van dentro del zip** en
+`Source\`. Los permisos siguen restrictivos: publicar el código no es lo mismo que
+autorizar a republicarlo o derivarlo.
+
+Consecuencia honesta del cambio: la protección que quedaba en 1.0.0 —«los `.lua` son
+el trabajo de verdad y no se regalan»— **ya no aplica**. Lo único que queda es la
+parte que Nexus hace cumplir: si alguien sube un fork, se reporta y lo bajan.
+
+En el formulario de permisos de Nexus (sección *Permissions and credits* de la página
+del mod), poner:
 
 | Campo de Nexus | Valor |
 |---|---|
@@ -253,16 +328,14 @@ de Nexus (sección *Permissions and credits* de la página del mod), poner:
 | Others can use assets in files that are being sold | **No** |
 | Others can earn Donation Points from this file | **No** |
 
-**Límite honesto de esto.** Los EXML son texto plano: quien descargue el mod puede
-abrirlo en un editor y cambiar los números en treinta segundos. No se puede impedir, y
-ningún formato de NMS lo impediría. Lo que se consigue con lo de arriba es:
+**Límite honesto de esto.** Los EXML son texto plano y ahora los `.lua` también van
+dentro. Cualquiera puede abrirlos y cambiar los números en treinta segundos. No se
+puede impedir, y ningún formato de NMS lo impediría.
 
-1. No regalar los `.lua`, que son el trabajo de verdad — la lógica, los comentarios y
-   el saber qué propiedad toca cambiar.
-2. Dejar por escrito que no hay permiso para republicar ni derivar. Es la parte que
-   Nexus hace cumplir: si alguien sube un fork, se reporta y lo bajan.
+Lo único que consigue la tabla de arriba es dejar por escrito que **no hay permiso para
+republicar ni derivar**. Esa parte sí la hace cumplir Nexus.
 
-O sea, "no editable" = no reutilizable ni republicable, no "imposible de tocar".
+O sea: "no editable" = no reutilizable ni republicable, no "imposible de tocar".
 
 ---
 

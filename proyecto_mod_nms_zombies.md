@@ -547,7 +547,7 @@ primero las que multiplican los valores más altos.
 | MBINCompiler | ✅ 6.45.0.1 — 'latest' y 'public' coinciden |
 | Carpeta de mods real | ✅ `GAMEDATA\MODS\` — ver §10d |
 | Mods instalados | 87 activos, gestionados por Vortex |
-| `DISABLEMODS.TXT` | ✅ ausente → carga de mods habilitada |
+| Carga de mods | ✅ habilitada |
 | Espacio libre C: | 358 GB |
 | Ruta proyecto | ✅ sin acentos, fuera de OneDrive |
 | git | ✅ 2.50.0 |

@@ -1,11 +1,33 @@
 --[[
   HORRIBLE TERROR - Infestacion :: FACIL
   ==================================================================
-  MOD 2. Los Horrores Biologicos (FIEND en los archivos) dejan de ser
-  una rareza y pasan a ser parte del paisaje. Los huevos se siembran
-  por el terreno, y cuando uno eclosiona vienen mas y aguantan mas.
+  MOD 2, version 0.2.0. Los Horrores Biologicos (FIEND en los archivos)
+  dejan de ser una rareza y pasan a ser parte del paisaje. Los huevos se
+  siembran por el terreno, y cuando uno eclosiona vienen mas.
 
   >>> CONFIGURACION 1 de 4: FACIL <<<
+
+  ------------------------------------------------------------------
+  0.2.0: ESTE TIER NO CAMBIA
+  ------------------------------------------------------------------
+  0.2.0 anade ocho cambios de CONDUCTA de los Fiend (sin marcador de
+  UI, eclosion en oleada, mas golpes por racha, que se multipliquen...).
+  Facil NO coge ninguno.
+
+  El motivo es el mismo criterio que ya seguia en 0.1.0: este tier no
+  escribe valores que coincidan con vanilla, porque ensucian el EXML
+  delta sin cambiar nada. Los ocho cambios de 0.2.0 empiezan en Normal.
+
+  Eran nueve: el zigzag se ha quitado de todos los tiers sin llegar a
+  probarlo. Se vio in-game que los Fiend ya se acercan zigzagueando con
+  el campo a 0, o sea que no es la palanca que lo causa -- y subirlo iria
+  en contra de lo que se busca, que vengan DERECHOS a por ti.
+
+  --> El EXML de Facil en 0.2.0 es IDENTICO al de 0.1.0. Quien tenga
+      Facil instalado no necesita actualizar.
+
+  Facil sigue siendo: densidad x2, 23% de planetas hostiles, manadas de
+  1-2, huevos x2 y los depredadores conservan la huida al 30% de vida.
 
   ------------------------------------------------------------------
   RELACION CON EL MOD 1 (Predators)
@@ -36,16 +58,27 @@
   % depredadores hostiles    0.5     0.6     0.75      1.0      1.0
   Tope criaturas a la vez     40      45       50       60       70
   Distancia de aburrimiento   80      80       80       80      150
-  -- Parte nueva: Fiends --
+  -- Fiends: cantidad (0.1.0) --
   Densidad de huevos          x1      x2       x5      x20      x20
   FiendMaxAttackers            2       2        3        4        6
   FiendMaxEngaged              6       6        8       10       12
   MaxFiendsToSpawn             6       6        8       10       12
   FiendAggroTime (s)          45      45       60       90      120
+  -- Fiends: conducta (0.2.0) --
+  Marcador de UI              si      si       si       NO       NO
+  Percepcion Fiend (m)        60      60       65       70       80
+  Eclosion min/max (s)   0.25/3.0  0.25/3  0.2/2.0  0.15/1.0  0.1/0.5
+  AvoidCreaturesWeight         6       6        8       10       10
+  Radio activacion gusano    100     100       50       20       10
+  Golpes por racha           2/4     2/4      2/4      3/5      3/6
+  Cadencia del salto (s)     2.0     2.0      1.8      1.5      1.2
+  Velocidad de ataque        1.0     1.0      1.0      1.1      1.2
+  Se multiplican              no      no       no       no       SI
 
-  ESTE TIER no escribe ningun global de Fiend a proposito: los cuatro
+  ESTE TIER no escribe ningun global de Fiend a proposito: todos sus
   valores coinciden con vanilla y escribirlos ensuciaria el EXML delta
-  sin cambiar nada. Facil solo multiplica los huevos por 2.
+  sin cambiar nada. Facil solo multiplica los huevos por 2, y por el
+  mismo motivo tampoco toca CREATUREDATATABLE.
 
   ------------------------------------------------------------------
   QUE SIGNIFICA CADA PARAMETRO NUEVO
@@ -78,9 +111,12 @@
     METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\FIENDEGGS.MBIN
     METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\INFESTATION.MBIN
 
-  Escaneo del 2026-07-30 sobre los 87 mods de terceros instalados:
-  FIENDEGGS, INFESTATION y CREATUREDATATABLE estan libres. La unica ruta
-  disputada es GCCREATUREGLOBALS, y solo contra nuestro propio mod 1.
+  Son 6 y no 7: los otros tres tiers estrenan en 0.2.0
+  CREATUREDATATABLE.MBIN, que este no necesita.
+
+  Escaneo del 2026-08-03: las 7 rutas del mod siguen libres de mods de
+  terceros. La unica disputada es GCCREATUREGLOBALS, y solo contra
+  nuestro propio mod 1.
 
   ------------------------------------------------------------------
   TRAMPAS VERIFICADAS - no tocar sin leer esto
@@ -131,12 +167,14 @@
   ------------------------------------------------------------------
   VERIFICACION ESPERADA
   ------------------------------------------------------------------
-  REPORT: 23 CHANGE(s) en total.
+  REPORT: 23 CHANGE(s) en total. IGUAL QUE EN 0.1.0.
     5 en CREATUREGENERATIONDATA (4 de densidad + 1 de peso)
     2 en cada tabla PLAYERPREDATOR (x2 archivos = 4)
     4 en GCCREATUREGLOBALS (solo depredador; este tier no toca Fiend)
     4 en FIENDEGGS    (2 FlatDensity + 2 SlopeDensity)
     6 en INFESTATION  (4 del grupo 0.005 + 1 de 0.025 + 1 de 0.030)
+
+  Si da 23, esta bien. Este tier no cambia en 0.2.0 a proposito.
 --]]
 
 -- ---------- Heredado del mod 1 ----------
