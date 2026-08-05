@@ -14,6 +14,7 @@ Doc de diseño y roadmap: [`../proyecto_mod_nms_zombies.md`](../proyecto_mod_nms
 | [`NEXUS.md`](NEXUS.md) | Publicación y textos de la página |
 | [`CHANGELOG.md`](CHANGELOG.md) | Historial del proyecto y del mod 1 |
 | [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) | Historial del mod 2 (Infestation), versionado aparte |
+| [`CHANGELOG-MOD3.md`](CHANGELOG-MOD3.md) | Historial del mod 3 (Mapa Galáctico a Pie), versionado aparte |
 
 ## Qué hay en este repo
 
@@ -31,11 +32,20 @@ Solo fuentes propias:
 1. Editar .lua en work/scripts/
 2. Copiarlo a tools/AMUMSS/ModScript/   (AMUMSS solo lee de ahi)
 3. Correr tools/AMUMSS/BUILDMOD.bat     modo FULL, rama Experimental
-4. Copiar el resultado a:
-   C:\Program Files (x86)\Steam\steamapps\common\No Man's Sky\GAMEDATA\MODS\
-5. Lanzar juego. Probar en save de pruebas.
-6. Si OK → releases/ + anotar en CHANGELOG.md con la version de NMS probada
+4. VERIFICAR leyendo el EXML delta de tools/AMUMSS/CreatedMODS/<mod>/
+5. DESPLEGAR copiando los .MBIN de tools/AMUMSS/ModBackups/<mod>/ a:
+   C:\Program Files (x86)\Steam\steamapps\common\No Man's Sky\GAMEDATA\MODS\<mod>\
+6. Lanzar juego. Probar en save de pruebas.
+7. Si OK → releases/ + anotar en CHANGELOG.md con la version de NMS probada
 ```
+
+> **Los pasos 4 y 5 leen de carpetas distintas.** `CreatedMODS/` tiene EXML **delta**:
+> solo las propiedades que cambiaron, con marcas `!# CHANGED`. Sirve para revisar el
+> cambio, **no es un archivo de juego** y copiarlo al juego no despliega nada. Los `.MBIN`
+> completos estan en `ModBackups/<mod>/`, y el `.pak` en
+> `ModBackups/________________BuildHistory/<mod>.pak`.
+>
+> Esto costo una prueba entera del mod 3: ver `CHANGELOG-MOD3.md`.
 
 ## Entorno verificado
 
