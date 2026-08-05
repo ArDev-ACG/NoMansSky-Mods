@@ -7,9 +7,9 @@ y **sobre qué criatura actúa**.
 > de los `.lua`, esta tabla se actualiza en la misma sesión. Si la tabla y los `.lua` no
 > coinciden, manda el `.lua`.
 
-- Versión cubierta: **mod 2 Infestation 0.3.0** (incluye lo del mod 1 Predators 1.1.0).
+- Versión cubierta: **mod 2 Infestation 0.3.1** (incluye lo del mod 1 Predators 1.1.0).
 - Referencias: [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) · [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) · [`../work/scripts/infestacion/README.md`](../work/scripts/infestacion/README.md)
-- Última revisión: **2026-08-04**, contra el EXML desplegado en `GAMEDATA\MODS`.
+- Última revisión: **2026-08-05**, descompilando los **MBIN** desplegados en `GAMEDATA\MODS`.
 
 ---
 
@@ -18,10 +18,16 @@ y **sobre qué criatura actúa**.
 | | |
 |---|---|
 | Mod en `GAMEDATA\MODS` | `HorribleTerror_Infestation_4-Hardcore` |
-| Versión | **0.3.0** |
-| Verificado | 54 `!# CHANGED` en 8 EXML — 26+2+7+5+2+2+4+6 |
+| Versión | **0.3.1** |
+| Formato | **9 MBIN** desde `ModBackups\`, con el `GLOBALS\` creado a mano |
+| Verificado | descompilando de vuelta desde `GAMEDATA\MODS`, campo por campo |
 | Mod 1 | **no instalado** (correcto: se instala uno o el otro) |
 | NMS | 170671, rama Public · MBINCompiler 6.45.0.1 |
+
+> **Lo que había antes eran 8 EXML con las marcas `!# CHANGED` dentro** — el delta de
+> `CreatedMODS`, que es el informe y no el archivo de juego. 0.3.1 es el primer despliegue
+> de Hardcore verificado como MBIN, así que **todo lo probado in-game antes del 05/08 hay
+> que tratarlo como no medido**. Ver `CHANGELOG-MOD2.md`, 0.3.1 § Fixed.
 
 ---
 
@@ -66,7 +72,7 @@ Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 
 ---
 
-## 3 · `GLOBALS\GCCREATUREGLOBALS.MBIN` — hasta 15 cambios
+## 3 · `GLOBALS\GCCREATUREGLOBALS.MBIN` — hasta 31 cambios
 
 ### 3a · Heredado del mod 1 — depredadores
 
@@ -86,17 +92,22 @@ Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 13 | `FiendMaxAttackers` | Cuántos te pegan **a la vez**. Entero | **Fiend** | 2 | — | 3 | 4 | 6 |
-| 14 | `FiendMaxEngaged` | Cuántos están en combate contigo. Entero | Fiend | 6 | — | 8 | 10 | 12 |
-| 15 | `MaxFiendsToSpawn` | Tope de Fiends generados por un evento. Entero | Fiend | 6 | — | 8 | 10 | 12 |
-| 16 | `FiendAggroTime` | Segundos que te persiguen tras perderte de vista | Fiend | 45 | — | 60 | 90 | 120 |
+| 13 | `FiendMaxAttackers` | Cuántos te pegan **a la vez**. Entero | **Fiend** | 2 | — | 3 | 4 | **8** |
+| 14 | `FiendMaxEngaged` | Cuántos están en combate contigo. Entero | Fiend | 6 | — | 8 | 10 | **16** |
+| 15 | `MaxFiendsToSpawn` | Tope de Fiends generados por un evento. Entero | Fiend | 6 | — | 8 | 10 | **16** |
+| 16 | `FiendAggroTime` | Segundos que te persiguen tras perderte de vista | Fiend | 45 | — | 60 | 90 | **600** |
+
+> Hardcore sube estos cuatro en **0.3.1**. `MaxFiendsToSpawn` tiene que ir a la par de
+> `FiendMaxEngaged`: si caben 16 comprometidos pero solo nacen 12, el cupo extra no lo
+> llena nadie. Ojo con el nombre — `MaxFiendsToSpawnCarnage` **no se toca**, y no se toca
+> porque AMUMSS empareja el nombre **exacto**; verificado en el delta.
 
 ### 3c · Fiends — conducta (0.2.0)
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
 | 17 | `FiendOnscreenMarkers` | Icono de UI sobre cada Fiend. `false` = sin aviso | **Fiend** (solo UI, no dificultad) | `true` | — | — | **`false`** | **`false`** `[SIN PROBAR]` |
-| 18 | `FiendPerceptionDistance` | A cuántos metros te detecta. **Campo aparte** del de depredador | Fiend | 60 | — | 65 | 70 | 80 |
+| 18 | `FiendPerceptionDistance` | A cuántos metros te detecta. **Campo aparte** del de depredador | Fiend | 60 | — | 65 | 70 | **120** |
 | 19 | `FiendMinSpawnTime` | Retardo mínimo entre Fiends que salen del huevo | Fiend, al eclosionar | 0.25 | — | 0.2 | 0.15 | 0.1 |
 | 20 | `FiendMaxSpawnTime` | Retardo máximo. Bajarlo = salen **de golpe**, no escalonados | Fiend, al eclosionar | 3.0 | — | 2.0 | 1.0 | 0.5 |
 | 21 | `AvoidCreaturesWeight` | Peso de la separación entre bichos. Contra el amontonamiento de las manadas | **Todas las criaturas** | 6 | — | 8 | 10 | 10 |
@@ -138,6 +149,30 @@ Vanilla extraído de `NMSARC.globals.pak` el 2026-08-04, **no** de los backups d
 | 48 | `SpherePusherWeight.Small` | Cuánto se empujan físicamente los pequeños. Bajarlo = no se sacan unos a otros de su línea de carga | Criaturas pequeñas | 10 | — | 9 | 7 | **5** |
 | 49 | `SpherePusherWeight.Medium` | Ídem, medianas (**los Fiend caen aquí**) | Criaturas medianas | 10 | — | 9 | 7 | **5** |
 | 50 | `SpherePusherWeight.Large` | Ídem, grandes | Criaturas grandes | 5 | — | 4.5 | 4 | **3** |
+
+### 3e · Fiends — que no suelten la presa (0.3.1)
+
+Solo Hardcore. Estos cinco campos son el diagnóstico de «unos vienen y otros se van».
+
+| # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| 53 | `FiendAggroDecreasePerSpawn` | **Cuánto aggro gasta cada Fiend al nacer.** Ésta es la causa de fondo: romper un huevo suma +1.0, pero cada bicho que sale resta 0.1, así que una oleada de 12 vacía el medidor ella sola | **Fiend** | 0.1 | — | — | — | **0.0** |
+| 54 | `FiendAggroIncreaseDamageEgg` | Aggro que suma **rozar** un huevo | Fiend | 1.0 | — | — | — | **3.0** |
+| 55 | `FiendAggroIncreaseDestroyEgg` | Aggro que suma **romperlo** | Fiend | 1.0 | — | — | — | **3.0** |
+| 56 | `FiendBeingShotMemoryTime` | Segundos que recuerda que le disparaste | Fiend | 10 | — | — | — | **60** |
+| 57 | `FiendDespawnDistance` | A cuántos metros se evapora si te alejas | Fiend | 150 | — | — | — | **300** |
+
+> **Por qué unos venían y otros no, en tres frases.** (1) Con huevos ×20 hay nidos que no
+> has tocado: sus Fiends nunca te fijaron, y lo que parece «perder el interés» es que
+> nunca lo tuvieron — por eso #18 sube a 120 m. (2) El aggro se drena solo con cada
+> nacimiento (#53), que es un sistema calibrado para 6 bichos y densidad ×1. (3) Y encima
+> caducaba a los 120 s (#16).
+>
+> **Sin tocar, a propósito:** `FiendDistToConsiderTargetSwtich` (10.0, el typo es de Hello
+> Games) y el `MoveRange` = 100 del `FIEND` en `CREATUREDATATABLE`. Los dos podrían ser
+> palancas de «a quién persigue» y «hasta dónde se aleja de su nido», pero no sabemos en
+> qué dirección empujan y 0.3.1 ya mueve diez campos. Si con esto todavía se sueltan, es
+> lo siguiente que se prueba — **de uno en uno**.
 
 > `SpherePusherWeight.Huge` **no se toca**: los bichos enormes ya empujan poco (2) y
 > bajarlo más los haría atravesarse.
@@ -244,12 +279,35 @@ build: el delta contiene **una sola entrada, `_id="FIEND"`**.
 
 ---
 
+## 8 · `GLOBALS\GCUIGLOBALS.GLOBAL.MBIN` — 1 cambio
+
+**Archivo nuevo en 0.3.1. Novena ruta, y la primera fuera del ecosistema.** Solo Hardcore.
+
+| # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| 58 | `ShowOnscreenPredatorMarkers` | Icono de UI sobre el depredador que te está cazando. `false` = te cae encima sin aviso | **Depredadores** (solo UI, no dificultad) | `true` | — | — | — | **`false`** |
+
+**Dónde estaba y por qué costó encontrarlo.** No está en `GCCREATUREGLOBALS`, que es donde
+viven los otros ~40 campos de depredador y donde se buscó primero. Está en `GCUIGLOBALS`,
+línea 2572 — el archivo del HUD. Es el gemelo de `FiendOnscreenMarkers` (#17), que sí vive
+con las criaturas: **la misma función, en dos archivos distintos.**
+
+Se encontró barriendo la tabla de cadenas de `libMBIN.dll` por `Marker` — 230
+identificadores, y `ShowOnscreenPredatorMarkers` es el único que pega. Es el mismo método
+que destapó `DebugGalaxyMapInQuickMenu` en el mod 3, y aquí sí sirvió de algo.
+
+⚠️ **Es una ruta disputada.** `Small Cursor 6.6` la toca con un EXML de cuatro líneas
+(`FrontendCursorSize`, `FrontendCursorWidth`). No hay solape de campos, pero sí de archivo.
+Ver el README de `infestacion` — el cursor del menú es el testigo al probar.
+
+---
+
 ## Resumen por monstruo — «qué le hicimos a quién»
 
 | Monstruo / entidad | Qué cambia | Filas |
 |---|---|---|
-| **Depredadores** (`PLAYERPREDATORMED` / `LARGE`) | Salen en manada en vez de solos, en muchos más planetas, te ven más lejos, no huyen heridos, todos son hostiles, tardan más en aburrirse y **desde 0.3.0 no te acechan: te ven y cargan desde 40 m sin cansarse** | 5-12, 40-43 |
-| **Fiend** (Horror Biológico) | Muchos más huevos, más Fiends encima a la vez, más rato persiguiendo, te ven más lejos, salen del huevo en oleada, sin marcador de UI, pegan más golpes por racha, saltan más seguido, animan más rápido y en Hardcore **paren crías mientras luchas** | 13-33 |
+| **Depredadores** (`PLAYERPREDATORMED` / `LARGE`) | Salen en manada en vez de solos, en muchos más planetas, te ven más lejos, no huyen heridos, todos son hostiles, tardan más en aburrirse, **desde 0.3.0 no te acechan: te ven y cargan desde 40 m sin cansarse**, y **desde 0.3.1 sin marcador de UI que te avise** | 5-12, 40-43, 58 |
+| **Fiend** (Horror Biológico) | Muchos más huevos, más Fiends encima a la vez, más rato persiguiendo, te ven más lejos, salen del huevo en oleada, sin marcador de UI, pegan más golpes por racha, saltan más seguido, animan más rápido, en Hardcore **paren crías mientras luchas** y **desde 0.3.1 no se les agota el aggro** | 13-33, 53-57 |
 | **`BUGFIEND`** | Es lo que pare el brood del Fiend en Hardcore. **No se le edita ningún campo**, solo se le invoca | 28 |
 | **Gusano de arena** (`GROUNDWORMSPAWNER`) | Muchos más spawners y salta cuando ya lo tienes encima (100 m → 10 m) | 22, 34-35 |
 | **Todo el que use el árbol `MELEE`** (Fiends + depredadores cuerpo a cuerpo) | Cierran distancia en `Fast` y **no frenan** al llegar encima | 51-52 |
@@ -262,15 +320,15 @@ build: el delta contiene **una sola entrada, `_id="FIEND"`**.
 
 ## Conteo por tier — si el `REPORT` no da esto, no se despliega
 
-| Tier | gen | med | large | globals | datatable | eggs | infest | **árbol** | **Total** |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 Fácil | 5 | 2 | 2 | 4 | — | 4 | 6 | — | **23** |
-| 2 Normal | 5 | 2 | 2 | 24 | 1 | 4 | 6 | 1 | **45** |
-| 3 Difícil | 5 | 2 | 2 | 25 | 4 | 4 | 6 | 2 | **50** |
-| 4 Hardcore | 5 | 2 | 2 | 26 | 7 | 4 | 6 | 2 | **54** |
+| Tier | gen | med | large | globals | datatable | eggs | infest | árbol | **uiglobals** | **Total** |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 Fácil | 5 | 2 | 2 | 4 | — | 4 | 6 | — | — | **23** |
+| 2 Normal | 5 | 2 | 2 | 24 | 1 | 4 | 6 | 1 | — | **45** |
+| 3 Difícil | 5 | 2 | 2 | 25 | 4 | 4 | 6 | 2 | — | **50** |
+| 4 Hardcore | 5 | 2 | 2 | 31 | 7 | 4 | 6 | 2 | **1** | **60** |
 
-**Construidos y verificados el 2026-08-04:** los cuatro dan estos totales con 0 errores.
-Fácil sigue sin cambiar desde 0.1.0.
+**Construidos y verificados el 2026-08-05:** los cuatro dan estos totales con 0 errores.
+Fácil sigue sin cambiar desde 0.1.0, y Normal y Difícil desde 0.3.0.
 
 Comprobar el total en **las cuatro** configuraciones: el bug de cascada de 0.1.0 solo
 aparecía en una.
@@ -282,7 +340,8 @@ aparecía en una.
 | 0.1.0 | 23 | 27 | 27 | 28 |
 | 0.2.0 (1ª build, con zigzag) | 23 | 33 | 39 | 43 |
 | 0.2.0 (final) | 23 | 33 | 37 | 41 |
-| **0.3.0** | **23** | **45** | **50** | **54** |
+| 0.3.0 | 23 | 45 | 50 | 54 |
+| **0.3.1** | **23** | **45** | **50** | **60** |
 
 ---
 
@@ -290,10 +349,14 @@ aparecía en una.
 
 | Enteros (sin decimales) | Booleanos (minúsculas) | Cadenas |
 |---|---|---|
-| `FiendMaxAttackers`, `FiendMaxEngaged`, `MaxFiendsToSpawn`, `MaxEcosystemCreaturesNormal`, `MinFlurryHits`, `MaxFlurryHits` | `FiendOnscreenMarkers`, `AllowSpawnBrood` | `SpawnBroodID`, `BehaviourMoveSpeed` (enum: `Normal` / `Fast`) |
+| `FiendMaxAttackers`, `FiendMaxEngaged`, `MaxFiendsToSpawn`, `MaxEcosystemCreaturesNormal`, `MinFlurryHits`, `MaxFlurryHits` | `FiendOnscreenMarkers`, `ShowOnscreenPredatorMarkers`, `AllowSpawnBrood` | `SpawnBroodID`, `BehaviourMoveSpeed` (enum: `Normal` / `Fast`) |
 
 Todo lo demás es float con **6 decimales**. Ojo con `PredatorEnergyUseChasing`: vanilla es
 **negativo** (`-0.100000`).
+
+**AMUMSS empareja el nombre de propiedad exacto, no por prefijo.** Verificado en el delta
+de 0.3.1: `MaxFiendsToSpawn` **no** tocó `MaxFiendsToSpawnCarnage`. (El `{"Weight ", ...}`
+con espacio final que hay en los scripts es para anclar dentro de un struct, no por esto.)
 
 ---
 

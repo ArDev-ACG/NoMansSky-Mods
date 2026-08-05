@@ -15,6 +15,97 @@ Cada entrada anota la **versión de NMS** contra la que se probó.
 
 ---
 
+## [0.3.1] — 2026-08-05
+
+Construido contra NMS **170671** (rama Public), MBINCompiler 6.45.0.1.
+**Solo cambia Hardcore.** Fácil, Normal y Difícil salen idénticos a 0.3.0 — mismo conteo
+(23 / 45 / 50) y mismos deltas.
+
+### Added
+
+- **Se le quita el marcador de UI a los depredadores**, no solo a los Horrores.
+  El campo **no está en `GCCREATUREGLOBALS`**, que es donde se buscó primero: vive en
+  `GLOBALS\GCUIGLOBALS.GLOBAL.MBIN`, línea 2572, y se llama
+  **`ShowOnscreenPredatorMarkers`** (`true` en vanilla). Es una **novena ruta** para el mod
+  y la primera fuera del ecosistema.
+  - Cómo se encontró: barriendo la tabla de cadenas de `libMBIN.dll` por `Marker` — el
+    mismo método que destapó `DebugGalaxyMapInQuickMenu` en el mod 3. Devuelve 230
+    identificadores y `ShowOnscreenPredatorMarkers` es el único que pega. Buscar campo por
+    archivo no lo habría encontrado nunca: nadie iba a abrir `GCUIGLOBALS` buscando
+    depredadores.
+  - Es un booleano, único en el archivo, sin colisión de prefijo.
+
+### Changed — los Horrores no sueltan la presa
+
+El diagnóstico de por qué unos vienen y otros se van. Son **tres causas distintas**, y
+solo la tercera es la que suena a «pierden el interés»:
+
+| Causa | Campo | Qué pasaba |
+|---|---|---|
+| **Nunca te vieron** | `FiendPerceptionDistance` = 80 | Con huevos ×20 hay nidos por todas partes. Un Horror que sale de un nido que no has tocado y a más de 80 m **no llega a fijarte**: no pierde el interés, es que nunca lo tuvo. Ése es el que «se aleja» — está haciendo su ronda |
+| **El aggro se drena solo** | `FiendAggroDecreasePerSpawn` = 0.1 | Es la causa de fondo. Romper un huevo sube el aggro +1.0; **cada Horror que nace lo baja 0.1**. Con 12 saliendo en oleada el medidor se vacía él solo en un combate, sin que tú hagas nada. Es un sistema pensado para 6 bichos y densidad ×1 |
+| **Caducaba** | `FiendAggroTime` = 120 s | Dos minutos y a casa |
+
+Además, `FiendMaxEngaged` = 12 con `MaxFiendsToSpawn` = 12 dejaba el cupo justo: cualquier
+Horror de más se queda mirando en vez de entrar.
+
+Valores nuevos, todos solo en Hardcore:
+
+| Campo | 0.3.0 | 0.3.1 | Qué hace |
+|---|---:|---:|---|
+| `FiendAggroDecreasePerSpawn` | 0.1 | **0.0** | nacer ya no gasta aggro |
+| `FiendAggroIncreaseDamageEgg` | 1.0 | **3.0** | rozar un huevo llena el medidor a fondo |
+| `FiendAggroIncreaseDestroyEgg` | 1.0 | **3.0** | ídem al romperlo |
+| `FiendAggroTime` | 120 | **600** | diez minutos de rencor |
+| `FiendPerceptionDistance` | 80 | **120** | te fijan desde el doble de lejos que en vanilla |
+| `FiendMaxEngaged` | 12 | **16** | cuántos te tienen fichado |
+| `FiendMaxAttackers` | 6 | **8** | cuántos pegan a la vez |
+| `MaxFiendsToSpawn` | 12 | **16** | si sube el cupo de comprometidos, el de vivos tiene que dar |
+| `FiendBeingShotMemoryTime` | 10 | **60** | dispararle a uno lo deja pegado a ti un minuto |
+| `FiendDespawnDistance` | 150 | **300** | correr 150 m ya no los evapora |
+
+Conteo Hardcore: **54 → 60** (31 globals + 1 uiglobals). 0 errores. Delta verificado
+propiedad por propiedad, y `MaxFiendsToSpawnCarnage` **sin tocar** pese a que
+`MaxFiendsToSpawn` es prefijo suyo — AMUMSS empareja el nombre exacto, no por prefijo.
+
+### Fixed — el mod no estaba desplegado, otra vez
+
+Lo que había en `GAMEDATA\MODS\HorribleTerror_Infestation_4-Hardcore\` eran **8 EXML y 0
+MBIN**, y los EXML eran el delta de `CreatedMODS` **con sus 26 marcas `!# CHANGED` dentro
+del XML**. Es exactamente lo que hundió la PRUEBA 01 del mod 3, y es la tercera vez que
+esta trampa muerde a este proyecto (ver también la sesión del 04/08 en el README de
+`infestacion`, donde la prueba midió 0.1.0 creyendo medir 0.2.0).
+
+**Consecuencia:** las observaciones in-game de 0.3.0 —incluida «unos Horrores vienen y
+otros se van»— se hicieron contra un mod que **probablemente no estaba activo**. El
+diagnóstico de arriba se sostiene igual, porque sale de leer los campos vanilla y no de lo
+que se vio en pantalla; pero **0.3.1 es el primer despliegue de Hardcore que está
+verificado como MBIN**, y por tanto la primera medición que va a valer.
+
+Desplegado desde `ModBackups\` creando el `GLOBALS\` a mano —AMUMSS deja los dos MBIN de
+globals sueltos en la raíz, mismo detalle que en la PRUEBA 05 del mod 3— y verificado
+descompilando de vuelta desde `GAMEDATA\MODS`. La carpeta vieja se retiró a
+`build\_retirado_2026-08-05_infestacion-0.3.0-EXML\`.
+
+### Tooling
+
+`Build-Tiers.ps1` borraba de `ModScript\` solo los `.lua` cuyo nombre coincidía con los de
+la carpeta que se construía, así que un script olvidado de otra sesión se construía también
+y contaminaba el conteo agregado. Ahora los borra **todos**. Lo destapó el mod 3 y aquí
+habría vuelto a pasar: `MOD3_MapaGalactico_PRUEBA06.lua` seguía en la carpeta.
+
+### Sin probar
+
+- Todo lo de esta versión. Save respaldado: `NMS_saves_2026-08-05_0111_antes-infestacion-031`.
+- **Mirar el cursor del menú.** Es el testigo gratis de si nuestro MBIN de `GCUIGLOBALS`
+  convive con el EXML de `Small Cursor 6.6`. Ver el README de `infestacion`.
+- `FiendDistToConsiderTargetSwtich` (10.0, el typo es de Hello Games) y el `MoveRange` =
+  100 del `FIEND` en `CREATUREDATATABLE` se dejan quietos: los dos podrían ser palancas de
+  «a quién persigue» y «hasta dónde», pero no sabemos en qué dirección empujan y esta
+  versión ya cambia diez campos. Quedan para la siguiente si con esto todavía se sueltan.
+
+---
+
 ## [0.3.0] — 2026-08-04
 
 Construido contra NMS **170671** (rama Public), MBINCompiler 6.45.0.1.

@@ -9,13 +9,19 @@ MAX_CREATURE     = "70"
 BOREDOM          = "150.000000"
 
 EGG_MULT         = "20"
-FIEND_ATTACKERS  = "6"
-FIEND_ENGAGED    = "12"
-FIEND_SPAWN      = "12"
-FIEND_AGGRO      = "120.000000"
+FIEND_ATTACKERS  = "8"
+FIEND_ENGAGED    = "16"
+FIEND_SPAWN      = "16"
+FIEND_AGGRO      = "600.000000"
 
 FIEND_MARKERS    = "false"
-FIEND_PERCEPTION = "80.000000"
+FIEND_PERCEPTION = "120.000000"
+
+PREDATOR_MARKERS  = "false"
+FIEND_AGGRO_DECAY = "0.000000"
+FIEND_AGGRO_EGG   = "3.000000"
+FIEND_SHOT_MEMORY = "60.000000"
+FIEND_DESPAWN     = "300.000000"
 HATCH_MIN        = "0.100000"
 HATCH_MAX        = "0.500000"
 AVOID_WEIGHT     = "10.000000"
@@ -47,7 +53,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_4-Hardcore",
 ["MOD_AUTHOR"]      = "AldrichDDD",
 ["NMS_VERSION"]     = "6.45",
-["MOD_DESCRIPTION"] = "[HARDCORE] Infestacion 0.2.0: huevos x20, sin marcador de UI, eclosion en oleada, se multiplican mientras luchas, mas los depredadores del mod de dificultad.",
+["MOD_DESCRIPTION"] = "[HARDCORE] Infestacion 0.3.1: huevos x20, sin marcador de UI ni en Horrores ni en depredadores, eclosion en oleada, se multiplican mientras luchas, no pierden el interes y atacan mas a la vez, mas los depredadores del mod de dificultad.",
 ["MODIFICATIONS"]   =
   {
     {
@@ -182,6 +188,33 @@ NMS_MOD_DEFINITION_CONTAINER =
                 {"Medium", PUSH_MEDIUM},
                 {"Large",  PUSH_LARGE},
               }
+            },
+            {
+              ["COMMENT"]            = "0.3.1 - el aggro no se drena ni caduca",
+              ["VALUE_CHANGE_TABLE"] =
+              {
+                {"FiendAggroDecreasePerSpawn",   FIEND_AGGRO_DECAY},
+                {"FiendAggroIncreaseDamageEgg",  FIEND_AGGRO_EGG},
+                {"FiendAggroIncreaseDestroyEgg", FIEND_AGGRO_EGG},
+              }
+            },
+            {
+              ["COMMENT"]            = "0.3.1 - memoria y correa: no te sueltan ni te pierden",
+              ["VALUE_CHANGE_TABLE"] =
+              {
+                {"FiendBeingShotMemoryTime", FIEND_SHOT_MEMORY},
+                {"FiendDespawnDistance",     FIEND_DESPAWN},
+              }
+            },
+          }
+        },
+        {
+          ["MBIN_FILE_SOURCE"] = "GLOBALS\GCUIGLOBALS.GLOBAL.MBIN",
+          ["MXML_CHANGE_TABLE"] =
+          {
+            {
+              ["COMMENT"]            = "0.3.1 - sin marcador de UI en los depredadores",
+              ["VALUE_CHANGE_TABLE"] = { {"ShowOnscreenPredatorMarkers", PREDATOR_MARKERS} }
             },
           }
         },

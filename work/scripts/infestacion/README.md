@@ -33,15 +33,15 @@ Se instala **una sola**.
 | % depredadores hostiles | 0.5 | 0.6 | 0.75 | 1.0 | 1.0 |
 | Tope criaturas a la vez | 40 | 45 | 50 | 60 | 70 |
 | Distancia de aburrimiento | 80 | 80 | 80 | 80 | 150 |
-| **Fiends: cantidad (0.1.0)** ||||||
+| **Fiends: cantidad (0.1.0, retocado en 0.3.1)** ||||||
 | Densidad de huevos | ×1 | ×2 | ×5 | ×20 | ×20 |
-| `FiendMaxAttackers` | 2 | 2 | 3 | 4 | 6 |
-| `FiendMaxEngaged` | 6 | 6 | 8 | 10 | 12 |
-| `MaxFiendsToSpawn` | 6 | 6 | 8 | 10 | 12 |
-| `FiendAggroTime` (s) | 45 | 45 | 60 | 90 | 120 |
+| `FiendMaxAttackers` | 2 | 2 | 3 | 4 | **8** |
+| `FiendMaxEngaged` | 6 | 6 | 8 | 10 | **16** |
+| `MaxFiendsToSpawn` | 6 | 6 | 8 | 10 | **16** |
+| `FiendAggroTime` (s) | 45 | 45 | 60 | 90 | **600** |
 | **Fiends: conducta (0.2.0)** ||||||
-| Marcador de UI | sí | sí | sí | **NO** | **NO** |
-| `FiendPerceptionDistance` (m) | 60 | 60 | 65 | 70 | 80 |
+| Marcador de UI del Fiend | sí | sí | sí | **NO** | **NO** |
+| `FiendPerceptionDistance` (m) | 60 | 60 | 65 | 70 | **120** |
 | Eclosión min/max (s) | 0.25/3.0 | 0.25/3.0 | 0.2/2.0 | 0.15/1.0 | 0.1/0.5 |
 | `AvoidCreaturesWeight` | 6 | 6 | 8 | 10 | 10 |
 | Radio activación gusano (m) | 100 | 100 | 50 | 20 | 10 |
@@ -65,6 +65,15 @@ Se instala **una sola**.
 | **Árbol `MELEE` (0.3.0)** ||||||
 | `BehaviourMoveSpeed` | Normal | Normal | Normal | **Fast** | **Fast** |
 | `DynamicMoveSlowdownDistMul` | 4.0 | 4.0 | 3.0 | 2.0 | **1.0** |
+| **Sin marcador y sin soltar presa (0.3.1)** ||||||
+| `ShowOnscreenPredatorMarkers` | sí | sí | sí | sí | **NO** |
+| `FiendAggroDecreasePerSpawn` | 0.1 | 0.1 | 0.1 | 0.1 | **0.0** |
+| `FiendAggroIncrease` Damage/DestroyEgg | 1.0 | 1.0 | 1.0 | 1.0 | **3.0** |
+| `FiendBeingShotMemoryTime` (s) | 10 | 10 | 10 | 10 | **60** |
+| `FiendDespawnDistance` (m) | 150 | 150 | 150 | 150 | **300** |
+
+**0.3.1 es solo Hardcore.** Los otros tres tiers no cambian ni un campo: sus deltas
+salen idénticos a los de 0.3.0 (23 / 45 / 50, verificado en la build del 05/08).
 
 **Fácil no cambia en 0.2.0.** No coge ninguno de los ocho cambios de conducta: sus
 valores coincidirían con vanilla y escribirlos ensuciaría el EXML delta sin cambiar
@@ -82,16 +91,17 @@ cambiar nada, que es el mismo criterio de Fácil.
 
 Si `REPORT` no da estos números, algo no encajó y **no se despliega**.
 
-| Tier | Total | Desglose (gen + med + large + globals + datatable + eggs + infest + árbol) |
+| Tier | Total | Desglose (gen + med + large + globals + datatable + eggs + infest + árbol + **uiglobals**) |
 |---|---|---|
-| 1 Fácil | **23** | 5 + 2 + 2 + 4 + — + 4 + 6 + — |
-| 2 Normal | **45** | 5 + 2 + 2 + 24 + 1 + 4 + 6 + 1 |
-| 3 Difícil | **50** | 5 + 2 + 2 + 25 + 4 + 4 + 6 + 2 |
-| 4 Hardcore | **54** | 5 + 2 + 2 + 26 + 7 + 4 + 6 + 2 |
+| 1 Fácil | **23** | 5 + 2 + 2 + 4 + — + 4 + 6 + — + — |
+| 2 Normal | **45** | 5 + 2 + 2 + 24 + 1 + 4 + 6 + 1 + — |
+| 3 Difícil | **50** | 5 + 2 + 2 + 25 + 4 + 4 + 6 + 2 + — |
+| 4 Hardcore | **60** | 5 + 2 + 2 + 31 + 7 + 4 + 6 + 2 + **1** |
 
-Hardcore lleva un global más que Difícil porque es el único tier que toca
-`PlayerPredatorBoredomDistance`, y tres cambios más de `datatable` por el brood. Normal
-lleva una regla menos del árbol: no escribe `BehaviourMoveSpeed`, que ya es `Normal`.
+Hardcore lleva seis globals más que Difícil: `PlayerPredatorBoredomDistance` (único tier
+que lo toca) y los cinco de tenacidad de 0.3.1. Y tres cambios más de `datatable` por el
+brood. El de `uiglobals` es el marcador de depredador, también solo Hardcore. Normal lleva
+una regla menos del árbol: no escribe `BehaviourMoveSpeed`, que ya es `Normal`.
 
 **Construidos y verificados el 2026-08-04** contra NMS 170671 / MBINCompiler 6.45.0.1:
 los cuatro dan **23 / 45 / 50 / 54** con **0 errores**, y los deltas se comprobaron
@@ -108,11 +118,12 @@ confirmados leyendo el EXML de `GAMEDATA\MODS`. Desglose de cada campo en
 | 0.1.0 | 23 | 27 | 27 | 28 |
 | 0.2.0 (1ª build, con zigzag) | 23 | 33 | 39 | 43 |
 | 0.2.0 (final) | 23 | 33 | 37 | 41 |
-| **0.3.0** | **23** | **45** | **50** | **54** |
+| 0.3.0 | 23 | 45 | 50 | 54 |
+| **0.3.1** | **23** | **45** | **50** | **60** |
 
 ---
 
-## Rutas que toca — 8
+## Rutas que toca — 9
 
 ```
 METADATA\SIMULATION\ECOSYSTEM\CREATUREGENERATIONDATA.MBIN
@@ -121,15 +132,37 @@ METADATA\SIMULATION\ECOSYSTEM\GROUND\GROUNDTABLEPLAYERPREDATORLARGE.MBIN
 METADATA\SIMULATION\ECOSYSTEM\CREATUREDATATABLE.MBIN          <-- nuevo en 0.2.0
 METADATA\SIMULATION\ECOSYSTEM\CREATUREBEHAVIOURTREES.MBIN     <-- nuevo en 0.3.0
 GLOBALS\GCCREATUREGLOBALS.MBIN
+GLOBALS\GCUIGLOBALS.GLOBAL.MBIN                               <-- nuevo en 0.3.1
 METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\FIENDEGGS.MBIN
 METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\INFESTATION.MBIN
 ```
 
-Fácil solo toca 6: no necesita `CREATUREDATATABLE` ni `CREATUREBEHAVIOURTREES`.
+Fácil solo toca 6: no necesita `CREATUREDATATABLE`, `CREATUREBEHAVIOURTREES` ni
+`GCUIGLOBALS`. La novena ruta es **solo de Hardcore**.
 
-Escaneo del **2026-08-03**: las 8 rutas están **libres** de mods de terceros
+Escaneo del **2026-08-03**: las 8 primeras rutas están **libres** de mods de terceros
 (`CREATUREBEHAVIOURTREES` entró en esa misma pasada). La única disputada es
 `GCCREATUREGLOBALS`, y solo contra nuestro propio mod 1.
+
+### ⚠️ `GCUIGLOBALS` sí está disputada — escaneo del 2026-08-05
+
+De los 87 mods instalados hay **uno** que la toca: `Small Cursor 6.6`, y con un EXML de
+cuatro líneas:
+
+```xml
+<Data template="GcUIGlobals">
+  <Property name="FrontendCursorSize" value="14" />
+  <Property name="FrontendCursorWidth" value="7" />
+</Data>
+```
+
+No hay solape de campos con `ShowOnscreenPredatorMarkers`, pero **sí de archivo**, y es la
+primera vez que enviamos un MBIN completo sobre un archivo que otro mod parchea por EXML.
+Según `README-How MBIN and EXML coexist.txt` de AMUMSS los dos conviven: nuestro MBIN
+reemplaza el archivo y su EXML parchea líneas encima, así que el cursor pequeño debería
+seguir funcionando. **Es lo que hay que mirar de refilón al probar** — si el cursor del
+menú vuelve al tamaño normal, la regla de convivencia no es como la leímos y habría que
+enviar el nuestro también como EXML.
 
 ---
 
