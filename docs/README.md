@@ -9,6 +9,9 @@ Doc de diseño y roadmap: [`../proyecto_mod_nms_zombies.md`](../proyecto_mod_nms
 |---|---|
 | [`MODIFICACIONES.md`](MODIFICACIONES.md) | **Tabla viva**: cada campo que toca el mod, qué hace y sobre qué monstruo |
 | [`IDEAS.md`](IDEAS.md) | Mapa de spawn y cola de trabajo |
+| [`ASSETS.md`](ASSETS.md) | **Aspecto**: texturas, paletas, partes, y dónde se pueden fijar monstruos |
+| [`CHECKLIST-0.3.1.md`](CHECKLIST-0.3.1.md) | Pruebas in-game pendientes de la 0.3.1 |
+| [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md) | Pruebas de la 0.3.2 y de los 3 experimentos de aspecto |
 | [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) | Conducta: percepción, acecho, ataques, cadencia, separación |
 | [`FAUNA_REFERENCE.md`](FAUNA_REFERENCE.md) | Referencia de fauna, arquetipos y tablas |
 | [`NEXUS.md`](NEXUS.md) | Publicación y textos de la página |

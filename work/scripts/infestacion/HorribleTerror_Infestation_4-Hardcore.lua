@@ -48,12 +48,23 @@ PUSH_LARGE       = "3.000000"
 MELEE_SPEED      = "Fast"
 MELEE_SLOWDOWN   = "1.000000"
 
+TENTACLE_MODEL   = "MODELS/PLANETS/BIOMES/COMMON/BUILDINGS/PROPS/ABANDONED/INTERIOR_TENTACLEPLANT.SCENE.MBIN"
+EGG_MODEL        = "MODELS/PLANETS/BIOMES/COMMON/RARERESOURCE/GROUND/FIENDEGG.SCENE.MBIN"
+EGG_PROB         = "100.000000"
+
+FREIGHTER_SPAWN   = "60.000000"
+FREIGHTER_DESPAWN = "150.000000"
+FIEND_SPAWN_DIST  = "120.000000"
+
+POD_TORCH        = "12.000000"
+POD_GUNFIRE      = "8.000000"
+
 NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_4-Hardcore",
 ["MOD_AUTHOR"]      = "AldrichDDD",
 ["NMS_VERSION"]     = "6.45",
-["MOD_DESCRIPTION"] = "[HARDCORE] Infestacion 0.3.1: huevos x20, sin marcador de UI ni en Horrores ni en depredadores, eclosion en oleada, se multiplican mientras luchas, no pierden el interes y atacan mas a la vez, mas los depredadores del mod de dificultad.",
+["MOD_DESCRIPTION"] = "[HARDCORE] Infestacion 0.3.2: huevos de Horror dentro de los edificios abandonados, los nidos de carguero reaccionan a la linterna y a los disparos, huevos x20, sin marcador de UI, eclosion en oleada, se multiplican mientras luchas y no pierden el interes.",
 ["MODIFICATIONS"]   =
   {
     {
@@ -204,6 +215,58 @@ NMS_MOD_DEFINITION_CONTAINER =
               {
                 {"FiendBeingShotMemoryTime", FIEND_SHOT_MEMORY},
                 {"FiendDespawnDistance",     FIEND_DESPAWN},
+              }
+            },
+            {
+              ["COMMENT"]            = "0.3.2 - interiores: los Horrores del carguero salen antes y aguantan mas",
+              ["VALUE_CHANGE_TABLE"] =
+              {
+                {"FreighterSpawnDist",   FREIGHTER_SPAWN},
+                {"FreighterDespawnDist", FREIGHTER_DESPAWN},
+                {"FiendSpawnDistance",   FIEND_SPAWN_DIST},
+              }
+            },
+          }
+        },
+        {
+          ["MBIN_FILE_SOURCE"] =
+          {
+            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDSCIENTIFIC.LSYSTEM.MBIN",
+            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDTRADER.LSYSTEM.MBIN",
+            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDWARRIOR.LSYSTEM.MBIN",
+          },
+          ["MXML_CHANGE_TABLE"] =
+          {
+            {
+              ["COMMENT"]            = "0.3.2 - locator TENTACLE_: la planta pasa a ser un huevo de Horror",
+              ["REPLACE_TYPE"]       = "ALL",
+              ["VALUE_MATCH"]        = TENTACLE_MODEL,
+              ["VALUE_CHANGE_TABLE"] = { {"Model", EGG_MODEL} }
+            },
+            {
+              ["COMMENT"]            = "0.3.2 - ese locator sale siempre, no al 30%",
+              ["SPECIAL_KEY_WORDS"]  = {"LocatorType", "TENTACLE_"},
+              ["REPLACE_TYPE"]       = "ALL",
+              ["VALUE_CHANGE_TABLE"] = { {"Probability", EGG_PROB} }
+            },
+          }
+        },
+        {
+          ["MBIN_FILE_SOURCE"] =
+          {
+            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\PARTS\BUILDABLEPARTS\SPACEBASE\INFESTATION\LARGEPILLARSLIME\ENTITIES\LARGEPILLARSLIME.ENTITY.MBIN",
+            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\PARTS\BUILDABLEPARTS\SPACEBASE\INFESTATION\MEDIUMHANGSLIME\ENTITIES\MEDIUMHANGSLIME.ENTITY.MBIN",
+          },
+          ["MXML_CHANGE_TABLE"] =
+          {
+            {
+              ["COMMENT"]            = "0.3.2 - el nido despierta con la linterna y con los disparos [SIN PROBAR]",
+              ["SPECIAL_KEY_WORDS"]  = {"Components", "GcAlienPodComponentData"},
+              ["REPLACE_TYPE"]       = "ONCE",
+              ["VALUE_CHANGE_TABLE"] =
+              {
+                {"AgroTorch",   POD_TORCH},
+                {"GunfireAgro", POD_GUNFIRE},
               }
             },
           }

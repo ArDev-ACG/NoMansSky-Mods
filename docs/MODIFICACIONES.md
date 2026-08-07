@@ -7,9 +7,11 @@ y **sobre qué criatura actúa**.
 > de los `.lua`, esta tabla se actualiza en la misma sesión. Si la tabla y los `.lua` no
 > coinciden, manda el `.lua`.
 
-- Versión cubierta: **mod 2 Infestation 0.3.1** (incluye lo del mod 1 Predators 1.1.0).
-- Referencias: [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) · [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) · [`../work/scripts/infestacion/README.md`](../work/scripts/infestacion/README.md)
-- Última revisión: **2026-08-05**, descompilando los **MBIN** desplegados en `GAMEDATA\MODS`.
+- Versión cubierta: **mod 2 Infestation 0.3.2** (incluye lo del mod 1 Predators 1.1.0).
+- Referencias: [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) · [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) · [`ASSETS.md`](ASSETS.md) · [`../work/scripts/infestacion/README.md`](../work/scripts/infestacion/README.md)
+- Última revisión: **2026-08-07**, descompilando los **MBIN** desplegados en `GAMEDATA\MODS`.
+- Los tres mods de prueba de aspecto (`NecroSkin`, `DerelictBugs`, `PredatorParts`) no
+  están en esta tabla: son experimentos 0.1.0 y viven en [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md).
 
 ---
 
@@ -17,9 +19,9 @@ y **sobre qué criatura actúa**.
 
 | | |
 |---|---|
-| Mod en `GAMEDATA\MODS` | `HorribleTerror_Infestation_4-Hardcore` |
-| Versión | **0.3.1** |
-| Formato | **9 MBIN** desde `ModBackups\`, con el `GLOBALS\` creado a mano |
+| Mod en `GAMEDATA\MODS` | `HorribleTerror_Infestation_4-Hardcore` + 3 mods de prueba |
+| Versión | **0.3.2** |
+| Formato | **14 MBIN** desde `ModBackups\`, con el `GLOBALS\` creado a mano (otra vez) |
 | Verificado | descompilando de vuelta desde `GAMEDATA\MODS`, campo por campo |
 | Mod 1 | **no instalado** (correcto: se instala uno o el otro) |
 | NMS | 170671, rama Public · MBINCompiler 6.45.0.1 |
@@ -302,6 +304,59 @@ Ver el README de `infestacion` — el cursor del menú es el testigo al probar.
 
 ---
 
+## 9 · `BUILDINGS\ABANDONED\*.LSYSTEM.MBIN` — 30 cambios (3 archivos × 10)
+
+**Archivos nuevos en 0.3.2. Décima ruta, y la primera que toca geometría del mundo.**
+Solo Hardcore. Son `ABANDONDEDSCIENTIFIC`, `ABANDONDEDTRADER` y `ABANDONDEDWARRIOR`
+(el typo `ABANDONDED` es de Hello Games).
+
+| # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
+|---|---|---|---|---|---:|---:|---:|---|
+| 59 | `Model` del locator `TENTACLE_` | Qué prop cuelga de ese hueco. Pasa de planta de tentáculos a **huevo de Horror** | **Huevos de Fiend**, dentro de edificios abandonados | `INTERIOR_TENTACLEPLANT` | — | — | — | **`FIENDEGG.SCENE`** `[SIN PROBAR]` |
+| 60 | `Probability` del locator `TENTACLE_` | Con qué frecuencia se llena ese hueco | Ídem | 30 | — | — | — | **100** `[SIN PROBAR]` |
+
+Son 5 locators `TENTACLE_` por edificio → **hasta 5 huevos por edificio, siempre**.
+
+> **Por qué basta con poner el huevo.** El huevo no invoca criaturas: su entidad solo
+> declara `IncreaseFiendCrime = EggDestroyed`, y cuántos Horrores salen lo decide
+> `GCCREATUREGLOBALS`. El spawn es **global**, así que un huevo puesto en cualquier sitio
+> hereda los diez campos de 0.3.1 sin escribir una línea más.
+>
+> ⚠️ Cada archivo tiene **diez** `Probability = 30`, y solo cinco son del `TENTACLE_`. La
+> regla va anclada con `SPECIAL_KEY_WORDS = {"LocatorType","TENTACLE_"}`. Verificado tras
+> la build: quedan cinco `30.000000` sin tocar en cada archivo.
+
+---
+
+## 10 · Nidos del carguero — `…\INFESTATION\*SLIME\ENTITIES\*.ENTITY.MBIN` — 4 cambios
+
+**Archivos nuevos en 0.3.2. Undécima ruta.** Dos archivos: `LARGEPILLARSLIME` y
+`MEDIUMHANGSLIME` — son **los únicos dos** nidos con `GcAlienPodComponentData`.
+
+| # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| 61 | `AgroTorch` | Aggro que suma **apuntarle con la linterna**. Cono de 25°, 10 m | **Nido del carguero** → MiniFiends | 0.0 | — | — | — | **12.0** `[SIN PROBAR]` |
+| 62 | `GunfireAgro` | Aggro que suma **disparar cerca**. Radio 20 m | Ídem | 0.0 | — | — | — | **8.0** `[SIN PROBAR]` |
+
+> Los dos estaban **a cero**: implementados y apagados por Hello Games, igual que
+> `AllowSpawnBrood`. `AgroMovement` (11), `AgroThreshold` (15) y `AgroRate` (−5) se dejan
+> quietos — **la escala de los valores nuevos es inferencia**, no está confirmada.
+>
+> ⚠️ **Ruta disputada:** `NoDerelictMiniHorrors` escribe estos dos archivos y les quita el
+> componente entero. Hay que desactivarlo para medir nada.
+
+---
+
+## 3f · Fiends — interiores (0.3.2)
+
+| # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| 63 | `FreighterSpawnDist` | A qué distancia **aparecen** dentro de un carguero. Campo aparte, vive con los `Indoor*` | **Fiend de carguero** | 30 | — | — | — | **60** |
+| 64 | `FreighterDespawnDist` | A qué distancia se evaporan dentro de un carguero | Ídem | 50 | — | — | — | **150** |
+| 65 | `FiendSpawnDistance` | A qué distancia aparecen en superficie. El gemelo de `FiendDespawnDistance` (#57), que sí se tocaba desde 0.3.1 | Fiend | 70 | — | — | — | **120** |
+
+---
+
 ## Resumen por monstruo — «qué le hicimos a quién»
 
 | Monstruo / entidad | Qué cambia | Filas |
@@ -320,14 +375,14 @@ Ver el README de `infestacion` — el cursor del menú es el testigo al probar.
 
 ## Conteo por tier — si el `REPORT` no da esto, no se despliega
 
-| Tier | gen | med | large | globals | datatable | eggs | infest | árbol | **uiglobals** | **Total** |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 Fácil | 5 | 2 | 2 | 4 | — | 4 | 6 | — | — | **23** |
-| 2 Normal | 5 | 2 | 2 | 24 | 1 | 4 | 6 | 1 | — | **45** |
-| 3 Difícil | 5 | 2 | 2 | 25 | 4 | 4 | 6 | 2 | — | **50** |
-| 4 Hardcore | 5 | 2 | 2 | 31 | 7 | 4 | 6 | 2 | **1** | **60** |
+| Tier | gen | med | large | globals | datatable | eggs | infest | árbol | uiglobals | **lsystem** | **nidos** | **Total** |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 Fácil | 5 | 2 | 2 | 4 | — | 4 | 6 | — | — | — | — | **23** |
+| 2 Normal | 5 | 2 | 2 | 24 | 1 | 4 | 6 | 1 | — | — | — | **45** |
+| 3 Difícil | 5 | 2 | 2 | 25 | 4 | 4 | 6 | 2 | — | — | — | **50** |
+| 4 Hardcore | 5 | 2 | 2 | **34** | 7 | 4 | 6 | 2 | 1 | **30** | **4** | **97** |
 
-**Construidos y verificados el 2026-08-05:** los cuatro dan estos totales con 0 errores.
+**Construidos y verificados el 2026-08-07:** los cuatro dan estos totales con 0 errores.
 Fácil sigue sin cambiar desde 0.1.0, y Normal y Difícil desde 0.3.0.
 
 Comprobar el total en **las cuatro** configuraciones: el bug de cascada de 0.1.0 solo
@@ -341,7 +396,8 @@ aparecía en una.
 | 0.2.0 (1ª build, con zigzag) | 23 | 33 | 39 | 43 |
 | 0.2.0 (final) | 23 | 33 | 37 | 41 |
 | 0.3.0 | 23 | 45 | 50 | 54 |
-| **0.3.1** | **23** | **45** | **50** | **60** |
+| 0.3.1 | 23 | 45 | 50 | 60 |
+| **0.3.2** | **23** | **45** | **50** | **97** |
 
 ---
 

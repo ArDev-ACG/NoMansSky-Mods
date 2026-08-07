@@ -351,9 +351,11 @@ Ya lo tienes. Si hay bichos por todas partes, también los hay junto a los edifi
 - **Por bioma: sí, y de dos maneras.** `BiomeSpecific → <bioma> → Ground` en
   `CREATUREGENERATIONDATA` (hoy vacío para los biomas normales — se puede rellenar), y
   las listas `<X>OBJECTS*.MBIN` de cada bioma.
-- **Por edificio: no directamente** `[Inferencia]`. Los edificios se colocan por otro
-  sistema. Lo más cercano es la Opción A de arriba: ligar criaturas a la lista de
-  objetos del bioma donde aparece ese edificio.
+- **Por edificio: SÍ.** 🔓 Corregido el 2026-08-06 — la inferencia de antes era falsa.
+  Los edificios abandonados son L-systems (`BUILDINGS\ABANDONED\*.LSYSTEM.MBIN`) con
+  locators de prop y probabilidad; el locator `TENTACLE_` ya cuelga un bicho orgánico
+  al 30 %. Colgar ahí `FIENDEGG.SCENE.MBIN` pone huevos **dentro** del edificio. Ver
+  [`ASSETS.md`](ASSETS.md) §5.
 
 ---
 
@@ -570,10 +572,14 @@ techo con x20. Subirla más no hará nada. Para más amenaza, la palanca es la 4
 
 ## 6. Preguntas abiertas
 
-- `[Sin investigar]` **Fragatas abandonadas.** Los archivos las llaman "dungeon"
-  (`DUNGEONENTRANCE`). ¿Los Fiends de dentro se colocan como entidades del layout o
-  por ecosistema? Es el escenario que mejor encaja con Dead Space: cerrado, oscuro,
-  sin nave a la que huir, y ya trae monstruos.
+- 🔓 **Resuelto el 2026-08-06 — fragatas abandonadas.** Ver [`ASSETS.md`](ASSETS.md) §5.
+  Ni layout ni ecosistema: los **nidos** (`SPACEBASE\INFESTATION\*SLIME`) son props
+  destructibles con `GcAlienPodComponentData` (agro por movimiento/linterna) y su
+  `DestroyedModel` es lo que suelta los MiniFiends. El interior lo arma
+  `FREIGHTERDUNGEONSTABLE` con 10 tipos, de los que los `_BUGS` son los infestados.
+  Y el huevo **no invoca nada**: sube el «se busca» de Fiends
+  (`IncreaseFiendCrime = EggDestroyed`), así que el spawn es **global** y funciona en
+  cualquier sitio donde se coloque el huevo.
 - `[Sin probar]` ¿Qué dispara `MaxFiendsToSpawnCarnage = 10`? Hay un modo "carnage"
   implementado.
 - `[Sin probar]` ¿`PredatorStealthDist = 11` es "te ve aunque vayas agachado" o al

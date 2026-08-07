@@ -15,6 +15,89 @@ Cada entrada anota la **versión de NMS** contra la que se probó.
 
 ---
 
+## [0.3.2] — 2026-08-07
+
+Construido contra NMS **170671**, MBINCompiler 6.45.0.1. **Solo cambia Hardcore**: Fácil,
+Normal y Difícil salen idénticos (23 / 45 / 50). Hardcore pasa de **60 a 97** cambios,
+0 errores. Es la primera versión que toca **geometría del mundo** en vez de solo números.
+
+### Added — los Horrores anidan dentro de los edificios abandonados
+
+**Décima ruta, y la primera fuera de `METADATA` y `GLOBALS`:**
+
+```
+MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDSCIENTIFIC.LSYSTEM.MBIN
+                                                \ABANDONDEDTRADER.LSYSTEM.MBIN
+                                                \ABANDONDEDWARRIOR.LSYSTEM.MBIN
+```
+
+(el typo `ABANDONDED` es de Hello Games). Los edificios abandonados **no son modelos
+fijos**: son L-systems que cuelgan props de *locators* con una probabilidad. Los tres
+traen un locator **`TENTACLE_`** —hueco de bicho orgánico colgado— con
+`INTERIOR_TENTACLEPLANT` al 30 %, cinco veces por edificio.
+
+Ese modelo pasa a ser `RARERESOURCE\GROUND\FIENDEGG.SCENE.MBIN` y la probabilidad sube a
+100. Resultado: **hasta 5 huevos por edificio abandonado, siempre.**
+
+**Por qué esto funciona sin escribir nada de spawn:** el huevo **no invoca criaturas**. Su
+entidad solo declara `Explosion = FIENDHATCH` e `IncreaseFiendCrime = EggDestroyed`; quién
+sale, cuántos y cuándo lo decide el sistema global de `GCCREATUREGLOBALS`. Es decir, el
+spawn de Horrores es **global, no local**, y un huevo puesto en cualquier sitio hereda
+gratis los diez campos que 0.3.1 ya subió. Detalle en [`ASSETS.md`](ASSETS.md) §5.4.
+
+### Added — los nidos del carguero reaccionan a la linterna y a los disparos
+
+**Undécima ruta:** `…\SPACEBASE\INFESTATION\{LARGEPILLARSLIME,MEDIUMHANGSLIME}\ENTITIES\*.ENTITY.MBIN`.
+
+Los nidos de los cargueros abandonados llevan un componente que no habíamos visto nunca,
+**`GcAlienPodComponentData`**, con la mecánica de «el nido te huele»:
+
+| Campo | Vanilla | 0.3.2 | Qué hace |
+|---|---:|---:|---|
+| `AgroMovement` / `Range` | 11.0 / 8.5 | — | te detecta por moverte cerca |
+| **`AgroTorch`** | **0.0** | **12.0** | apuntar con la linterna lo despierta |
+| **`GunfireAgro`** | **0.0** | **8.0** | disparar cerca lo despierta |
+
+Los dos que subimos estaban **a cero: interruptores implementados y apagados por Hello
+Games**, igual que `AllowSpawnBrood`. `AgroThreshold` (15) y `AgroRate` (−5) se dejan
+quietos, así que la escala de los valores nuevos es **inferencia sin confirmar**.
+
+### Added — los Horrores de interior salen antes y aguantan más
+
+En `GCCREATUREGLOBALS`, tres campos que el mod nunca había tocado:
+
+| Campo | Vanilla | 0.3.2 |
+|---|---:|---:|
+| `FreighterSpawnDist` | 30 | **60** |
+| `FreighterDespawnDist` | 50 | **150** |
+| `FiendSpawnDistance` | 70 | **120** |
+
+Los dos primeros son **específicos de interiores de carguero** y viven pegados al bloque
+`Indoor*`, no al de Fiend — por eso no aparecieron en los barridos anteriores.
+
+### Conteo
+
+| Tier | gen | med | large | globals | uigl | árbol | datatable | eggs | infest | **lsystem** | **nidos** | Total |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4 Hardcore | 5 | 2 | 2 | **34** | 1 | 2 | 7 | 4 | 6 | **30** | **4** | **97** |
+
+Verificado descompilando desde `GAMEDATA\MODS`: 5 huevos por L-system, los otros cinco
+`Probability = 30` del archivo **sin tocar**, y `AgroMovement`/`AgroThreshold` intactos.
+
+### ⚠️ Conflicto conocido
+
+**`NoDerelictMiniHorrors` (Lenni) escribe los mismos dos `.ENTITY.MBIN`** de los nidos. Hay
+que desactivarlo en Vortex antes de probar cargueros, o no se mide nada: ese mod les quita
+el `GcAlienPodComponentData` entero y el `DestroyedModel` que suelta los MiniFiends.
+
+### Sin probar
+
+Todo. Save respaldado: `NMS_saves_2026-08-07_0019_antes-032-huevos-en-edificios-y-skin`.
+Plan de prueba: [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md). Sigue pendiente **toda** la
+0.3.1: [`CHECKLIST-0.3.1.md`](CHECKLIST-0.3.1.md).
+
+---
+
 ## [0.3.1] — 2026-08-05
 
 Construido contra NMS **170671** (rama Public), MBINCompiler 6.45.0.1.
