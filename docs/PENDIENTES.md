@@ -124,7 +124,7 @@ Las siete tareas, y en qué estado están:
 | 1 | `nmsgeom`, ida y vuelta del `.DATA` | `tools/nmsgeom.py`, `tools/tests/test_nmsgeom.py` | ✅ commit `bdd16ca` · **revisada** el 15/08 |
 | 2 | `nmsgeom`, stride 8 → 20 y offsets | `ampliar_stride`, `layout`, `parchear_layout`, `parchear_metadata` | ✅ commit `55ddee8`, **11 tests OK** |
 | 3 | `Weight-NMSMesh`, los pesos | `tools/Weight-NMSMesh.py` → `work/models/scuttlermesh/pesos.json` | ✅ commit `0a42a92`, **17 tests OK** |
-| 4 | `nmsskin`, paleta y canales 5 y 6 | `tools/nmsskin.py` | ⬜ |
+| 4 | `nmsskin`, paleta y canales 5 y 6 | `tools/nmsskin.py` | ✅ commit `a5356e3`, **30 tests OK** |
 | 5 | `Skin-NMSGeometry`, el comando | `tools/Skin-NMSGeometry.py` | ⬜ |
 | 6 | `Check-NMSGraft` ampliado al binario | `_revisar_piel`, cinco comprobaciones nuevas | ⬜ |
 | 7 | Pasada completa y documentación | fila de PRUEBA12 y cierre | ⬜ |
@@ -253,6 +253,14 @@ En el vanilla eso cuadra así: `SkinMatrixLayout` tiene 23 entradas y `MeshBaseS
 
 > El importador solo lee **3 pesos** de los 4 (`np_blendWeight[i][0:3]`), aunque el hueco de 4
 > exista en el buffer.
+
+> **El casado va por vecino más cercano, no por posición exacta** — medido el 15/08 en la
+> Task 4. El buffer guarda las posiciones en **half** y `pesos.json` en float, así que el
+> mismo vértice sale movido hasta **1,4 ULP**: `1.829884` en el JSON contra `1.8291016` en el
+> buffer. Casar por clave exacta falla en **10 014 de los 11 357**, y no es que sean mallas
+> distintas —las cajas coinciden a la cuarta cifra y los 4 820 orígenes se alcanzan todos—.
+> La tolerancia es **0,003**, entre el peor casado bueno (0,001355) y el segundo vecino más
+> cercano de toda la malla (0,005036). No hay solape.
 
 > **El riesgo conocido tiene nombre y ya nos pasó:** con el flag `_F02_SKINNED` puesto y los
 > pesos mal, el bicho **se estira sin forma** (`PRUEBA01`). Con el flag puesto y los índices
