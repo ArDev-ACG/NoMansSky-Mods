@@ -204,9 +204,25 @@ def _revisar_piel(carpeta, geo, mallas, temporal):
     return fallos
 
 
+def _hace_falta(carpeta, patron, de):
+    """El .MXML, sacandolo del .MBIN si solo esta el binario.
+
+    Antes esto era un next() pelado y reventaba con un StopIteration sin
+    decir que faltaba. Pasa siempre que se revisa lo DESPLEGADO, porque en
+    GAMEDATA\\MODS solo estan los .MBIN.
+    """
+    hecho = next(carpeta.glob(patron), None)
+    if hecho is not None:
+        return hecho
+    binario = next(carpeta.glob(de), None)
+    if binario is None:
+        sys.exit(f"\n  en {carpeta} no hay ni {patron} ni {de}\n")
+    return nmsgeom.descompilar(binario)
+
+
 def revisar(carpeta):
-    escena = next(carpeta.glob("*.SCENE.MXML"))
-    geometria = next(carpeta.glob("*.GEOMETRY.MXML"))
+    escena = _hace_falta(carpeta, "*.SCENE.MXML", "*.SCENE.MBIN")
+    geometria = _hace_falta(carpeta, "*.GEOMETRY.MXML", "*.GEOMETRY.MBIN.PC")
     print(f"  .SCENE     {escena.name}")
     print(f"  .GEOMETRY  {geometria.name}\n")
 
