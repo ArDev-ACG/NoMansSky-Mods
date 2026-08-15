@@ -55,8 +55,8 @@ def _correr(ruta: Path, salida: Path) -> Path:
     r = subprocess.run([str(MBINCOMPILER), ruta.name], cwd=str(ruta.parent),
                        capture_output=True, text=True)
     if not salida.exists():
-        raise RuntimeError(f"MBINCompiler no escribio {salida}:\n"
-                           f"{r.stdout}\n{r.returncode}")
+        raise RuntimeError(f"MBINCompiler no escribio {salida} "
+                           f"(codigo {r.returncode}):\n{r.stdout}\n{r.stderr}")
     return salida
 
 
@@ -126,3 +126,68 @@ def cabecera(data_mbin: Path, s: Streams) -> int:
     """Los bytes de cabecera del .DATA: lo que hay antes de los streams."""
     return (Path(data_mbin).stat().st_size
             - len(s.vertices) - len(s.indices) - len(s.posiciones))
+
+
+def ampliar_stride(vertices: bytes, viejo: int, nuevo: int) -> bytearray:
+    """Recoloca cada vertice en un hueco mas ancho. El relleno va a cero."""
+    if len(vertices) % viejo:
+        raise ValueError(f"{len(vertices)} bytes no es multiplo de {viejo}")
+    n = len(vertices) // viejo
+    salida = bytearray(n * nuevo)
+    for i in range(n):
+        salida[i * nuevo: i * nuevo + viejo] = vertices[i * viejo:
+                                                        (i + 1) * viejo]
+    return salida
+
+
+def layout(geo_mxml: Path) -> dict:
+    raiz = ET.parse(Path(geo_mxml)).getroot()
+    vl = raiz.find(".//Property[@name='VertexLayout']")
+    elementos = {}
+    for e in vl.find("Property[@name='VertexElements']"):
+        clave = int(_campo(e, "SemanticID").get("value"))
+        elementos[clave] = int(_campo(e, "Offset").get("value"))
+    return {"stride": int(_campo(vl, "Stride").get("value")),
+            "elementos": elementos}
+
+
+def parchear_layout(geo_mxml: Path) -> None:
+    """ElementCount 2 -> 4, Stride 8 -> 20, y los dos canales de piel."""
+    geo_mxml = Path(geo_mxml)
+    arbol = ET.parse(geo_mxml)
+    vl = arbol.getroot().find(".//Property[@name='VertexLayout']")
+    elementos = vl.find("Property[@name='VertexElements']")
+
+    presentes = {_campo(e, "SemanticID").get("value") for e in elementos}
+    for canal in CANALES_PIEL:
+        if canal["SemanticID"] in presentes:
+            continue
+        e = ET.SubElement(elementos, "Property",
+                          {"name": "VertexElements",
+                           "value": "TkVertexElement",
+                           "_index": str(len(elementos))})
+        for clave, valor in canal.items():
+            ET.SubElement(e, "Property", {"name": clave, "value": valor})
+
+    _campo(vl, "ElementCount").set("value", str(len(elementos)))
+    _campo(vl, "Stride").set("value", "20")
+    arbol.write(geo_mxml, encoding="utf-8", xml_declaration=True)
+
+
+def parchear_metadata(geo_mxml: Path, data_mbin: Path, s: Streams) -> None:
+    """Los offsets, en la convencion del vanilla: los dos de datos son
+    absolutos en el archivo y el de indices es relativo a los vertices."""
+    geo_mxml = Path(geo_mxml)
+    arbol = ET.parse(geo_mxml)
+    meta = arbol.getroot().find(".//Property[@value='TkMeshMetaData']")
+    inicio = cabecera(data_mbin, s)
+    for clave, valor in (
+            ("VertexDataSize", len(s.vertices)),
+            ("VertexDataOffset", inicio),
+            ("IndexDataSize", len(s.indices)),
+            ("IndexDataOffset", len(s.vertices)),
+            ("VertexPositionDataSize", len(s.posiciones)),
+            ("VertexPositionDataOffset",
+             inicio + len(s.vertices) + len(s.indices))):
+        _campo(meta, clave).set("value", str(valor))
+    arbol.write(geo_mxml, encoding="utf-8", xml_declaration=True)
