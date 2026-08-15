@@ -9,7 +9,18 @@
 # --- Assets del juego / binarios pesados (NUNCA subir) ---
 unpacked/
 build/
-tools/
+# tools/ es AMUMSS vendored, MBINCompiler y sus .exe: nada de eso va a git.
+# Pero los .py de ahi dentro SI son fuente propia y si se versionan. La
+# regla tiene que ser "tools/*" y no "tools/": git no puede re-incluir
+# nada que este dentro de un directorio excluido.
+tools/*
+!tools/*.py
+!tools/tests/
+tools/tests/*
+!tools/tests/*.py
+# PCBANKS desempaquetado para NMSDK: assets de Hello Games, y ademas
+# MBINCompiler deja .MXML sueltos que las reglas por extension no cazan.
+work/pcbanks/
 *.pak
 *.mbin
 *.MBIN
