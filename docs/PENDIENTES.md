@@ -123,7 +123,7 @@ Las siete tareas, y en qué estado están:
 |---|---|---|---|
 | 1 | `nmsgeom`, ida y vuelta del `.DATA` | `tools/nmsgeom.py`, `tools/tests/test_nmsgeom.py` | ✅ commit `bdd16ca` · **revisada** el 15/08 |
 | 2 | `nmsgeom`, stride 8 → 20 y offsets | `ampliar_stride`, `layout`, `parchear_layout`, `parchear_metadata` | ✅ commit `55ddee8`, **11 tests OK** |
-| 3 | `Weight-NMSMesh`, los pesos | `tools/Weight-NMSMesh.py` → `work/models/scuttlermesh/pesos.json` | ⬜ |
+| 3 | `Weight-NMSMesh`, los pesos | `tools/Weight-NMSMesh.py` → `work/models/scuttlermesh/pesos.json` | ✅ commit `0a42a92`, **17 tests OK** |
 | 4 | `nmsskin`, paleta y canales 5 y 6 | `tools/nmsskin.py` | ⬜ |
 | 5 | `Skin-NMSGeometry`, el comando | `tools/Skin-NMSGeometry.py` | ⬜ |
 | 6 | `Check-NMSGraft` ampliado al binario | `_revisar_piel`, cinco comprobaciones nuevas | ⬜ |
@@ -202,12 +202,19 @@ Resultado sobre nuestros 4 820 vértices:
 | | |
 |---|---:|
 | Vértices con peso | **4 820 de 4 820** |
-| Asignaciones | 5 137 |
+| Asignaciones | 4 895 |
 | Máximo de huesos por vértice | **2** |
+| Centroide de la cabeza en Y | **+1,493** |
 
-1,07 huesos por vértice, contra 1,05 del vanilla: **sale igual de rígido que el original**, que
+1,02 huesos por vértice, contra 1,05 del vanilla: **sale igual de rígido que el original**, que
 es exactamente lo que se buscaba. Y con máximo 2 influencias caben de sobra en los 4 huecos
 del buffer.
+
+> **Estos son los números de la corrida del 15/08, la que está en disco** —
+> `work/models/scuttlermesh/pesos.json`, commit `0a42a92`—. La sesión del 13/08 había anotado
+> 5 137 asignaciones (1,07); la diferencia es la variación admisible del `vert_mapping`, y los
+> cuatro invariantes que sí mandan —4 820 de 4 820, el máximo de 2, los cinco grupos vacíos y
+> el signo del centroide— salieron iguales.
 
 > **Dos grupos se quedan a cero y hay que saberlo**: `NewBack1/2/3JNT` (la espalda no
 > doblará; el cuerpo se moverá en bloque con `RootJNT`) y los dos `Pincer1JNT` (nuestro bicho
