@@ -91,12 +91,23 @@ El camino, y cada paso se puede comprobar sin entrar al juego:
 2. Transferir esos pesos a polySurface6 con el modificador Data Transfer   [HECHO]
       (Vertex Group Data, por superficie más cercana)
 3. Escribir los canales 5 y 6 en el .GEOMETRY nosotros, como ya se hace con
-      los arrays por hueso -> herramienta nueva, hermana de Patch-NMSGraft.py
+      los arrays por hueso -> herramienta nueva, hermana de Patch-NMSGraft.py   [HECHO]
 4. Rellenar SkinMatrixLayout y MeshBaseSkinMat, y abrir el rango
-      FIRSTSKINMAT / LASTSKINMAT del nodo de malla en el .SCENE
-5. Devolver _F02_SKINNED a FFIENDMAT
-6. tools/Check-NMSGraft.py, que es quien caza los índices fuera de rango
+      FIRSTSKINMAT / LASTSKINMAT del nodo de malla en el .SCENE   [HECHO]
+5. Devolver _F02_SKINNED a FFIENDMAT   <- LO UNICO QUE QUEDA, y va en el .lua
+6. tools/Check-NMSGraft.py, que es quien caza los índices fuera de rango   [HECHO]
 ```
+
+> **Pasos 3, 4 y 6 hechos, sin entrar al juego.** `work/models/scuttlermesh_anim/` lleva el
+> buffer a stride 20 con los canales 5 y 6, `SkinMatrixLayout` de 14 huesos, `MeshBaseSkinMat`
+> a `[0]` y el nodo de malla con `FIRSTSKINMAT` 0 → `LASTSKINMAT` 14. `Check-NMSGraft` pasa
+> con salida 0, y **caza los tres modos de fallo** cuando se rompe a propósito. Falta el paso
+> 5 —`_F02_SKINNED`— que va en el `.lua` de la `PRUEBA12` junto a `M-TEX`.
+>
+> **Esa carpeta no está en git**: son `.MBIN` de Hello Games. Se rehace con
+> `python tools/Skin-NMSGeometry.py work/models/scuttlermesh work/models/scuttlermesh_anim`.
+>
+> Para repetir todo esto con otra malla, la receta está en [`RECETA-PIEL.md`](RECETA-PIEL.md).
 
 **El paso 3 es el trabajo de verdad**: cambia el stride del buffer de vértices, así que hay
 que reescribir el `.GEOMETRY.DATA` entrelazando los dos canales nuevos. Lo demás es
@@ -126,8 +137,8 @@ Las siete tareas, y en qué estado están:
 | 3 | `Weight-NMSMesh`, los pesos | `tools/Weight-NMSMesh.py` → `work/models/scuttlermesh/pesos.json` | ✅ commit `0a42a92`, **17 tests OK** |
 | 4 | `nmsskin`, paleta y canales 5 y 6 | `tools/nmsskin.py` | ✅ commit `a5356e3`, **30 tests OK** |
 | 5 | `Skin-NMSGeometry`, el comando | `tools/Skin-NMSGeometry.py` | ✅ commit `e4a0be1`, corrido sobre la malla real |
-| 6 | `Check-NMSGraft` ampliado al binario | `_revisar_piel`, cinco comprobaciones nuevas | ⬜ |
-| 7 | Pasada completa y documentación | fila de PRUEBA12 y cierre | ⬜ |
+| 6 | `Check-NMSGraft` ampliado al binario | `_revisar_piel`, cinco comprobaciones nuevas | ✅ commit `a0c3f89`, **caza los 3 modos de fallo** |
+| 7 | Pasada completa y documentación | fila de PRUEBA12 y cierre | ✅ conducto entero en verde desde cero |
 
 Tres cosas que hay que tener presentes al retomar:
 
