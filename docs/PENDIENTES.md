@@ -49,7 +49,7 @@ chocaban están movidas a `GAMEDATA\MODS_Retirados\`, fuera de donde el juego le
 | 3 | **`HT_FiendMarkers_PRUEBA05`** | Marcadores de Horror. En el juego no hay ninguno: el `PRUEBA04` está retirado | ✍️ escrito, sin construir · **choca**, ver abajo | [`../work/scripts/marcadores/README.md`](../work/scripts/marcadores/README.md) |
 | 4 | **`HT_DerelictBugs`** | Devolver `CARG` y `MEDI`, **de una en una** | ⬜ sin escribir | [`../work/scripts/derelict/README.md`](../work/scripts/derelict/README.md) |
 | 5 | **`N1`** | **Huevo de interior**: prueba **A** (control con `DEBRISLARGE_COMMON`) y luego **B** (huevo de `SPACEBASE`). Bloquea la Etapa 3 de Blender, que usa el mismo locator | ⬜ la **A** ya está escrita, la **B** no | [`ASSETS.md`](ASSETS.md) §5.1 y §5.7 · [`../work/scripts/pruebas/HT_LocatorTest_PRUEBA01.lua`](../work/scripts/pruebas/HT_LocatorTest_PRUEBA01.lua) |
-| 6 | **`M3`** | **Segunda malla propia.** `ScrullCrawler_max_hd` y `Necro_partes_7_own_2` son estáticos y entran por el conducto de la Etapa 2, que **ya está cerrado y automatizado** en `tools/Export-NMSMesh.py`; `zombie-monster-slasher` no, viene rigged. Antes hay que **decimar en Blender**: el marker son 822 vértices y esos dos pesan 14,3 y 6,1 MB | ⬜ sin escribir | [`ASSETS.md`](ASSETS.md) §4.2 |
+| 6 | **`M3`** | **Segunda malla propia.** *Para la piel de estas, la receta ya está escrita: [`RECETA-PIEL.md`](RECETA-PIEL.md).* `ScrullCrawler_max_hd` y `Necro_partes_7_own_2` son estáticos y entran por el conducto de la Etapa 2, que **ya está cerrado y automatizado** en `tools/Export-NMSMesh.py`; `zombie-monster-slasher` no, viene rigged. Antes hay que **decimar en Blender**: el marker son 822 vértices y esos dos pesan 14,3 y 6,1 MB | ⬜ sin escribir | [`ASSETS.md`](ASSETS.md) §4.2 |
 
 > **`M-ANIM` y `M-TEX` van en el MISMO `.lua`.** Los dos escriben `FFIENDMAT.MATERIAL.MBIN` y
 > los dos `.GEOMETRY`: no pueden ser dos mods a la vez. La `PRUEBA12` lleva las dos cosas y
@@ -125,7 +125,7 @@ Las siete tareas, y en qué estado están:
 | 2 | `nmsgeom`, stride 8 → 20 y offsets | `ampliar_stride`, `layout`, `parchear_layout`, `parchear_metadata` | ✅ commit `55ddee8`, **11 tests OK** |
 | 3 | `Weight-NMSMesh`, los pesos | `tools/Weight-NMSMesh.py` → `work/models/scuttlermesh/pesos.json` | ✅ commit `0a42a92`, **17 tests OK** |
 | 4 | `nmsskin`, paleta y canales 5 y 6 | `tools/nmsskin.py` | ✅ commit `a5356e3`, **30 tests OK** |
-| 5 | `Skin-NMSGeometry`, el comando | `tools/Skin-NMSGeometry.py` | ⬜ |
+| 5 | `Skin-NMSGeometry`, el comando | `tools/Skin-NMSGeometry.py` | ✅ commit `e4a0be1`, corrido sobre la malla real |
 | 6 | `Check-NMSGraft` ampliado al binario | `_revisar_piel`, cinco comprobaciones nuevas | ⬜ |
 | 7 | Pasada completa y documentación | fila de PRUEBA12 y cierre | ⬜ |
 
