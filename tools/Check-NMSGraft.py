@@ -17,9 +17,18 @@ Los .MXML se sacan con MBINCompiler:
     MBINCompiler.exe FREIGHTERFIEND.GEOMETRY.MBIN.PC
 """
 
+import shutil
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import nmsgeom
+import nmsskin
 
 # Un array por hueso tiene una entrada por cada nodo JOINT del .SCENE, mas una:
 # el vanilla del SCUTTLER trae 115 para 114 nodos.
@@ -86,6 +95,115 @@ def nombre_de(nodo):
     return "?"
 
 
+def _data_mxml(carpeta, temporal):
+    """El .GEOMETRY.DATA.MXML, descompilandolo si hace falta.
+
+    No estar descompilado NO es un fallo del injerto: la carpeta congelada
+    solo guarda el .MBIN.PC. Antes esto se contaba como fallo y el check
+    daba salida 1 por no encontrar un archivo intermedio, que es criar
+    lobos. Si esta el .MBIN.PC, se saca; si no esta ninguno, se avisa y las
+    comprobaciones de piel se saltan.
+
+    Y se saca en un TEMPORAL, no al lado del original: este comando solo
+    lee. work/models/scuttlermesh/ es la PRUEBA11, dada por buena en
+    partida, y un revisor que escribe en lo que revisa no vale.
+    """
+    hecho = next(carpeta.glob("*.GEOMETRY.DATA.MXML"), None)
+    if hecho is not None:
+        return hecho
+    mbin = next(carpeta.glob("*.GEOMETRY.DATA.MBIN.PC"), None)
+    if mbin is None:
+        return None
+    copia = Path(temporal) / mbin.name
+    shutil.copy(mbin, copia)
+    return nmsgeom.descompilar(copia)
+
+
+def _revisar_piel(carpeta, geo, mallas, temporal):
+    """Lo que vive en el binario y el XML solo no ve.
+
+    Existe porque con el flag _F02_SKINNED puesto y los indices de hueso
+    fuera de rango el juego CIERRA SIN AVISAR. Eso paso en la PRUEBA05 y
+    costo una sesion de juego entera.
+    """
+    fallos = []
+    data_mxml = _data_mxml(carpeta, temporal)
+    if data_mxml is None:
+        print("  aviso: no hay .GEOMETRY.DATA, la piel no se revisa\n")
+        return fallos
+
+    geo_mxml = next(carpeta.glob("*.GEOMETRY.MXML"))
+    s = nmsgeom.leer_streams(data_mxml)
+    d = nmsgeom.layout(geo_mxml)
+    stride = d["stride"]
+    vertices = int(geo.get("VertexCount", 0))
+    print(f"  stride {stride} con los canales {sorted(d['elementos'])}\n")
+
+    if stride * vertices != len(s.vertices):
+        fallos.append(f"stride {stride} x {vertices} vertices = "
+                      f"{stride * vertices}, pero el buffer trae "
+                      f"{len(s.vertices)} bytes")
+
+    data_mbin = next(carpeta.glob("*.GEOMETRY.DATA.MBIN.PC"), None)
+    if data_mbin is not None:
+        inicio = nmsgeom.cabecera(data_mbin, s)
+        meta = ET.parse(geo_mxml).getroot().find(
+            ".//Property[@value='TkMeshMetaData']")
+        espera = {"VertexDataSize": len(s.vertices),
+                  "VertexDataOffset": inicio,
+                  "IndexDataSize": len(s.indices),
+                  "IndexDataOffset": len(s.vertices),
+                  "VertexPositionDataSize": len(s.posiciones),
+                  "VertexPositionDataOffset":
+                      inicio + len(s.vertices) + len(s.indices)}
+        for clave, valor in espera.items():
+            dice = int(meta.find(f"Property[@name='{clave}']").get("value"))
+            if dice != valor:
+                fallos.append(f"{clave} dice {dice}, pero el .DATA da {valor}")
+
+    crudo = geo.get("SkinMatrixLayout")
+    palet = ([int(p.get("value")) for p in crudo]
+             if isinstance(crudo, list) else [])
+    joints = nmsskin.leer_joints(next(carpeta.glob("*.SCENE.MXML")))
+    fuera = [v for v in palet if v not in set(joints.values())]
+    if fuera:
+        fallos.append(f"SkinMatrixLayout apunta a JOINTINDEX que no existen: "
+                      f"{fuera[:8]} (los del .SCENE van de 1 a {len(joints)})")
+
+    for nodo in mallas:
+        attr = atributos(nodo)
+        primero = int(attr.get("FIRSTSKINMAT", 0))
+        ultimo = int(attr.get("LASTSKINMAT", 0))
+        if ultimo == primero:
+            continue  # malla rigida a proposito: no hay piel que revisar
+
+        if 5 not in d["elementos"] or 6 not in d["elementos"]:
+            fallos.append(f"{nombre_de(nodo)} pide piel, pero el VertexLayout "
+                          f"no declara los canales 5 y 6")
+            continue
+
+        v = np.frombuffer(s.vertices, dtype=np.uint8).reshape(-1, stride)
+        idx = v[:, d["elementos"][5]: d["elementos"][5] + 4]
+        w = v[:, d["elementos"][6]: d["elementos"][6] + 8].copy().view("<f2")
+
+        tope = ultimo - primero
+        peor = int(idx.max())
+        if peor >= tope:
+            culpables = int((idx.max(axis=1) >= tope).sum())
+            fallos.append(f"{nombre_de(nodo)}: indice de hueso {peor} con un "
+                          f"rango de {tope} ({culpables} vertices). "
+                          f"EL JUEGO CIERRA SIN AVISAR")
+
+        suma = w.astype("float32").sum(axis=1)
+        malos = int((abs(suma - 1.0) > 0.01).sum())
+        if malos:
+            i = int(abs(suma - 1.0).argmax())
+            fallos.append(f"{nombre_de(nodo)}: {malos} vertices con pesos que "
+                          f"no suman 1 (el peor, el {i}, suma {suma[i]:.3f})")
+
+    return fallos
+
+
 def revisar(carpeta):
     escena = next(carpeta.glob("*.SCENE.MXML"))
     geometria = next(carpeta.glob("*.GEOMETRY.MXML"))
@@ -140,6 +258,8 @@ def revisar(carpeta):
                 fallos.append(f"{etiqueta}: el lote llega a {fin}, pero "
                               f"IndexCount es {indices}")
 
+    with tempfile.TemporaryDirectory(prefix="check-nmsgraft-") as temporal:
+        fallos += _revisar_piel(carpeta, geo, mallas, temporal)
     return fallos
 
 
