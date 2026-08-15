@@ -12,7 +12,7 @@ El diseño completo, con los porqués: [`../specs/2026-08-14-skin-nmsgeometry-de
 
 ## Global Constraints
 
-- **No hay pytest y no se instala.** Los tests son `unittest` de la stdlib, y se corren con `python -m unittest discover -s tools/tests -t .` desde la raíz del repo.
+- **No hay pytest y no se instala.** Los tests son `unittest` de la stdlib, y se corren con `python -m unittest discover -s tools/tests` desde la raíz del repo.
 - **Los `.py` de `tools/` van sin acentos**, como los que ya hay (`Patch-NMSGraft.py` escribe «segun», «costo», «vacios»). Docstring de cabecera en el estilo de la casa: qué hace, cómo se llama, y qué fallo real lo hizo existir. **Este plan, el spec y los `.md` sí llevan acentos**: la regla es solo para el código.
 - **Los commits no llevan trailer `Co-Authored-By`.**
 - **MBINCompiler es `tools/AMUMSS/MODBUILDER/MBINCompiler.exe`.** Convierte según la extensión que le des y escribe al lado.
@@ -63,7 +63,7 @@ Crear `tools/tests/test_nmsgeom.py`:
 ```python
 """Tests de tools/nmsgeom.py. Se corren desde la raiz del repo:
 
-    python -m unittest discover -s tools/tests -t .
+    python -m unittest discover -s tools/tests
 """
 
 import shutil
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Correrlo y ver que falla**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `ModuleNotFoundError: No module named 'nmsgeom'`.
@@ -270,7 +270,7 @@ def cabecera(data_mbin: Path, s: Streams) -> int:
 - [ ] **Step 4: Correr los tests y ver que pasan**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `Ran 3 tests` · `OK`.
@@ -385,7 +385,7 @@ class TestLayout(unittest.TestCase):
 - [ ] **Step 2: Correrlos y ver que fallan**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `AttributeError: module 'nmsgeom' has no attribute 'ampliar_stride'`.
@@ -461,7 +461,7 @@ def parchear_metadata(geo_mxml: Path, data_mbin: Path, s: Streams) -> None:
 - [ ] **Step 4: Correr los tests**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `Ran 10 tests` · `OK`.
@@ -559,7 +559,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Correrlo y ver que se salta**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: los de `nmsgeom` en `OK` y los de pesos en `skipped ('falta ...pesos.json: corre Weight-NMSMesh.py')`.
@@ -738,7 +738,7 @@ Las asignaciones pueden bailar un poco respecto a 5 137 —depende del `vert_map
 - [ ] **Step 5: Correr los tests, que ya no se saltan**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `Ran 16 tests` · `OK`.
@@ -899,7 +899,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Correrlos y ver que fallan**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `ModuleNotFoundError: No module named 'nmsskin'`.
@@ -1048,7 +1048,7 @@ def tejer(vertices: bytearray, idx: np.ndarray, w: np.ndarray,
 - [ ] **Step 4: Correr los tests**
 
 ```
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: `Ran 26 tests` · `OK`.
@@ -1425,7 +1425,7 @@ Que los tres comandos corran seguidos sobre una carpeta que no existe todavía, 
 python -c "import shutil; shutil.rmtree('work/models/scuttlermesh_anim', ignore_errors=True)"
 python tools/Skin-NMSGeometry.py work/models/scuttlermesh work/models/scuttlermesh_anim
 python tools/Check-NMSGraft.py work/models/scuttlermesh_anim
-python -m unittest discover -s tools/tests -t .
+python -m unittest discover -s tools/tests
 ```
 
 Esperado: los tres en verde, `Check` con salida 0 y `OK` en los tests.
