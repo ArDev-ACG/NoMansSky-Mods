@@ -65,9 +65,22 @@ REPORT.txt
 *.log
 
 # --- Trabajo pesado local (opt-in manual si lo quieres versionar) ---
-work/models/
+# Las excepciones van pieza a pieza, y ojo con la forma: para re-incluir un
+# archivo hay que abrir TODOS sus directorios padre, porque git no mira
+# dentro de un directorio excluido. Por eso "work/models/*" y no
+# "work/models/". Con *.blend no hace falta: es un patron de archivo, no de
+# directorio, y basta con negar la ruta.
+work/models/*
+!work/models/scuttlermesh/
+work/models/scuttlermesh/*
+# El sidecar de pesos: 285 KB de texto, y es lo que consume el splice de
+# M-ANIM. Es justo lo que se perdio la primera vez por no versionarlo.
+!work/models/scuttlermesh/pesos.json
 work/textures/
 *.blend
+# 20,9 MB. Decision del humano el 2026-08-15: entra, para que el proyecto de
+# Blender quede reproducible sin depender de volver a correr el script.
+!BLENDER/proyectos/scuttler.blend
 *.blend1
 *.psd
 *.xcf
