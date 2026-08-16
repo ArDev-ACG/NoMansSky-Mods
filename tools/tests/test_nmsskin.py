@@ -135,9 +135,15 @@ class TestSobreLaMallaReal(unittest.TestCase):
         s = nmsgeom.leer_streams(nmsgeom.descompilar(self._copia(DATA)))
 
         palet = nmsskin.paleta(pesos, joints)
-        self.assertEqual(len(palet), 14)  # los 14 grupos que reciben peso
+        # Cuantos huesos hay depende de como se pese, y ya cambio una vez:
+        # eran 14 con el reparto que fallo en partida el 15/08 y son 41
+        # pesando por hueso mas cercano. Lo que NO puede cambiar es que
+        # quepan en un byte, que vayan ascendentes y que existan todos.
+        self.assertLessEqual(len(palet), 256)
         self.assertEqual(palet, sorted(palet))
-        self.assertEqual(palet[0], joints["RootJNT"])
+        self.assertEqual(len(set(palet)), len(palet))
+        self.assertTrue(set(palet) <= set(joints.values()))
+        self.assertIn(joints["RootJNT"], palet)
 
         mapa = nmsskin.casar(nmsskin.posiciones(s), pesos)
         self.assertEqual(len(mapa), 11357)

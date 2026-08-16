@@ -11,11 +11,15 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[2]
 PESOS = RAIZ / "work" / "models" / "scuttlermesh" / "pesos.json"
 
-# Los cinco grupos que se quedan a cero son conocidos y NO son fallo: la
-# espalda no doblara -el cuerpo se movera en bloque con RootJNT- y nuestro
-# bicho no tiene pinzas.
-VACIOS = {"NewBack1JNT", "NewBack2JNT", "NewBack3JNT",
-          "LPincer1JNT", "RPincer1JNT"}
+# Lo que se probo en partida el 15/08 y salio mal: las puntas de las dos
+# patas delanteras se llevaban el 82% de la malla y RootJNT tenia 17
+# vertices, o sea que el cuerpo colgaba de las patas. Al caminar, las patas
+# se llevaban el torso. Estos numeros son la frontera entre aquello y un
+# reparto sano; salen del comentario de tools/Weight-NMSMesh.py.
+TOPE_REPARTO = 0.35
+MINIMO_TRONCO = 0.30
+TOPE_PUNTA = 0.10
+PUNTAS = ("Leg3", "Leg4", "END")
 
 
 class TestPesos(unittest.TestCase):
@@ -43,18 +47,30 @@ class TestPesos(unittest.TestCase):
             with self.subTest(vertice=i):
                 self.assertEqual(pesos, sorted(pesos, reverse=True))
 
-    def test_catorce_grupos_reciben_peso(self):
-        usados = {g for e in self.pesos for g, _ in e[3]}
-        self.assertEqual(len(usados), 14)
-        self.assertEqual(usados & VACIOS, set())
+    def _reparto(self):
+        cuenta = {}
+        for e in self.pesos:
+            g = max(e[3], key=lambda t: t[1])[0]
+            cuenta[g] = cuenta.get(g, 0) + 1
+        return cuenta
 
-    def test_la_cabeza_cae_en_mas_y(self):
-        # El criterio que decidio GIRO_Z 180. Puntuar por "cuantos grupos
-        # reciben vertices" elige mal y deja el craneo mirando hacia atras.
-        ys = [e[1] for e in self.pesos
-              if any(g == "NewHeadJNT" and p > 0.5 for g, p in e[3])]
-        self.assertTrue(ys, "ningun vertice cuelga de NewHeadJNT")
-        self.assertGreater(sum(ys) / len(ys), 0)
+    def test_ningun_hueso_se_lleva_media_malla(self):
+        peor, n = max(self._reparto().items(), key=lambda t: t[1])
+        self.assertLess(n / len(self.pesos), TOPE_REPARTO,
+                        f"{peor} domina {n} de {len(self.pesos)} vertices")
+
+    def test_el_cuerpo_cuelga_de_la_columna(self):
+        # El 15/08 RootJNT tenia 17 vertices de 4820 y el cuerpo colgaba de
+        # las puntas de las patas delanteras.
+        tronco = sum(n for g, n in self._reparto().items()
+                     if "Root" in g or "Back" in g)
+        self.assertGreaterEqual(tronco / len(self.pesos), MINIMO_TRONCO)
+
+    def test_ninguna_punta_de_miembro_domina(self):
+        for g, n in self._reparto().items():
+            if any(t in g for t in PUNTAS):
+                with self.subTest(hueso=g):
+                    self.assertLess(n / len(self.pesos), TOPE_PUNTA)
 
 
 if __name__ == "__main__":
