@@ -8,17 +8,15 @@ PCT_HOSTILE      = "1.000000"
 MAX_CREATURE     = "70"
 BOREDOM          = "150.000000"
 
-EGG_MULT         = "20"
 FIEND_ATTACKERS  = "8"
 FIEND_ENGAGED    = "16"
 FIEND_SPAWN      = "16"
 FIEND_AGGRO      = "600.000000"
-
 FIEND_MARKERS    = "false"
 FIEND_PERCEPTION = "120.000000"
 
 PREDATOR_MARKERS  = "false"
-FIEND_AGGRO_DECAY = "0.000000"
+FIEND_AGGRO_DECAY = "0.100000"
 FIEND_AGGRO_EGG   = "3.000000"
 FIEND_SHOT_MEMORY = "60.000000"
 FIEND_DESPAWN     = "300.000000"
@@ -48,23 +46,21 @@ PUSH_LARGE       = "3.000000"
 MELEE_SPEED      = "Fast"
 MELEE_SLOWDOWN   = "1.000000"
 
-TENTACLE_MODEL   = "MODELS/PLANETS/BIOMES/COMMON/BUILDINGS/PROPS/ABANDONED/INTERIOR_TENTACLEPLANT.SCENE.MBIN"
-EGG_MODEL        = "MODELS/PLANETS/BIOMES/COMMON/RARERESOURCE/GROUND/FIENDEGG.SCENE.MBIN"
-EGG_PROB         = "100.000000"
-
-FREIGHTER_SPAWN   = "60.000000"
-FREIGHTER_DESPAWN = "150.000000"
+FREIGHTER_SPAWN   = "30.000000"
+FREIGHTER_DESPAWN = "50.000000"
 FIEND_SPAWN_DIST  = "120.000000"
 
 POD_TORCH        = "12.000000"
 POD_GUNFIRE      = "8.000000"
+POD_BROTAN       = "true"
+EGG_MULT         = "20"
 
 NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_4-Hardcore",
 ["MOD_AUTHOR"]      = "AldrichDDD",
 ["NMS_VERSION"]     = "6.45",
-["MOD_DESCRIPTION"] = "[HARDCORE] Infestacion 0.3.2: huevos de Horror dentro de los edificios abandonados, los nidos de carguero reaccionan a la linterna y a los disparos, huevos x20, sin marcador de UI, eclosion en oleada, se multiplican mientras luchas y no pierden el interes.",
+["MOD_DESCRIPTION"] = "[HARDCORE] Terror 0.6.5: contiene el mod de conducta (manadas de 5-7, deteccion a 80 m, Horrores que te ven a 120 m, se multiplican al rugir, crias que pegan igual que sus padres y no pierden el interes) y ademas siembra el mundo con huevos x20 y gusanos x20. Nuevo en 0.6.5: romper el nido colgante del carguero -el MEDIUMHANGSLIME- llama Horrores, porque su entidad ya traia IncreaseFiendCrime = EggDestroyed e IncreaseFiendWantedChance 1.0 y solo tenia IncreaseFiendWanted en false. Se pone en true. Va aqui y no solo en la prueba HT_CeilingPlague_PRUEBA03 porque los dos mods escriben ese mismo MBIN y el segundo que cargue gana entero: con los dos diciendo lo mismo, el orden de carga deja de importar. En 0.6.3: la banda de ataque del Horror vuelve a vanilla (6/10). En 0.6.1 se habia estrechado a 1/3 para que el padre no retrocediera al rugir, y el efecto secundario fue peor que el problema: con el limite lejano en 3 m el Horror no se comprometia con nada que estuviera mas lejos y te ignoraba por completo, el y sus crias. Retirados los huevos dentro de los edificios abandonados, que borraban la planta del techo sin poner nada en su sitio. Arreglada la primera puerta del carguero abandonado, que pedia seguridad adicional sin abrir nunca: el medidor de alerta se vacia cuando nacen Horrores, y estaba con el drenaje a cero. Vuelve al valor de vanilla. Las dos distancias del interior de carguero se quedan en vanilla tambien mientras se comprueba. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {
     {
@@ -141,7 +137,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - sin marcador de UI y percepcion de Fiend a "..FIEND_PERCEPTION,
+              ["COMMENT"]            = "Sin marcador de UI y percepcion de Fiend a "..FIEND_PERCEPTION,
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendOnscreenMarkers",    FIEND_MARKERS},
@@ -149,7 +145,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - eclosion en oleada",
+              ["COMMENT"]            = "Eclosion en oleada",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendMinSpawnTime", HATCH_MIN},
@@ -157,7 +153,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - separacion entre criaturas y gusano por cercania",
+              ["COMMENT"]            = "Separacion entre criaturas y gusano por cercania",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"AvoidCreaturesWeight",            AVOID_WEIGHT},
@@ -165,7 +161,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - sin acecho: te ve y arranca",
+              ["COMMENT"]            = "Sin acecho: te ve y arranca",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"PredatorNoticePauseTime", NOTICE_PAUSE},
@@ -175,7 +171,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - rumbo directo: mas refresco de steering y giro cerrado",
+              ["COMMENT"]            = "Rumbo directo: mas refresco de steering y giro cerrado",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"SteeringUpdateRate", STEER_RATE},
@@ -183,7 +179,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - horda: la manada se mueve como un bloque",
+              ["COMMENT"]            = "Horda: la manada se mueve como un bloque",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FollowLeaderCohereWeight", COHERE_WEIGHT},
@@ -191,7 +187,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]             = "0.3.0 - horda: menos empujon mutuo (struct por tamano)",
+              ["COMMENT"]             = "Horda: menos empujon mutuo (struct por tamano)",
               ["PRECEDING_KEY_WORDS"] = {"SpherePusherWeight"},
               ["VALUE_CHANGE_TABLE"]  =
               {
@@ -201,7 +197,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.1 - el aggro no se drena ni caduca",
+              ["COMMENT"]            = "El aggro sube el triple con los huevos pero se drena como en vanilla",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendAggroDecreasePerSpawn",   FIEND_AGGRO_DECAY},
@@ -210,7 +206,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.1 - memoria y correa: no te sueltan ni te pierden",
+              ["COMMENT"]            = "Memoria y correa: no te sueltan ni te pierden",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendBeingShotMemoryTime", FIEND_SHOT_MEMORY},
@@ -218,7 +214,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.2 - interiores: los Horrores del carguero salen antes y aguantan mas",
+              ["COMMENT"]            = "Interiores: distancias de carguero en vanilla, sospechosas de la puerta atascada",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FreighterSpawnDist",   FREIGHTER_SPAWN},
@@ -231,36 +227,13 @@ NMS_MOD_DEFINITION_CONTAINER =
         {
           ["MBIN_FILE_SOURCE"] =
           {
-            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDSCIENTIFIC.LSYSTEM.MBIN",
-            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDTRADER.LSYSTEM.MBIN",
-            "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDEDWARRIOR.LSYSTEM.MBIN",
-          },
-          ["MXML_CHANGE_TABLE"] =
-          {
-            {
-              ["COMMENT"]            = "0.3.2 - locator TENTACLE_: la planta pasa a ser un huevo de Horror",
-              ["REPLACE_TYPE"]       = "ALL",
-              ["VALUE_MATCH"]        = TENTACLE_MODEL,
-              ["VALUE_CHANGE_TABLE"] = { {"Model", EGG_MODEL} }
-            },
-            {
-              ["COMMENT"]            = "0.3.2 - ese locator sale siempre, no al 30%",
-              ["SPECIAL_KEY_WORDS"]  = {"LocatorType", "TENTACLE_"},
-              ["REPLACE_TYPE"]       = "ALL",
-              ["VALUE_CHANGE_TABLE"] = { {"Probability", EGG_PROB} }
-            },
-          }
-        },
-        {
-          ["MBIN_FILE_SOURCE"] =
-          {
             "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\PARTS\BUILDABLEPARTS\SPACEBASE\INFESTATION\LARGEPILLARSLIME\ENTITIES\LARGEPILLARSLIME.ENTITY.MBIN",
             "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\PARTS\BUILDABLEPARTS\SPACEBASE\INFESTATION\MEDIUMHANGSLIME\ENTITIES\MEDIUMHANGSLIME.ENTITY.MBIN",
           },
           ["MXML_CHANGE_TABLE"] =
           {
             {
-              ["COMMENT"]            = "0.3.2 - el nido despierta con la linterna y con los disparos [SIN PROBAR]",
+              ["COMMENT"]            = "El nido despierta con la linterna y con los disparos",
               ["SPECIAL_KEY_WORDS"]  = {"Components", "GcAlienPodComponentData"},
               ["REPLACE_TYPE"]       = "ONCE",
               ["VALUE_CHANGE_TABLE"] =
@@ -272,11 +245,23 @@ NMS_MOD_DEFINITION_CONTAINER =
           }
         },
         {
+          ["MBIN_FILE_SOURCE"] = "MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\PARTS\BUILDABLEPARTS\SPACEBASE\INFESTATION\MEDIUMHANGSLIME\ENTITIES\MEDIUMHANGSLIME.ENTITY.MBIN",
+          ["MXML_CHANGE_TABLE"] =
+          {
+            {
+              ["COMMENT"]            = "Romper el nido colgante llama Horrores, igual que romper un huevo de suelo",
+              ["SPECIAL_KEY_WORDS"]  = {"Components", "GcDestructableComponentData"},
+              ["REPLACE_TYPE"]       = "ONCE",
+              ["VALUE_CHANGE_TABLE"] = { {"IncreaseFiendWanted", POD_BROTAN} }
+            },
+          }
+        },
+        {
           ["MBIN_FILE_SOURCE"] = "GLOBALS\GCUIGLOBALS.GLOBAL.MBIN",
           ["MXML_CHANGE_TABLE"] =
           {
             {
-              ["COMMENT"]            = "0.3.1 - sin marcador de UI en los depredadores",
+              ["COMMENT"]            = "Sin marcador de UI en los depredadores",
               ["VALUE_CHANGE_TABLE"] = { {"ShowOnscreenPredatorMarkers", PREDATOR_MARKERS} }
             },
           }
@@ -324,7 +309,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               ["VALUE_CHANGE_TABLE"] = { {"AnimSpeedModifier", ANIM_SPEED} }
             },
             {
-              ["COMMENT"]            = "FIEND: se multiplica mientras luchas [SIN PROBAR]",
+              ["COMMENT"]            = "FIEND: se multiplica mientras luchas",
               ["SPECIAL_KEY_WORDS"]  = {"Id", "FIEND"},
               ["REPLACE_TYPE"]       = "ONCE",
               ["VALUE_CHANGE_TABLE"] =
@@ -333,6 +318,28 @@ NMS_MOD_DEFINITION_CONTAINER =
                 {"SpawnBroodID",     BROOD_ID},
                 {"SpawnBroodTimer",  BROOD_TIMER},
               }
+            },
+            {
+              ["COMMENT"]            = "BUGFIEND: golpes por racha "..FLURRY_MIN.."/"..FLURRY_MAX,
+              ["SPECIAL_KEY_WORDS"]  = {"Id", "BUGFIEND"},
+              ["REPLACE_TYPE"]       = "ONCE",
+              ["VALUE_CHANGE_TABLE"] =
+              {
+                {"MinFlurryHits", FLURRY_MIN},
+                {"MaxFlurryHits", FLURRY_MAX},
+              }
+            },
+            {
+              ["COMMENT"]            = "BUGFIEND: cadencia del salto -> "..POUNCE_DELAY,
+              ["SPECIAL_KEY_WORDS"]  = {"Id", "BUGFIEND"},
+              ["REPLACE_TYPE"]       = "ONCE",
+              ["VALUE_CHANGE_TABLE"] = { {"DelayBetweenPounceAttacks", POUNCE_DELAY} }
+            },
+            {
+              ["COMMENT"]            = "BUGFIEND: velocidad de animacion de ataque -> "..ANIM_SPEED,
+              ["SPECIAL_KEY_WORDS"]  = {"Id", "BUGFIEND"},
+              ["REPLACE_TYPE"]       = "ONCE",
+              ["VALUE_CHANGE_TABLE"] = { {"AnimSpeedModifier", ANIM_SPEED} }
             },
           }
         },

@@ -16,9 +16,21 @@ PESOS = RAIZ / "work" / "models" / "scuttlermesh" / "pesos.json"
 # vertices, o sea que el cuerpo colgaba de las patas. Al caminar, las patas
 # se llevaban el torso. Estos numeros son la frontera entre aquello y un
 # reparto sano; salen del comentario de tools/Weight-NMSMesh.py.
-TOPE_REPARTO = 0.35
+#
+# Recalibrados el 26/08 contra el VANILLA, que es la referencia que faltaba:
+#
+#   TOPE_REPARTO  el FreighterFiend pone el 45,9% de su propia malla en
+#                 RootJNT. El tope de 0,35 rechazaba pesados buenos por algo
+#                 que el juego hace de serie.
+#   TOPE_PUNTA    ahora se mide CONTRA EL TRONCO, no contra la malla entera.
+#                 La fraccion de vertices no es comparable entre las dos
+#                 mallas -el vanilla amontona el 73% de los suyos en el
+#                 cuerpo y la nuestra, decimada, los reparte parejos-. El
+#                 fallo del 15/08 era 43,2% de punta con el tronco al 0,4%:
+#                 la punta CIEN VECES el tronco.
+TOPE_REPARTO = 0.50
 MINIMO_TRONCO = 0.30
-TOPE_PUNTA = 0.10
+TOPE_PUNTA = 0.50
 PUNTAS = ("Leg3", "Leg4", "END")
 
 
@@ -67,10 +79,13 @@ class TestPesos(unittest.TestCase):
         self.assertGreaterEqual(tronco / len(self.pesos), MINIMO_TRONCO)
 
     def test_ninguna_punta_de_miembro_domina(self):
-        for g, n in self._reparto().items():
+        reparto = self._reparto()
+        tronco = sum(n for g, n in reparto.items()
+                     if "Root" in g or "Back" in g) / len(self.pesos)
+        for g, n in reparto.items():
             if any(t in g for t in PUNTAS):
                 with self.subTest(hueso=g):
-                    self.assertLess(n / len(self.pesos), TOPE_PUNTA)
+                    self.assertLess(n / len(self.pesos), tronco * TOPE_PUNTA)
 
 
 if __name__ == "__main__":

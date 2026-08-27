@@ -35,6 +35,9 @@ import nmsskin
 POR_HUESO = ["JointBindings", "JointExtents", "JointMirrorAxes",
              "JointMirrorPairs"]
 
+# El indice de 2 bytes llega hasta 65535, o sea 65536 vertices.
+TECHO_16BIT = 65536
+
 # Un array por malla tiene una entrada por cada nodo MESH.
 POR_MALLA = ["MeshAABBMin", "MeshAABBMax", "MeshVertRStart", "MeshVertREnd",
              "BoundHullVertSt", "BoundHullVertEd", "MeshBaseSkinMat"]
@@ -204,6 +207,32 @@ def _revisar_piel(carpeta, geo, mallas, temporal):
     return fallos
 
 
+# Lo que ya se aprobo en partida y no puede volver a caerse solo. La PRUEBA14
+# reinjerto sobre el .SCENE vanilla y resucito el AttackLight que la PRUEBA13
+# habia dejado muerto: el Horror volvio a salir con el ojo encendido, y nadie
+# se entero hasta verlo en el juego dos pruebas despues. Se comprueba aqui
+# porque este guion es la puerta por la que pasa todo antes de construir.
+LUZ_MUERTA = {"FALLOFF": 0.0, "INTENSITY": 0.0, "COL_R": 0.0, "COL_G": 0.0,
+              "COL_B": 0.0}
+LUCES_APAGADAS = ("AttackLight",)
+
+
+def _revisar_acordados(raiz_escena):
+    fallos = []
+    for nodo in nodos(raiz_escena, "LIGHT"):
+        if nombre_de(nodo) not in LUCES_APAGADAS:
+            continue
+        attr = atributos(nodo)
+        vivos = {k: attr[k] for k, cero in LUZ_MUERTA.items()
+                 if k in attr and abs(float(attr[k]) - cero) > 1e-6}
+        if vivos:
+            fallos.append(f"{nombre_de(nodo)} esta encendido otra vez: {vivos}. "
+                          f"Se aprobo APAGADO en la PRUEBA13 -el bicho sale "
+                          f"dorado y con el ojo brillante- y lo apaga "
+                          f"tools/Graft-NMSScene.py")
+    return fallos
+
+
 def _hace_falta(carpeta, patron, de):
     """El .MXML, sacandolo del .MBIN si solo esta el binario.
 
@@ -251,6 +280,16 @@ def revisar(carpeta):
     vertices = int(geo.get("VertexCount", 0))
     indices = int(geo.get("IndexCount", 0))
 
+    # Con Indices16Bit el indice es de 2 bytes: 65536 vertices como mucho. NMSDK
+    # NO lo comprueba -exporto 69261 con la bandera puesta y sin una queja- y lo
+    # que se lleva al juego son indices que dan la vuelta. Se caza aqui porque
+    # el numero solo aparece despues de exportar, y depende de cuanto parta el
+    # exportador, no de los triangulos que se vean en Blender.
+    if int(geo.get("Indices16Bit", 0)) and vertices > TECHO_16BIT:
+        fallos.append(f"VertexCount es {vertices} con Indices16Bit=1: el techo "
+                      f"son {TECHO_16BIT}. Hay que bajar el presupuesto de "
+                      f"tools/Decimate-NMSMesh.py y repetir el conducto")
+
     for nodo in mallas:
         attr = atributos(nodo)
         etiqueta = nombre_de(nodo)
@@ -276,19 +315,28 @@ def revisar(carpeta):
 
     with tempfile.TemporaryDirectory(prefix="check-nmsgraft-") as temporal:
         fallos += _revisar_piel(carpeta, geo, mallas, temporal)
-    return fallos
+    return fallos, _revisar_acordados(raiz_escena)
 
 
 if __name__ == "__main__":
     carpeta = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
     print(f"\nInjerto en {carpeta}\n")
-    fallos = revisar(carpeta)
+    fallos, perdidos = revisar(carpeta)
+
+    if perdidos:
+        print("  ACUERDOS PERDIDOS -- ya estaba arreglado y ha vuelto:\n")
+        for f in perdidos:
+            print(f"    {f}")
+        print()
 
     if fallos:
         print("  FUERA DE RANGO -- el juego cierra al usarlo:\n")
         for f in fallos:
             print(f"    {f}")
         print()
+        sys.exit(1)
+
+    if perdidos:
         sys.exit(1)
 
     print("  todos los indices del .SCENE caen dentro del .GEOMETRY\n")

@@ -76,6 +76,12 @@ work/models/scuttlermesh/*
 # El sidecar de pesos: 285 KB de texto, y es lo que consume el splice de
 # M-ANIM. Es justo lo que se perdio la primera vez por no versionarlo.
 !work/models/scuttlermesh/pesos.json
+!work/models/fiendmesh/
+work/models/fiendmesh/*
+!work/models/fiendmesh/pesos.json
+!work/models/zombiemesh/
+work/models/zombiemesh/*
+!work/models/zombiemesh/pesos.json
 work/textures/
 *.blend
 # 20,9 MB. Decision del humano el 2026-08-15: entra, para que el proyecto de

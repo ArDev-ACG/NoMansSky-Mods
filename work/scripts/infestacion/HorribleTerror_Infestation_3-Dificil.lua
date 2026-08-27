@@ -7,12 +7,10 @@ RUNAWAY_HP       = "0.000000"
 PCT_HOSTILE      = "1.000000"
 MAX_CREATURE     = "60"
 
-EGG_MULT         = "20"
 FIEND_ATTACKERS  = "4"
 FIEND_ENGAGED    = "10"
 FIEND_SPAWN      = "10"
 FIEND_AGGRO      = "90.000000"
-
 FIEND_MARKERS    = "false"
 FIEND_PERCEPTION = "70.000000"
 HATCH_MIN        = "0.150000"
@@ -37,13 +35,14 @@ PUSH_MEDIUM      = "7.000000"
 PUSH_LARGE       = "4.000000"
 MELEE_SPEED      = "Fast"
 MELEE_SLOWDOWN   = "2.000000"
+EGG_MULT = "20"
 
 NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_3-Dificil",
 ["MOD_AUTHOR"]      = "AldrichDDD",
 ["NMS_VERSION"]     = "6.45",
-["MOD_DESCRIPTION"] = "[DIFICIL] Infestacion 0.2.0: huevos de Horror Biologico x20, sin marcador de UI, eclosion en oleada, mas los depredadores del mod de dificultad.",
+["MOD_DESCRIPTION"] = "[DIFICIL] Terror 0.5.0: contiene el mod de conducta (99% de planetas hostiles, manadas de 3-5, nunca huyen, Horrores sin marcador que eclosionan en oleada y pegan 3-5 golpes por racha) y ademas siembra el mundo con huevos x20 y gusanos x20. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {
     {
@@ -119,7 +118,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - sin marcador de UI y percepcion de Fiend a "..FIEND_PERCEPTION,
+              ["COMMENT"]            = "Sin marcador de UI y percepcion de Fiend a "..FIEND_PERCEPTION,
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendOnscreenMarkers",    FIEND_MARKERS},
@@ -127,7 +126,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - eclosion en oleada",
+              ["COMMENT"]            = "Eclosion en oleada",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendMinSpawnTime", HATCH_MIN},
@@ -135,7 +134,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - separacion entre criaturas y gusano por cercania",
+              ["COMMENT"]            = "Separacion entre criaturas y gusano por cercania",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"AvoidCreaturesWeight",            AVOID_WEIGHT},
@@ -143,7 +142,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - sin acecho: te ve y arranca",
+              ["COMMENT"]            = "Sin acecho: te ve y arranca",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"PredatorNoticePauseTime",  NOTICE_PAUSE},
@@ -153,7 +152,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - rumbo directo: mas refresco de steering y giro cerrado",
+              ["COMMENT"]            = "Rumbo directo: mas refresco de steering y giro cerrado",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"SteeringUpdateRate", STEER_RATE},
@@ -161,7 +160,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - horda: la manada se mueve como un bloque",
+              ["COMMENT"]            = "Horda: la manada se mueve como un bloque",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FollowLeaderCohereWeight", COHERE_WEIGHT},
@@ -169,7 +168,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]             = "0.3.0 - horda: menos empujon mutuo (struct por tamano)",
+              ["COMMENT"]             = "Horda: menos empujon mutuo (struct por tamano)",
               ["PRECEDING_KEY_WORDS"] = {"SpherePusherWeight"},
               ["VALUE_CHANGE_TABLE"]  =
               {

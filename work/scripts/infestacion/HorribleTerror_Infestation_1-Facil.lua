@@ -1,20 +1,16 @@
 DENSITY_MULT     = 2
-DANGEROUS_WEIGHT = "3.000000"
 PACK_MIN         = "1"
 PACK_MAX         = "2"
 PERCEPTION       = "45.000000"
-RUNAWAY_HP       = "30.000000"
-PCT_HOSTILE      = "0.600000"
 MAX_CREATURE     = "45"
-
-EGG_MULT         = "2"
+EGG_MULT = "2"
 
 NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_1-Facil",
 ["MOD_AUTHOR"]      = "AldrichDDD",
 ["NMS_VERSION"]     = "6.45",
-["MOD_DESCRIPTION"] = "[FACIL] Infestacion: huevos de Horror Biologico x2, mas los depredadores del mod de dificultad.",
+["MOD_DESCRIPTION"] = "[FACIL] Terror 0.6.4: contiene el mod de conducta (depredadores mas agresivos, manadas de 1-2, deteccion a 45 m, sin tocar que planetas son hostiles) y ademas siembra el mundo con huevos de Horror Biologico x2 y gusanos de arena x2. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {
     {
@@ -34,16 +30,6 @@ NMS_MOD_DEFINITION_CONTAINER =
                 {"Dense",     "@*"..DENSITY_MULT},
                 {"VeryDense", "@*"..DENSITY_MULT},
               }
-            },
-            {
-              ["COMMENT"]            = "Generic/Ground: DANGEROUS -> "..DANGEROUS_WEIGHT,
-              ["SPECIAL_KEY_WORDS"]  =
-              {
-                "Generic",   "GcCreatureGenerationWeightedList",
-                "Archetype", "DANGEROUS",
-              },
-              ["REPLACE_TYPE"]       = "ONCE",
-              ["VALUE_CHANGE_TABLE"] = { {"Weight ", DANGEROUS_WEIGHT} }
             },
           }
         },
@@ -74,8 +60,6 @@ NMS_MOD_DEFINITION_CONTAINER =
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"PredatorPerceptionDistance",   PERCEPTION},
-                {"PredatorRunAwayHealthPercent", RUNAWAY_HP},
-                {"PercentagePlayerPredators",    PCT_HOSTILE},
                 {"MaxEcosystemCreaturesNormal",  MAX_CREATURE},
               }
             },

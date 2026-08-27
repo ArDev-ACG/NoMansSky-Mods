@@ -37,9 +37,9 @@ class TestIdaYVuelta(unittest.TestCase):
         s = nmsgeom.leer_streams(nmsgeom.descompilar(self.data))
         self.assertEqual(s.id_string, "POLYSURFACE6")
         self.assertEqual(s.hash, 2509576410)
-        self.assertEqual(len(s.vertices), 90856)
+        self.assertEqual(len(s.vertices), 61016)
         self.assertEqual(len(s.indices), 57552)
-        self.assertEqual(len(s.posiciones), 181712)
+        self.assertEqual(len(s.posiciones), 122032)
 
     def test_la_cabecera_mide_133(self):
         s = nmsgeom.leer_streams(nmsgeom.descompilar(self.data))
@@ -78,10 +78,10 @@ class TestStride(unittest.TestCase):
         self.assertEqual(nuevo[20:28], bytes(range(100, 108)))
         self.assertEqual(nuevo[28:40], b"\x00" * 12)
 
-    def test_el_buffer_real_pasa_de_90856_a_227140(self):
+    def test_el_buffer_real_pasa_de_61016_a_152540(self):
         s = nmsgeom.leer_streams(nmsgeom.descompilar(_copiar(self.tmp, DATA)))
         self.assertEqual(len(nmsgeom.ampliar_stride(s.vertices, 8, 20)),
-                         227140)
+                         152540)
 
     def test_un_buffer_que_no_es_multiplo_del_stride_revienta(self):
         with self.assertRaises(ValueError):
@@ -129,10 +129,10 @@ class TestLayout(unittest.TestCase):
 
         # VertexDataOffset y VertexPositionDataOffset son absolutos;
         # IndexDataOffset es relativo y vale lo mismo que VertexDataSize.
-        self.assertEqual(leer("VertexDataSize"), 227140)
+        self.assertEqual(leer("VertexDataSize"), 152540)
         self.assertEqual(leer("VertexDataOffset"), 133)
-        self.assertEqual(leer("IndexDataOffset"), 227140)
-        self.assertEqual(leer("VertexPositionDataOffset"), 133 + 227140 + 57552)
+        self.assertEqual(leer("IndexDataOffset"), 152540)
+        self.assertEqual(leer("VertexPositionDataOffset"), 133 + 152540 + 57552)
 
     def test_el_geometry_parcheado_vuelve_a_compilar(self):
         # Que el MXML parcheado se pueda volver a PARSEAR no demuestra que

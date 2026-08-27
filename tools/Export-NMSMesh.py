@@ -35,28 +35,138 @@ ata el nodo de malla a su stream por el hash de ese nombre. Si entregas un
 `.SCENE` vanilla, el objeto tiene que llamarse como su nodo de malla.
 """
 
-import bmesh
+import math
 import os
+import sys
+
+import bmesh
 import bpy
+import mathutils
+import numpy as np
 
-FBX = (os.path.expanduser(r"~\NMS_MOD_ZOMBIES\asset\Modelos Descomprimidos")
-       r"\marker-1\source\marker_1.fbx")
-BLEND = os.path.expanduser(r"~\NMS_MOD_ZOMBIES\BLENDER\proyectos\marker.blend")
-SALIDA = os.path.expanduser(r"~\NMS_MOD_ZOMBIES\BLENDER\FIENDEGG")
+RAIZ = os.path.expanduser(r"~\NMS_MOD_ZOMBIES")
 
-NOMBRE_NODO = "FiendEgg"
-MATERIAL = (r"MODELS\PLANETS\BIOMES\COMMON\RARERESOURCE\GROUND\FIENDEGG"
-            r"\EGGSHELL_MAT.MATERIAL.MBIN")
+# Lo que cambia de un modelo a otro, y nada mas.
+#
+# GIRO son los grados que hay que aplicar en X y en Y ANTES de exportar:
+#
+#   X -90   pasa de Z arriba -lo que deja el importador de FBX- a Y arriba,
+#           que es el "arriba" de NMS. El marker ya venia asi y no lo necesita.
+#   Y 180   pone la cara mirando a -Z, que es hacia donde mira el bicho
+#           vanilla. Medido, no supuesto: el AABB del FIEND va de -1.405 a
+#           +3.573 en Z, y al importarlo con NMSDK la caja sale de -3.572 a
+#           +1.405 en Y de Blender -o sea Y_blender = -Z_nms- con la cabeza
+#           en +Y. La cabeza vanilla esta en -Z de NMS.
+#
+# ALTO es la altura del bicho vanilla al que sustituye (AABBMAXY - AABBMINY
+# de su nodo de malla). La escala es UNIFORME y sale de la altura, no del
+# encaje de los tres ejes: el vanilla arrastra cola o patas largas y cuadrar
+# los tres deforma. None deja la malla como esta.
+MODELOS = {
+    "marker": dict(
+        fbx=RAIZ + r"\asset\Modelos Descomprimidos\marker-1\source\marker_1.fbx",
+        blend=RAIZ + r"\BLENDER\proyectos\marker.blend",
+        salida=RAIZ + r"\BLENDER\FIENDEGG",
+        nodo="FiendEgg",
+        escena="FIENDEGG",
+        material=(r"MODELS\PLANETS\BIOMES\COMMON\RARERESOURCE\GROUND\FIENDEGG"
+                  r"\EGGSHELL_MAT.MATERIAL.MBIN"),
+        giro=(0, 0),
+        alto=None,
+    ),
+    "necromorph": dict(
+        origen=RAIZ + r"\BLENDER\proyectos\necromorph_atlas.blend",
+        objeto="necromorph",
+        blend=RAIZ + r"\BLENDER\proyectos\necromorph_nms.blend",
+        salida=RAIZ + r"\BLENDER\FIEND",
+        nodo="_Fiend_Body",
+        escena="FIEND",
+        material=(r"MODELS\PLANETS\CREATURES\SPIDERRIG\FIEND"
+                  r"\FIEND_MAT.MATERIAL.MBIN"),
+        giro=(-90, 180),
+        alto=3.619638,
+    ),
+    "skrullcrawler": dict(
+        origen=RAIZ + r"\BLENDER\proyectos\skrullcrawler.blend",
+        objeto="skrullcrawler",
+        blend=RAIZ + r"\BLENDER\proyectos\scuttler30k.blend",
+        salida=RAIZ + r"\BLENDER\FREIGHTERFIEND",
+        nodo="polySurface6",
+        escena="FREIGHTERFIEND",
+        material=(r"MODELS\PLANETS\CREATURES\SPIDERRIG\FREIGHTERFIEND"
+                  r"\FFIENDMAT.MATERIAL.MBIN"),
+        giro=(-90, 180),
+        alto=1.85069,
+    ),
+    "zombie": dict(
+        origen=RAIZ + r"\BLENDER\proyectos\zombie.blend",
+        objeto="zombie",
+        blend=RAIZ + r"\BLENDER\proyectos\zombie_nms.blend",
+        salida=RAIZ + r"\BLENDER\BUGFIEND",
+        nodo="ArthropodThorax",
+        escena="BUGFIEND",
+        material=(r"MODELS\PLANETS\CREATURES\ARTHROPOD\BUGFIEND"
+                  r"\ARTHROPODTHORAX01MAT.MATERIAL.MBIN"),
+        giro=(-90, 180),
+        alto=2.430,
+    ),
+}
 
-bpy.ops.wm.read_homefile(use_empty=True)
-bpy.ops.import_scene.fbx(filepath=FBX)
+cual = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else "marker"
+M = MODELOS[cual]
+print(f"modelo: {cual}")
 
-ob = next(o for o in bpy.data.objects if o.type == "MESH")
+BLEND = M["blend"]
+SALIDA = M["salida"]
+NOMBRE_NODO = M["nodo"]
+MATERIAL = M["material"]
+
+if "fbx" in M:
+    bpy.ops.wm.read_homefile(use_empty=True)
+    bpy.ops.import_scene.fbx(filepath=M["fbx"])
+    ob = next(o for o in bpy.data.objects if o.type == "MESH")
+else:
+    bpy.ops.wm.open_mainfile(filepath=M["origen"])
+    ob = bpy.data.objects[M["objeto"]]
+
 ob.name = NOMBRE_NODO
 ob.data.name = NOMBRE_NODO
 
 bpy.context.view_layer.objects.active = ob
 ob.select_set(True)
+
+giro_x, giro_y = M["giro"]
+if giro_x or giro_y:
+    ob.rotation_euler = (math.radians(giro_x), 0, 0)
+    bpy.ops.object.transform_apply(rotation=True)
+    ob.rotation_euler = (0, math.radians(giro_y), 0)
+    bpy.ops.object.transform_apply(rotation=True)
+
+if M["alto"]:
+    co = [v.co for v in ob.data.vertices]
+    propio = max(c.y for c in co) - min(c.y for c in co)
+    ob.scale = (M["alto"] / propio,) * 3
+    print(f"escala uniforme {M['alto'] / propio:.4f}: "
+          f"alto {propio:.3f} -> {M['alto']:.3f}")
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+    # Y DE PIE sobre el origen, no centrado en el. El bicho vanilla se apoya
+    # en el suelo -el FIEND tiene AABBMINY -0.036- y el nuestro salia con los
+    # pies en -0.94 y la caja entera corrida en Z, porque el FBX trae su
+    # propio origen. Sin esto la criatura flota o se hunde, y ademas queda
+    # descolocada respecto a la colision, que es la del vanilla y no se toca.
+    # Se mueve la MALLA, no el objeto: transform_apply(location=True) en
+    # segundo plano no llegaba a los vertices y el .GEOMETRY salia con el
+    # AABB de antes, identico hasta el sexto decimal.
+    co = [v.co for v in ob.data.vertices]
+    lo = [min(c[i] for c in co) for i in range(3)]
+    hi = [max(c[i] for c in co) for i in range(3)]
+    mueve = mathutils.Vector((-(lo[0] + hi[0]) / 2, -lo[1],
+                              -(lo[2] + hi[2]) / 2))
+    ob.data.transform(mathutils.Matrix.Translation(mueve))
+    ob.data.update()
+    print(f"asentado: {tuple(round(v, 4) for v in mueve)}")
+
 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 assert tuple(round(v, 6) for v in ob.scale) == (1.0, 1.0, 1.0), ob.scale
 
@@ -72,14 +182,137 @@ assert lados == {3}, f"quedan caras sin triangular: {lados}"
 print(f"{len(ob.data.polygons)} caras, todas de 3 lados")
 
 co = [v.co for v in ob.data.vertices]
-alto = max(c.y for c in co) - min(c.y for c in co)
-print(f"alto de la malla en coordenadas locales: {alto:.4f}"
-      f"  (el huevo vanilla mide 0.7615)")
+lo = [min(c[i] for c in co) for i in range(3)]
+hi = [max(c[i] for c in co) for i in range(3)]
+caja = [hi[i] - lo[i] for i in range(3)]
+alto = caja[1]
+print(f"caja en coordenadas locales: "
+      f"{caja[0]:.4f} / {alto:.4f} / {caja[2]:.4f}"
+      f"  (el huevo vanilla mide 0.7615 de alto)")
+print(f"  min {tuple(round(v, 4) for v in lo)}"
+      f"  max {tuple(round(v, 4) for v in hi)}")
 assert alto < 10, f"la malla mide {alto:.1f} en local: falta aplicar la escala"
+
+# ---------------------------------------------------------------------------
+# El exportador de NMSDK escribe el index buffer EQUIVOCADO, y por eso la
+# textura sale estirada. Medido el 24/08 sobre el SkrullCrawler:
+#
+#   mesh_parser() parte bien los vertices de costura -4820 pasan a 11357, uno
+#   por cada combinacion de vertice y UV- y devuelve DOS listas de indices:
+#
+#     indexes      los indices ya remapeados a los vertices partidos
+#     np_indexes   data.loops.foreach_get("vertex_index"), o sea los de ANTES
+#                  de partir, del 0 al 4819
+#
+#   y export.py:296 serializa `self.np_indexes[i]`, la de antes de partir. Los
+#   6537 vertices partidos entran al buffer y NO LOS APUNTA NADIE: cada vertice
+#   de costura se queda con la PRIMERA UV que le tocara, que en un atlas como
+#   el de Meshy -cientos de islas diminutas- es de otra isla cualquiera.
+#
+#   La malla en 3D sale perfecta -los indices 0..4819 apuntan a las posiciones
+#   buenas- y solo la textura se rompe, que es justo lo que se veia en partida:
+#   el bicho bien plantado y la piel a remolinos. El 30,89% de las aristas de
+#   la malla desplegada cruzaban mas del 10% del atlas; el FBX original no pasa
+#   de 5,8%.
+#
+# Y de paso, normales: NMSDK escribe `poly.normal` -la normal de CARA de la
+# primera cara que toco el vertice-, ignorando las que Blender ya tiene
+# calculadas. Error mediano de 21,6 grados y un 2,7% de vertices apuntando al
+# reves. Aqui se usan las de Blender, que son las buenas.
+#
+# Se parchea desde fuera y no se toca el addon: vive en AppData y se pierde al
+# reinstalarlo.
+# ---------------------------------------------------------------------------
+
+def _parchear_nmsdk():
+    import importlib
+
+    addon = importlib.import_module(
+        "bl_ext.user_default.nmsdk.ModelExporter.addon_script")
+    original = addon.Exporter.mesh_parser
+
+    def mesh_parser(self, ob, is_coll_mesh=False):
+        if is_coll_mesh:
+            return original(self, ob, is_coll_mesh)
+
+        me = ob.data
+        assert me.uv_layers, f"{ob.name} no tiene UV"
+        assert all(len(p.vertices) == 3 for p in me.polygons), "hay caras sin triangular"
+
+        me.calc_tangents()
+        uv_data = me.uv_layers.active.data
+        normales_de_esquina = me.corner_normals
+
+        exporta_color = bool(len(me.color_attributes)) and not self.settings.get(
+            "no_vert_colours", False)
+        color_data = me.color_attributes.active_color.data if exporta_color else None
+
+        verts, uvs, normals, tangents = [], [], [], []
+        colours = [] if exporta_color else None
+        visto = {}
+        indexes = []
+
+        for lp in me.loops:
+            vi = lp.vertex_index
+            u, v = uv_data[lp.index].uv
+            n = normales_de_esquina[lp.index].vector
+            t = lp.tangent
+            clave = (vi, round(u, 6), round(v, 6),
+                     round(n[0], 5), round(n[1], 5), round(n[2], 5))
+            idx = visto.get(clave)
+            if idx is None:
+                idx = visto[clave] = len(verts)
+                co = me.vertices[vi].co
+                verts.append((co[0], co[1], co[2], 1))
+                # NMS guarda la V dada la vuelta, igual que hacia NMSDK.
+                uvs.append((u, 1 - v, 0, 1))
+                normals.append((n[0], n[1], n[2], 1))
+                tangents.append((t[0], t[1], t[2], 1))
+                if exporta_color:
+                    c = color_data[lp.index].color
+                    colours.append((int(255 * c[0]), int(255 * c[1]), int(255 * c[2])))
+            indexes.append(idx)
+
+        me.free_tangents()
+
+        chverts = addon.generate_hull(me)
+        np_indexes = np.array(indexes, dtype=np.uint32)
+
+        print(f"parseado {ob.name}: {len(me.vertices)} vertices de Blender -> "
+              f"{len(verts)} exportados, {len(indexes)} indices")
+        _medir_uv(verts, uvs, np_indexes)
+        return verts, normals, tangents, uvs, indexes, chverts, colours, np_indexes
+
+    addon.Exporter.mesh_parser = mesh_parser
+
+
+def _medir_uv(verts, uvs, indexes):
+    """Salta si una arista cruza medio atlas: es la firma del index malo.
+
+    El limite es 0,10 en UV. Medido: el FBX del SkrullCrawler no pasa de
+    0,0582 y el del necromorfo anda por ahi; la malla rota daba 1,2574 en el
+    30,89% de las aristas. Cualquier cosa entre medias tampoco es sana.
+    """
+    P = np.array(verts, dtype=np.float64)[:, :3]
+    U = np.array(uvs, dtype=np.float64)[:, :2]
+    I = np.asarray(indexes, dtype=np.int64).reshape(-1, 3)
+    largo = lambda A: np.concatenate(
+        [np.linalg.norm(A[I[:, i]] - A[I[:, (i + 1) % 3]], axis=1) for i in range(3)])
+    eu, e3 = largo(U), largo(P)
+    rotas = (eu > 0.10).mean() * 100
+    print(f"  aristas UV: mediana {np.median(eu):.5f}  max {eu.max():.5f}  "
+          f"por encima de 0.10: {rotas:.2f}%")
+    print(f"  correlacion con la arista en 3D: {np.corrcoef(e3, eu)[0, 1]:.3f}")
+    assert rotas == 0, (
+        f"{rotas:.2f}% de las aristas cruzan mas del 10% del atlas: la textura "
+        f"saldria estirada")
+
+
+_parchear_nmsdk()
 
 bpy.ops.nmsdk.create_root_scene()
 raiz = bpy.data.objects["NMS_Scene"]
-raiz.NMSReference_props.scene_name = "FIENDEGG"
+raiz.NMSReference_props.scene_name = M["escena"]
 
 ob.parent = raiz
 ob.matrix_parent_inverse = raiz.matrix_world.inverted()

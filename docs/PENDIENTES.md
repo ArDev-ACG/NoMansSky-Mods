@@ -9,52 +9,165 @@ toque. Si buscas *por qué* se hizo algo, está en
 es el nombre del `.lua` cuando la prueba tiene uno (`HT_EggMesh_PRUEBA03`), y un código corto
 cuando es una pregunta y no un mod (`N1`, `Q-GLOW`).
 
-Actualizado: **2026-08-15**.
+Actualizado: **2026-08-27** (sexta vuelta: `M-PALETA` cerrado, `M3-PIEL` y `M4-PIEL`
+entregados, y el `AttackLight` de vuelta a cero).
+
+> 📌 **Lo ya aprobado, y que no se toca, vive en [`ACUERDOS.md`](ACUERDOS.md).** Se creó el
+> 27/08 porque la `PRUEBA14` resucitó sin querer el `AttackLight` que la `PRUEBA13` había
+> apagado, y nadie lo vio hasta dos pruebas después.
 
 ---
 
 ## 1 · En el juego ahora, sin medir
 
-Construido **y desplegado** en `GAMEDATA\MODS`, verificado por md5. Las 16 pruebas que
+Construido **y desplegado** en `GAMEDATA\MODS`, verificado por md5. Las 22 pruebas que
 chocaban están movidas a `GAMEDATA\MODS_Retirados\`, fuera de donde el juego lee.
+
+**Dos cosas, y las dos tienen su firma escrita de antemano.**
 
 | ID | Qué mirar |
 |---|---|
-| **`HT_CeilingPlague_PRUEBA01`** | Que el nido colgante del carguero salga **del techo** de los edificios abandonados, en el sitio de la planta |
+| **`HT_ScuttlerMesh_PRUEBA17`** | **`M-OJO` — ¿se apaga el ojo del SkrullCrawler?** La malla **no se toca**: los dos archivos de geometría salen byte a byte como en la `PRUEBA16`, verificado con `cmp`, y lo único que cambia son **seis flotantes del `.SCENE`**. **Tres finales:** ojo apagado y espalda limpia → cerrado, y la `PRUEBA16` queda confirmada entera · ojo todavía encendido → no era el `AttackLight` y el sospechoso pasa a ser el emisivo horneado en el color base (`Q-GLOW`), que se mide en la textura · vuelve la lona de la espalda → **no se desplegó**, mirar la fecha del `.MBIN` |
+| **`HT_FiendMesh_PRUEBA04`** | **`M3-PIEL` — ¿mueve el necromorfo brazos y piernas por separado?** Lleva `_F02_SKINNED`, normal rehecho, máscaras propias y **mapa a mano región → hueso**: 7 huesos, el mayor al **21,0 %** (era `RootJNT` al 79,5 %). **Tres finales:** miembros que se mueven por su cuenta → cerrado · brazos que van con las piernas → el mapa tiene los lados cruzados, se cambian `L` por `R` en las dos filas de `FirstLeg` · un trozo sale disparado → la frontera de esa región es dura y hay que subir `SUAVIZADOS` |
+| **`HT_ZombieMesh_PRUEBA04`** | **`M4-PIEL` + la segunda mitad de `M-BABA` — ¿mueve los miembros y deja de verse mojado?** Mismo mapa a mano: 7 huesos, el mayor al **23,7 %** (era `spine_C0_0_jnt` al 80,1 %). **Tres finales:** se mueve y sale seco → cerrado, y con él `M-BABA` entero · sigue mojado → el canal no era brillo y hay que ir al material · el juego cierra al parir el Horror → el descriptor |
+| **`HT_CeilingPlague_PRUEBA03` + `Infestation 0.6.5`** | **La segunda vuelta del nido.** La primera no brotó nada: ganó el `Infestation`, exactamente por la firma escrita de antemano. Ahora **los dos MBIN son byte a byte iguales**. Sigue **sin medir** desde el 21/08 |
+
+> 🏁 **`M-BABA` y `M-UVIDX` cerrados el 2026-08-26 en el SkrullCrawler**, medidos en las cuatro
+> capturas de la `PRUEBA14`. **De frente el bicho sale perfecto**: se leen cráneo, ojos y pinzas, la
+> textura es continua y no queda ni un dibujo de estrella. La inversión del `gMasksMap` era la buena
+> y el index buffer era la causa de los remolinos, las dos cosas confirmadas en partida.
+>
+> 🏁 **`M-PALETA` cerrado el 2026-08-27 con la `PRUEBA16`, confirmado por ti en partida.** La
+> espalda deja de salir en lonas y astillas. Eran dos causas y las dos están arregladas en
+> `tools/Weight-NMSMesh.py`: los candidatos salen del `SkinMatrixLayout` del vanilla —19 de 113,
+> así que los párpados dejan de poder ganar— y cada vértice promedia los **8** vecinos más
+> cercanos de la piel vanilla con 12 pasadas de suavizado por nuestras aristas, que quita el
+> ganador único. **Esa versión del modelo es la que nos quedamos.**
+>
+> 🔴 **Pero la `PRUEBA14` se llevó por delante otra cosa, y tardó dos pruebas en verse: el
+> `AttackLight`.** Su propio `COMMENT` lo dice —«el nodo de malla **reinjertado sobre el `.SCENE`
+> vanilla**»— y el injerto conserva las luces del vanilla, así que la neutralización de la
+> `PRUEBA13`, que era un paso a mano, desapareció. Medido el 27/08 sobre los `.MBIN` de
+> `ModBackups`:
+>
+> | | `0.861` | `4.472136` | `0.0001` |
+> |---|---:|---:|---:|
+> | `PRUEBA13` (aprobada, luz muerta) | 0 | 0 | **2** |
+> | `PRUEBA14` | 1 | 1 | 1 |
+> | `PRUEBA16` | 1 | 1 | 1 |
+>
+> **El arreglo no es la `PRUEBA17`, es que no pueda repetirse:** `tools/Graft-NMSScene.py` apaga
+> ahora el `AttackLight` dentro del propio injerto, y `tools/Check-NMSGraft.py` trae el bloque
+> **ACUERDOS PERDIDOS**, que sale con código 1 si aparece encendido. Comprobado en los dos
+> sentidos. Y el acuerdo queda anotado en [`ACUERDOS.md`](ACUERDOS.md) **A1**.
+
+> 🏁 **`M-CONFETI` cerrado el 2026-08-22, medido en las capturas de `asset/Errores/`.**
+> Ni el necromorfo ni el zombie salen ya con el color a confeti: los dos van en gris hueso y
+> **la silueta se lee** — al zombie se le distinguen cráneo, costillas y dedos; al necromorfo,
+> el cráneo y los miembros con garra. Subir de 5 999 a 30 000 y 36 000 triángulos era el
+> arreglo, y el diagnóstico del horneado por triángulo queda **validado en partida**.
+>
+> **Y las capturas dejan dos cosas más, que no se preguntaban:**
+>
+> | Lo que se ve | Dónde baja |
+> |---|---|
+> | El **zombie se deforma**: en las tres capturas está en postura distinta —brazo alzado, zancada, brazos recogidos—, o sea que la cría **sí** aplica el esqueleto | `M4-PIEL` §2, **desbloqueado** |
+> | El **necromorfo va rígido**, con los miembros abiertos en estrella e idénticos en las tres. Es la malla sin `_F02_SKINNED`, exactamente como se entregó | `M3-PIEL` §2, **desbloqueado** |
+> | El **zombie se ve mojado**, igual que el SkrullCrawler | Es `M-BABA`, pero **por otra causa**: el zombie no lleva máscaras propias, lleva las del `ARTHROPOD` vanilla cayendo en NUESTRAS UV. Ver §2 fila 1 |
+>
+> **Y el juego no se cerró al parir el Horror**, que era la otra mitad de lo que medía la
+> `HT_ZombieMesh_PRUEBA02`: el `.DESCRIPTOR` recortado aguanta.
+
+> 🏁 **Las dos mallas de superficie YA NO van rígidas.** `M3-PIEL` y `M4-PIEL` entregados el
+> 27/08 con `_F02_SKINNED`, `HT_FiendMesh_PRUEBA03` y `HT_ZombieMesh_PRUEBA03`. Lo que los
+> bloqueaba no era el pesado, y son tres cosas medidas:
+>
+> | Lo que estaba mal | Qué pasaba | Dónde se arregló |
+> |---|---|---|
+> | `Weight-NMSMesh.py` cogía la **primera** malla vanilla con grupos de vértices, un `next()` | El `FreighterFiend` trae **una** y por eso bastó; el `BUGFIEND` trae **once** y la primera es `FiendButt`, 746 vértices de 26 299 pegados sólo a la cola. El zombie se pesaba contra el culo del bicho: 86,0 % en `tail_C0_1_jnt` | `vanillas`, una lista |
+> | El importador de NMSDK **aborta la escena entera** en el primer material roto (`realize_path` → `None` → `op.join` con `None`), y en el `FIEND` además revienta en `_add_light_to_scene` buscando un nodo `Emission` que Blender 5.2 ya no crea | La receta lo llamaba «ruidoso pero inofensivo». **No lo es**: se lleva por delante las mallas que quedaban por añadir | `_callar_materiales()`, parcheado desde fuera |
+> | El pesado **hinchaba el esqueleto** hasta llenar nuestra malla (×2,0008 en el necromorfo) | Los `JointBindings` se copian del vanilla en `Patch-NMSGraft.py`, así que **en partida los vértices se leen en el espacio del vanilla, sin reescalar**. Casar contra un rig hinchado es casar contra huesos que en partida están en otro sitio: `RootJNT` 63,7 % | `escala_piel = 1.0` |
+>
+> Con las tres, la distancia del vértice medio a su hueso baja de **2,479 → 0,578** en el zombie
+> (diagonal 3,05) y de **2,170 → 1,558** en el necromorfo (diagonal 4,97).
+
+> ⚠️ **Confirmado el 21/08: ganó el `Infestation` y el orden de carga sí importaba.** El nido
+> despertaba con la linterna pero romperlo no llamaba nada, que es la firma exacta que se
+> dejó escrita. Prioridades leídas del `GCMODSETTINGS.MXML`: `PRUEBA03` en **2**,
+> `Infestation` en **18** — o sea **gana el número más alto**. En vez de pelear con el orden,
+> el campo se puso **también** en el `Infestation`, y ahora los dos escriben el MISMO MBIN
+> (`5c0bc001…`). El empate deja de existir.
+
+> 🏁 **El `gMasksMap` del necromorfo y del zombie ya es PROPIO**, entregado el 27/08 en las dos
+> `PRUEBA03`. **Va plano a 87**, que es la media útil del `gMasksMap` del `FIEND` vanilla medida
+> el 22/08, con el hueco de UV retenido a 0 —35,4 % en el necromorfo, 3,2 % en el zombie—. Plano
+> y no invertido del `roughness` **porque estos dos assets no traen `roughness`**: el de Tripo y
+> el de Meshy sólo dan color. Es el arreglo mínimo que quita el brillo de baba sin inventar
+> relieve; si al verlo se echa de menos variación, ahí sí hay que hornear un mapa.
+>
+> El del zombie va a **ruta propia**, `ZOMBIE.BASE.MASKS.DDS`, con el sampler reapuntado:
+> `ARTHROPODTHORAX01.BASE.MASKS.DDS` la comparte toda la fauna artrópodo del juego.
+
+> 🏁 **El normal liso del necromorfo, arreglado el 27/08.** Rehecho con `--fuerza 9` y
+> `--sin-costuras`, que aplana el 21,0 % de la textura —borde de isla y hueco—. Desviación
+> **17,1 / 15,8**, contra los **4,7** de antes, los **17,2** del `FIEND` vanilla y los **17,8**
+> del SkrullCrawler que funciona.
+
+> ⚠️ **El 21/08 se desplegó con NMS.exe abierto.** Los mods se leen **al arrancar** y punto:
+> desplegar con el juego abierto no hace nada. **Cerrar NMS antes de desplegar, y arrancar de
+> nuevo por Steam.**
+
+> 🔎 **`BetterExtractorsDepots`: el archivo está BIEN y el diagnóstico del 26/08 estaba MAL.**
+> Medido el 27/08 descompilando el `.MBIN` desplegado y comparándolo con el vanilla sacado de
+> los 97 `.pak`, campo por campo:
+>
+> | | vanilla | desplegado | |
+> |---|---:|---:|---|
+> | `U_EXTRACTOR_S` · `Rate` | 100 | **1000** | ×10 ✅ |
+> | `U_GASEXTRACTOR` · `Rate` | 100 | **1000** | ×10 ✅ |
+> | `U_SILO_S` · `Storage` | 1 440 000 | **14 400 000** | ×10 ✅ |
+> | `U_BIOGENERATOR` · `DependentRate` | 50 | **50 000** | ×1000 ✅, y **funciona en partida** |
+>
+> **Y lo que lo cierra: los cuatro valores viven en el MISMO archivo.** Si el biogenerador va a
+> ×1000 en partida, el juego está leyendo ese `.MBIN`, y por tanto está leyendo también el
+> `Rate` 1000 y el `Storage` 14 400 000. **No es el mod.**
+>
+> ❌ **La teoría de la prioridad era falsa y se retira.** Se dijo que cinco mods entregaban la
+> misma tabla por encima del nuestro. **No la entregan:** `EXTRACTOR`, `DD-BUILDITHERE`,
+> `DD-SIZEITALL`, `FF_CUSTOMCORVETTEINTERIORMODULES_640` y `_BEYOND BASE BUILDING` son carpetas
+> de Vortex con **sólo `.EXML`**, que el juego no lee. Buscado el 27/08 en las 94 carpetas de
+> `GAMEDATA\MODS`: hay **un solo** `BASEBUILDINGOBJECTSTABLE.MBIN`, el nuestro, y **ningún**
+> `.pak`. Subir la prioridad a 96 no arregló nada porque no había nada que arreglar.
+>
+> ⬜ **Lo que queda por separar, y no hace falta tocar ningún archivo.** Si los datos están y el
+> juego los lee, lo que queda es estado **horneado en la partida**: los extractores y depósitos
+> YA COLOCADOS. La prueba que lo separa es **colocar uno nuevo al lado de uno viejo**. Si el
+> nuevo va a ×10 y el viejo no, es la partida; si tampoco va el nuevo, entonces `Rate` y
+> `Storage` no son los campos que mueven ese número y hay que buscar cuál.
+>
+> ⚠️ Nota aparte, medida: el **buffer** del extractor sigue en 360 000 (vanilla), sólo se subió
+> el `Rate`. Un extractor lleno no extrae, así que el ×10 sólo se nota **drenando**.
 
 > Arrancar **por Steam**. Reiniciar NMS: los mods solo se leen al arrancar.
 
-> 🏁 **`HT_ScuttlerMesh_PRUEBA11` es la configuración buena, dada por buena en partida el
-> 2026-08-14.** Malla propia entera, difuso propio, máscaras propias y el `AttackLight`
-> neutralizado. **De aquí no se retrocede**: cualquier prueba nueva parte de estos mismos
-> siete archivos y solo cambia lo que vaya a medir. El detalle, en
-> [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) y en
-> [`../work/scripts/malla/README.md`](../work/scripts/malla/README.md).
->
-> Lo que queda del bicho son **dos mejoras, no dos fallos**: el **normal** sigue siendo el del
-> bicho vanilla, y la malla **no se deforma con el esqueleto**. Van en §2 como `M-TEX` y
-> `M-ANIM`. En Blender se ve claramente mejor que en pantalla, y esa diferencia es justo lo
-> que esas dos filas persiguen.
-
 ---
-
 ## 2 · La cola, en orden
 
 **No se empieza uno hasta cerrar el de arriba.**
 
 | # | ID | Qué | Estado | Dónde lo leo |
 |---|---|---|---|---|
-| 1 | **`M-ANIM`** | **Etapa 4 — que el SkrullCrawler se mueva con el esqueleto.** Hoy va rígido: se desliza | ⬜ sin escribir · plan abajo en §2.1 | §2.1 y [`ASSETS.md`](ASSETS.md) §4.2 |
-| 2 | **`M-TEX`** | **Normal propio** para el SkrullCrawler. El `gNormalMap` sigue siendo el vanilla, pintado para otras UV | ⬜ sin escribir | [`../BLENDER/vista_ingame/README.md`](../BLENDER/vista_ingame/README.md) |
-| 3 | **`HT_FiendMarkers_PRUEBA05`** | Marcadores de Horror. En el juego no hay ninguno: el `PRUEBA04` está retirado | ✍️ escrito, sin construir · **choca**, ver abajo | [`../work/scripts/marcadores/README.md`](../work/scripts/marcadores/README.md) |
-| 4 | **`HT_DerelictBugs`** | Devolver `CARG` y `MEDI`, **de una en una** | ⬜ sin escribir | [`../work/scripts/derelict/README.md`](../work/scripts/derelict/README.md) |
-| 5 | **`N1`** | **Huevo de interior**: prueba **A** (control con `DEBRISLARGE_COMMON`) y luego **B** (huevo de `SPACEBASE`). Bloquea la Etapa 3 de Blender, que usa el mismo locator | ⬜ la **A** ya está escrita, la **B** no | [`ASSETS.md`](ASSETS.md) §5.1 y §5.7 · [`../work/scripts/pruebas/HT_LocatorTest_PRUEBA01.lua`](../work/scripts/pruebas/HT_LocatorTest_PRUEBA01.lua) |
-| 6 | **`M3`** | **Segunda malla propia.** *Para la piel de estas, la receta ya está escrita: [`RECETA-PIEL.md`](RECETA-PIEL.md).* `ScrullCrawler_max_hd` y `Necro_partes_7_own_2` son estáticos y entran por el conducto de la Etapa 2, que **ya está cerrado y automatizado** en `tools/Export-NMSMesh.py`; `zombie-monster-slasher` no, viene rigged. Antes hay que **decimar en Blender**: el marker son 822 vértices y esos dos pesan 14,3 y 6,1 MB | ⬜ sin escribir | [`ASSETS.md`](ASSETS.md) §4.2 |
+| 1 | **`HT_FiendMarkers_PRUEBA05`** | Marcadores de Horror. En el juego no hay ninguno: el `PRUEBA04` está retirado | ✍️ escrito, sin construir · **choca**, ver abajo | [`../work/scripts/marcadores/README.md`](../work/scripts/marcadores/README.md) |
+| 2 | **`HT_DerelictBugs`** | Devolver `CARG` y `MEDI`, **de una en una** | ⬜ sin escribir | [`../work/scripts/derelict/README.md`](../work/scripts/derelict/README.md) |
+| 3 | **`N1`** | **Huevo de interior**: prueba **A** (control con `DEBRISLARGE_COMMON`) y luego **B** (huevo de `SPACEBASE`). Ya no bloquea nada | ⬜ la **A** ya está escrita, la **B** no | [`ASSETS.md`](ASSETS.md) §5.1 y §5.7 |
+| 4 | **`M5`** | **Cuarta malla propia.** Quedan sin usar el `angel`, la `LivingFlesh` y el traje de Dead Space. `SCUTTLER_PET` **no se toca**: es la mascota del jugador | ⬜ sin escribir | [`ASSETS.md`](ASSETS.md) §4.2 |
 
-> **`M-ANIM` y `M-TEX` van en el MISMO `.lua`.** Los dos escriben `FFIENDMAT.MATERIAL.MBIN` y
-> los dos `.GEOMETRY`: no pueden ser dos mods a la vez. La `PRUEBA12` lleva las dos cosas y
-> **una sola entrada al juego mide las dos**, que es como se quiere trabajar de aquí en
-> adelante. Si sale mal, el `.GEOMETRY` dice cuál de las dos falló sin volver a entrar.
+> 🏁 **`M-PALETA`, `M3-PIEL` y `M4-PIEL` salen de la cola el 2026-08-27**, y con ellos la
+> Etapa 4 entera: los tres modelos propios llevan ya piel del esqueleto vanilla. Los tres
+> están desplegados y **sin medir**: ver §1.
+>
+> 🏁 **`M-CONFETI` sale de la cola: cerrado el 2026-08-22.** Las capturas de `asset/Errores/`
+> lo dan por bueno en los dos bichos. Ver §1 y el changelog 0.6.6.
 
 > **`HT_FiendMarkers_PRUEBA05` choca con la serie del SCUTTLER.** Las dos escriben
 > `SPIDERRIG\FREIGHTERFIEND.SCENE.MBIN`. Por eso la `PRUEBA04` está retirada. Cuando toque,
@@ -64,224 +177,107 @@ chocaban están movidas a `GAMEDATA\MODS_Retirados\`, fuera de donde el juego le
 
 ---
 
-### 2.1 · `M-ANIM` — qué falta exactamente para que se mueva
+### 2.1 · `M-BABA` — el canal no estaba flojo, estaba al revés
 
-Hoy el bicho va **rígido**: `FFIENDMAT` sin `_F02_SKINNED`, `SkinMatrixLayout` vacío y el nodo
-pidiendo `FIRSTSKINMAT` 0 → `LASTSKINMAT` 0. Fue **a propósito** —la `PRUEBA01` con el
-material vanilla salió estirada sin forma— y es lo que hay que deshacer al revés: primero los
-datos, después el flag.
+**Medido el 2026-08-22, antes de tocar nada.** El `gMasksMap` de las criaturas es un `ATI1`
+de **un solo canal**, y los números son estos:
 
-**Tres cosas leídas en el código, no supuestas:**
+| | media | útil media | p1 | p99 | máx |
+|---|---:|---:|---:|---:|---:|
+| `FIEND` vanilla | 85,4 | 86,9 | 5 | 156 | 192 |
+| Nuestro, `PRUEBA12` | 173,6 | 199,5 | 69 | 236 | 255 |
+| Nuestro, `PRUEBA13` | 47,3 | 54,0 | 17 | 105 | 255 |
 
-| Hecho | Dónde se lee |
-|---|---|
-| ✅ **NMSDK sí IMPORTA pesos**: crea un grupo de vértices por hueso y reparte `blendWeight` | `ModelImporter/import_scene.py:1090-1098` |
-| ⛔ **NMSDK NO los EXPORTA**: escribe `JointBindings`, `MeshBaseSkinMat` y `SkinMatrixLayout` **vacíos** | `ModelExporter/export.py:768-779` |
-| ⛔ **Nuestra malla no trae los canales de piel**: `VertexLayout` de stride 8 con `SemanticID` 2 y 3 (normal y tangente). Faltan el **5** y el **6**, índice y peso de hueso | `work/models/scuttlermesh/FREIGHTERFIEND.GEOMETRY.MXML` |
+*«Útil»* es sin el fondo (`≤ 2`), porque el nuestro tiene **13,3 %** de UV sin usar y el
+vanilla sólo **1,7 %**: comparar las medias crudas mezclaba hueco con superficie.
 
-O sea: **el muro de NMSDK es solo de salida**, y el esqueleto que hace falta ya está en el
-juego —es el `SPIDERRIG` vanilla, con sus animaciones—. No hay que animar nada: hay que
-**pesar nuestra malla contra sus huesos**.
+**La causa no es que el mapa esté flojo, es que viene al revés.** El asset de Meshy entrega
+**`roughness`** —valor alto = áspero = **mate**— y el shader lee ese canal como **brillo**
+—valor alto = **mojado**—. Con un mapa casi todo alto el bicho salía entero de baba, que es
+exactamente lo que se vio. Y el número lo ata: **255 − 173,6 = 81**, contra los **85** del
+vanilla. No es una coincidencia que sobreviva a tres decimales por casualidad.
 
-El camino, y cada paso se puede comprobar sin entrar al juego:
+Por eso **se invierte y no se atenúa**. Atenuar dejaría las grietas brillantes y los bultos
+mates —el mismo mapa del revés, sólo que más flojo—, que es un fallo distinto y no el arreglo.
 
-```
-1. Importar el FREIGHTERFIEND vanilla con NMSDK, con "import bones" puesto   [HECHO]
-      -> entran el Armature y los grupos de vértices con sus pesos
-2. Transferir esos pesos a polySurface6 con el modificador Data Transfer   [HECHO]
-      (Vertex Group Data, por superficie más cercana)
-3. Escribir los canales 5 y 6 en el .GEOMETRY nosotros, como ya se hace con
-      los arrays por hueso -> herramienta nueva, hermana de Patch-NMSGraft.py   [HECHO]
-4. Rellenar SkinMatrixLayout y MeshBaseSkinMat, y abrir el rango
-      FIRSTSKINMAT / LASTSKINMAT del nodo de malla en el .SCENE   [HECHO]
-5. Devolver _F02_SKINNED a FFIENDMAT   <- LO UNICO QUE QUEDA, y va en el .lua
-6. tools/Check-NMSGraft.py, que es quien caza los índices fuera de rango   [HECHO]
-```
-
-> **Pasos 3, 4 y 6 hechos, sin entrar al juego.** `work/models/scuttlermesh_anim/` lleva el
-> buffer a stride 20 con los canales 5 y 6, `SkinMatrixLayout` de 14 huesos, `MeshBaseSkinMat`
-> a `[0]` y el nodo de malla con `FIRSTSKINMAT` 0 → `LASTSKINMAT` 14. `Check-NMSGraft` pasa
-> con salida 0, y **caza los tres modos de fallo** cuando se rompe a propósito. Falta el paso
-> 5 —`_F02_SKINNED`— que va en el `.lua` de la `PRUEBA12` junto a `M-TEX`.
+> **Una cosa que el `--invertir` del conversor no hace, y por eso el PNG se prepara aparte.**
+> Ese 13,3 % de hueco está a 0, e invertirlo lo pondría a **255** — brillo máximo pegado al
+> borde de cada isla, que a partir del cuarto mip sangra hacia dentro. Se comprobó que el
+> hueco es hueco de verdad: **donde la rugosidad vale 0 el color base también es negro**
+> (RGB 2,8 / 1,8 / 1,7 con desviación 15, contra 106,7 / 68,3 / 65,3 en la parte útil). Así
+> que se invierte sólo lo útil y el fondo se queda a 0, que es mate y es lo que hace el
+> vanilla.
 >
-> **Esa carpeta no está en git**: son `.MBIN` de Hello Games. Se rehace con
-> `python tools/Skin-NMSGeometry.py work/models/scuttlermesh work/models/scuttlermesh_anim`.
->
-> Para repetir todo esto con otra malla, la receta está en [`RECETA-PIEL.md`](RECETA-PIEL.md).
+> ```
+> out = np.where(rough <= 2, 0, 255 - rough)
+> python tools/Make-NMSTexture.py work/textures/SKRULLCRAWLER.BASE.MASKS.PNG <vanilla ATI1>.DDS work/textures/SKRULLCRAWLER.BASE.MASKS.INV.DDS
+> ```
 
-**El paso 3 es el trabajo de verdad**: cambia el stride del buffer de vértices, así que hay
-que reescribir el `.GEOMETRY.DATA` entrelazando los dos canales nuevos. Lo demás es
-contabilidad.
+**Esto contesta a `Q-MASCARAS` a medias**: no dice qué canal es qué, pero sí dice que **el
+único canal que hay se comporta como brillo y no como rugosidad**, que es lo que hacía falta
+para arreglarlo. La `PRUEBA13` lo confirma o lo tumba.
 
-> **Ojo con el `[HECHO]` del paso 2.** El modificador se aplicó en su día, pero
-> `scuttler.blend` tiene hoy **0 grupos de vértices**: los pesos no están en disco. Por eso
-> el paso 3 los vuelve a generar y los versiona en un archivo aparte, en vez de darlos por
-> supuestos.
+**Y le queda una segunda mitad:** el necromorfo y el zombie **no llevan máscaras propias** —
+usan las del vanilla cayendo en nuestras UV—, y en las capturas el zombie sale mojado. El
+arreglo es el mismo, con el `roughness` de cada asset, pero va **después** de que la
+`PRUEBA13` diga si la inversión es la buena.
 
-#### El paso 3, en marcha — dónde va y qué falta
+---
 
-Diseño y plan escritos y comiteados; la implementación va por tareas, un subagente cada una,
-con revisión detrás. El ledger vivo está en `.superpowers/sdd/progress.md` (no va a git).
+### 2.2 · `HT_CeilingPlague_PRUEBA03` — qué toca, y por qué es un campo
 
-| | |
-|---|---|
-| Diseño | [`superpowers/specs/2026-08-14-skin-nmsgeometry-design.md`](superpowers/specs/2026-08-14-skin-nmsgeometry-design.md) · commit `8687740` |
-| Plan | [`superpowers/plans/2026-08-14-skin-nmsgeometry.md`](superpowers/plans/2026-08-14-skin-nmsgeometry.md) · commits `a8cf111`, `ad173ea` |
+**Construida y desplegada el 21/08** (3 + 1 cambios, 0 errores / 0 warnings / 0 notices).
+El nido del techo estaba a **un campo** de soltar Horrores y no hubo que añadir ningún
+componente. Los dos `.ENTITY` se leyeron del PCBANKS, no se supusieron:
 
-Las siete tareas, y en qué estado están:
+| `GcDestructableComponentData` | Huevo de suelo (`FIENDEGG`) | Nido del techo (`MEDIUMHANGSLIME`) |
+|---|---|---|
+| `IncreaseFiendWanted` | **`true`** | era **`false`** ← lo único que difiere, y lo único que toca la `PRUEBA03` |
+| `IncreaseFiendWantedChance` | `1.0` | `1.0` |
+| `IncreaseFiendCrime` | `EggDestroyed` | `EggDestroyed` |
+| `Explosion` | `FIENDHATCH` | `INFESTPILLAREXP` |
 
-| # | Tarea | Entrega | Estado |
-|---|---|---|---|
-| 1 | `nmsgeom`, ida y vuelta del `.DATA` | `tools/nmsgeom.py`, `tools/tests/test_nmsgeom.py` | ✅ commit `bdd16ca` · **revisada** el 15/08 |
-| 2 | `nmsgeom`, stride 8 → 20 y offsets | `ampliar_stride`, `layout`, `parchear_layout`, `parchear_metadata` | ✅ commit `55ddee8`, **11 tests OK** |
-| 3 | `Weight-NMSMesh`, los pesos | `tools/Weight-NMSMesh.py` → `work/models/scuttlermesh/pesos.json` | ✅ commit `0a42a92`, **17 tests OK** |
-| 4 | `nmsskin`, paleta y canales 5 y 6 | `tools/nmsskin.py` | ✅ commit `a5356e3`, **30 tests OK** |
-| 5 | `Skin-NMSGeometry`, el comando | `tools/Skin-NMSGeometry.py` | ✅ commit `e4a0be1`, corrido sobre la malla real |
-| 6 | `Check-NMSGraft` ampliado al binario | `_revisar_piel`, cinco comprobaciones nuevas | ✅ commit `a0c3f89`, **caza los 3 modos de fallo** |
-| 7 | Pasada completa y documentación | fila de PRUEBA12 y cierre | ✅ conducto entero en verde desde cero |
+O sea: **el nido ya está cableado como un huevo y solo tiene el interruptor apagado.** Los
+Horrores no salen del prop: los suelta el sistema de «fiend wanted» cuando se comete el
+crimen `EggDestroyed`, que es exactamente cómo funcionan los huevos del suelo.
 
-Tres cosas que hay que tener presentes al retomar:
+Lo que hay alrededor, y que también está leído:
 
-- **`tools/` ya no está ignorado en bloque** — commit `57bb8d5`, 2026-08-15. La regla pasó de
-  `tools/` a `tools/*` con cuatro negaciones, porque git **no puede re-incluir nada que esté
-  dentro de un directorio excluido** y un `!tools/*.py` a secas no habría hecho nada. Entraron
-  a git los cinco `.py` que llevaban ahí sin versionar desde siempre (`Check-NMSGraft`,
-  `Decimate-NMSMesh`, `Export-NMSMesh`, `Make-NMSTexture`, `Patch-NMSGraft`). AMUMSS, los
-  `.exe` y `__pycache__` siguen fuera. **Las tareas 3 a 7 ya no necesitan `git add -f`.**
-- **Los tests son `unittest` de la biblioteca estándar**, no pytest. Se corren desde la raíz
-  del repo con `python -m unittest discover -s tools/tests`.
-- **Nada de construir ni desplegar** hasta que el `Check-NMSGraft.py` ampliado pase. El
-  cierre sin aviso del juego viene justo de aquí: el byte del canal 5 es la posición dentro
-  de la paleta `SkinMatrixLayout[FIRSTSKINMAT:LASTSKINMAT]`, **no** el número de hueso.
+- El `MEDIUMHANGSLIME.SCENE` trae un locator **`SPAWNPOS_`** y un `GcAlienPodComponentData`
+  con agro por movimiento, linterna y disparo: el nido **ya reacciona al jugador**.
+- Trae `GcShootableComponentData` y un `MEDIUMHANGSLIME_DESTROYED.SCENE` propio, así que
+  romperlo es una interacción vanilla y no hay que inventarla.
 
-Fuera del alcance de este plan, para después: construir y desplegar, el `.lua` de PRUEBA12,
-devolver `_F02_SKINNED` (paso 5) y `M-TEX`.
+⚠️ **El archivo es compartido con la infestación de cargueros.** Encenderlo aquí lo enciende
+también allí: romper baba en un derrelicto también llamará Horrores. **Es deliberado**, y es
+la mitad de lo que hay que mirar en partida. Si sale a manadas donde no toca, se vuelve a la
+`PRUEBA02`, que solo escribe el primero de los dos archivos.
 
-#### El paso 1, hecho — lo que soltó el vanilla
+> ⚠️ **Empate de archivo con `HorribleTerror_Infestation_4-Hardcore`, y está resuelto por
+> superconjunto.** Los dos mods escriben `MEDIUMHANGSLIME.ENTITY.MBIN`, y cuando dos mods
+> escriben el mismo MBIN **el segundo que cargue gana entero y en silencio**. Las dos
+> versiones diferían en **tres campos y solo tres** — el Infestation pone `AgroTorch` 12 y
+> `GunfireAgro` 8 y deja `IncreaseFiendWanted` en `false`; la `PRUEBA03` hacía lo contrario—,
+> así que la `PRUEBA03` **escribe los tres**. Comprobado tras construir: el `diff` contra el
+> MBIN desplegado del Infestation deja **una sola línea**, la del campo nuevo.
 
-Los originales están extraídos en **`work/models/vanilla_freighterfiend/`** (de
-`NMSARC.EntitySceneMBIN.pak`, `MeshPlanetCREATURES`, `MetadataEtc` y `AnimMBIN`, con
-`tools/AMUMSS/MODBUILDER/hgpaktool.exe -U -f "*FREIGHTERFIEND*"`).
+> **Queda un solo escenario malo:** que gane el Infestation, y entonces no brota nada. Tiene
+> firma propia — el nido **despierta con la linterna pero romperlo no llama Horrores** — y se
+> arregla subiendo la prioridad de la `PRUEBA03` por encima del Infestation en el menú de mods
+> del juego. Hoy son **2** y **18** en `GCMODSETTINGS.MXML`.
 
-Importado en Blender sin interfaz, con `import_bones=True`:
 
-| | |
-|---|---:|
-| Huesos del Armature | **113** (raíz `RootJNT`) |
-| `polySurface6` vanilla | 7 635 vértices · 14 424 triángulos |
-| Grupos de vértices creados | **19** |
-| Vértices con peso | 7 635 de 7 635 |
-| Asignaciones totales | **8 042** |
-| Máximo de huesos por vértice | **3** |
-| Vértices cuya suma de pesos ≠ 1 | **0** |
+> El `.ENTITY` sale de `NMSARC.MetadataEtc.pak`, **no** del `NMSARC.EntitySceneMBIN.pak`
+> donde está el `.SCENE`. El filtro de `hgpaktool` es un **glob**, no una subcadena:
+> `-f "*mediumhangslime*"` encuentra, `-f "mediumhangslime"` da cero.
 
-> **El bicho vanilla es casi rígido.** 8 042 asignaciones para 7 635 vértices: la inmensa
-> mayoría cuelga de **un solo hueso**, y solo las junturas reparten entre dos o tres. Eso
-> rebaja mucho el listón: no hace falta un pesado fino, basta con asignar cada vértice al
-> hueso más cercano y suavizar las costuras.
 
-De los 113 huesos, la malla solo usa **19**: `RootJNT`, los dos `Pincer1`, primera y cuarta
-pata de cada lado (`1JNT`, `2JNT`, `3JNT`), `NewBack1/2/3JNT` y `NewHeadJNT`. Las patas
-segunda y tercera y toda la cola **no deforman nada**.
-
-#### El paso 2, hecho — y el giro que casi lo estropea
-
-Las dos mallas **no están en el mismo espacio**, y transferir sin alinear da basura:
-
-| | X | Y | Z |
-|---|---:|---:|---:|
-| vanilla, tal como lo deja NMSDK | 1,925 | **3,268** | 1,850 |
-| nuestro `polySurface6` | 2,637 | 1,851 | **2,768** |
-
-El vanilla viene **Z arriba** y el nuestro **Y arriba**: 90° de diferencia. Sin corregirlo,
-`RFourthLeg*` y `LFourthLeg*` se quedan **con 0 vértices** y `RFirstLeg3JNT` se traga 1 630.
-La alineación es girar +90° en X, y después encajar la caja envolvente en la del vanilla.
-
-Y queda un giro de 180° en Z que decidir —si el bicho mira adelante o atrás—. **Puntuar por
-«cuántos grupos reciben vértices» elige mal**: da `GIRO_Z 0`, que pone nuestro cráneo mirando
-hacia atrás. Lo que sí decide:
-
-- la cabeza del vanilla está en **+Y** (centroide de los vértices con peso > 0,5 en
-  `NewHeadJNT`: Y = **+0,365**, con la cola llegando a −2,049);
-- con `GIRO_Z 0` nuestro cráneo cae en −Y, y con **`GIRO_Z 180`** en +Y.
-
-**`GIRO_Z 180` es el bueno**, y de propina es el de mejor simetría izquierda/derecha (0,898
-contra 0,787). Comprobado con renders laterales de las tres siluetas.
-
-Resultado sobre nuestros 4 820 vértices:
-
-| | |
-|---|---:|
-| Vértices con peso | **4 820 de 4 820** |
-| Asignaciones | 4 895 |
-| Máximo de huesos por vértice | **2** |
-| Centroide de la cabeza en Y | **+1,493** |
-
-1,02 huesos por vértice, contra 1,05 del vanilla: **sale igual de rígido que el original**, que
-es exactamente lo que se buscaba. Y con máximo 2 influencias caben de sobra en los 4 huecos
-del buffer.
-
-> **Estos son los números de la corrida del 15/08, la que está en disco** —
-> `work/models/scuttlermesh/pesos.json`, commit `0a42a92`—. La sesión del 13/08 había anotado
-> 5 137 asignaciones (1,07); la diferencia es la variación admisible del `vert_mapping`, y los
-> cuatro invariantes que sí mandan —4 820 de 4 820, el máximo de 2, los cinco grupos vacíos y
-> el signo del centroide— salieron iguales.
-
-> **Dos grupos se quedan a cero y hay que saberlo**: `NewBack1/2/3JNT` (la espalda no
-> doblará; el cuerpo se moverá en bloque con `RootJNT`) y los dos `Pincer1JNT` (nuestro bicho
-> no tiene pinzas, así que da igual). Se mueven cabeza y las ocho patas. Es mucho mejor que
-> hoy, pero no es el vanilla entero.
-
-#### El contrato binario del paso 3 — leído, no supuesto
-
-`VertexLayout` del vanilla, de `freighterfiend.geometry.MXML`: **ElementCount 4, Stride 20**.
-
-| SemanticID | Qué es | `Type` | Bytes | `Offset` |
-|---:|---|---:|---:|---:|
-| 2 | normal | 36255 (`INT_2_10_10_10_REV`) | 4 | 0 |
-| 3 | tangente | 36255 | 4 | 4 |
-| **5** | **índice de hueso** | **5121 (`UNSIGNED_BYTE`)** | **4** | **8** |
-| **6** | **peso de hueso** | **5131 (`HALF_FLOAT`)** | **8** | **12** |
-
-O sea: 4 + 4 + 4×1 + 4×2 = **20**. El nuestro hoy es ElementCount 2 / Stride 8, así que el
-paso 3 son **+12 bytes por vértice** y reescribir el buffer entero.
-
-Y el detalle que decide si crashea o no, de `ModelImporter/import_scene.py:1085-1098`:
-
-```
-skin_mats = SkinMatrixLayout[FIRSTSKINMAT : LASTSKINMAT]
-por cada skin_mat -> un grupo de vértices, en ese orden
-blend_indices[j] indexa DIRECTAMENTE esa lista de grupos
-```
-
-**El byte del canal 5 NO es el número de hueso: es la posición dentro del tramo
-`FIRSTSKINMAT`→`LASTSKINMAT` de la malla.** Los valores de `SkinMatrixLayout` sí son
-`JOINTINDEX` de nodos JOINT del `.SCENE` (`_find_joint`, línea 1327). Confundir las dos cosas
-es exactamente el «índices fuera de rango» que cerró el juego en la `PRUEBA05`.
-
-En el vanilla eso cuadra así: `SkinMatrixLayout` tiene 23 entradas y `MeshBaseSkinMat` es
-`[0, 0, 0, 19]` — la malla del cuerpo usa las 19 primeras y la del ojo arranca en la 19.
-
-> El importador solo lee **3 pesos** de los 4 (`np_blendWeight[i][0:3]`), aunque el hueco de 4
-> exista en el buffer.
-
-> **El casado va por vecino más cercano, no por posición exacta** — medido el 15/08 en la
-> Task 4. El buffer guarda las posiciones en **half** y `pesos.json` en float, así que el
-> mismo vértice sale movido hasta **1,4 ULP**: `1.829884` en el JSON contra `1.8291016` en el
-> buffer. Casar por clave exacta falla en **10 014 de los 11 357**, y no es que sean mallas
-> distintas —las cajas coinciden a la cuarta cifra y los 4 820 orígenes se alcanzan todos—.
-> La tolerancia es **0,003**, entre el peor casado bueno (0,001355) y el segundo vecino más
-> cercano de toda la malla (0,005036). No hay solape.
-
-> **El riesgo conocido tiene nombre y ya nos pasó:** con el flag `_F02_SKINNED` puesto y los
-> pesos mal, el bicho **se estira sin forma** (`PRUEBA01`). Con el flag puesto y los índices
-> fuera de rango, el juego **cierra sin avisar** (`PRUEBA05`). Por eso el flag va el último y
-> el `Check` va después.
-
-> **`N1` depende de la `HT_CeilingPlague_PRUEBA01`.** Los dos quieren el locator `TENTACLE_`,
-> y la plaga lo alcanza **sin pasar por el `.LSYSTEM`**, que es justo el trozo que `N1`
-> intenta diagnosticar. Si la plaga sale bien, `N1` deja de ser un bloqueo y pasa a ser
-> curiosidad.
+> **✅ `N1` ya no bloquea nada — lo desbloqueó la `HT_CeilingPlague_PRUEBA01` el 17/08.**
+> Los dos querían el locator `TENTACLE_`, y la plaga lo alcanza **sin pasar por el
+> `.LSYSTEM`**, que es justo el trozo que `N1` intentaba diagnosticar. La `PRUEBA01` demostró
+> que **cambiar el `SCENEGRAPH` del envoltorio funciona**: el juego carga la escena nueva. Lo
+> único que quedó mal fue **dónde** queda, y eso es aritmética de transform, no una incógnita
+> de formato — lo arregla la `PRUEBA02`. `N1` baja a curiosidad.
 
 > **El build ya corre desatendido.** `tools/AMUMSS/BUILDMOD_AUTO.bat` tiene fijadas las seis
 > opciones que antes preguntaban por consola (`DEV_MODE F`, `GameVersion P`,
@@ -297,43 +293,56 @@ En el vanilla eso cuadra así: `SkinMatrixLayout` tiene 23 entradas y `MeshBaseS
 |---|---|---|
 | **`Q-IDBICHO`** | A qué `CreatureID` corresponde el mini-Fiend que sale del nido del carguero: la `CREATUREFILENAMETABLE` dice que el nido suelta `SCUTTLER`, no `MINIFIEND` | `HT_FiendMarkers_PRUEBA05` → [`../work/scripts/marcadores/README.md`](../work/scripts/marcadores/README.md) |
 | **`Q-TECHO`** | ¿Por qué el huevo de interior borra la planta del techo y no pone nada en su sitio? | **Hipótesis del 13/08:** el giro de 180° vive en el envoltorio y el `.LSYSTEM` lo tira. Prueba `N1` A/B → [`ASSETS.md`](ASSETS.md) §5.7 |
-| **`Q-MASCARAS`** | ¿Qué canal del `gMasksMap` es qué? El vanilla del huevo da `R` media 179 y `G` media 73, que no cuadra con «R = metalicidad» | Ninguna prueba escrita. Bloquea el tercer mapa del obelisco → [`ASSETS.md`](ASSETS.md) §1.4 |
+| **`Q-MASCARAS`** | ¿Qué canal del `gMasksMap` es qué? El vanilla del huevo da `R` media 179 y `G` media 73, que no cuadra con «R = metalicidad». **Contestada a medias el 22/08:** en criaturas el mapa es `ATI1` de **un canal**, y ese canal **se comporta como brillo, no como rugosidad** — con 174 el bicho sale mojado, y el vanilla mide 85, que es justo `255 − 174`. Qué nombre tiene el canal sigue sin saberse; cómo se usa, ya sí | La `HT_ScuttlerMesh_PRUEBA13` lo confirma o lo tumba → §2.1 |
 | **`Q-GLOW`** | ¿Cómo se enciende un emisivo de verdad? Hoy la emisión del marker va **horneada dentro del color base** | Ninguna prueba escrita → [`ASSETS.md`](ASSETS.md) §1.4 |
-| **`Q-REFPATHS`** | ¿Se puede recolocar una malla vanilla en otro rig con `ReferencePaths`? | [`ASSETS.md`](ASSETS.md) §3. Curiosidad, no puerta |
+| **`Q-REFPATHS`** | ¿Se puede recolocar una malla vanilla en otro rig con `ReferencePaths`? **Dato nuevo del 21/08:** en el `BUGFIEND` **no están vacíos** —los ocho apuntan a `ARTHROPOD.SCENE.MBIN`—, así que el campo sí se usa. Vacíos estaban los 172 del `TREX` | [`ASSETS.md`](ASSETS.md) §3. Sube de curiosidad a vía posible |
 | **`Q-CHANCE`** | ¿Qué hace un `Chance > 0` en un descriptor? | Los 172 valen 0.0 en vanilla; no hay ejemplo del que copiar → [`ASSETS.md`](ASSETS.md) §3 |
 | **`Q-CARNAGE`** | ¿Qué dispara el modo «carnage» de `MaxFiendsToSpawnCarnage`? | — |
 | **`Q-ANTAGONIST`** | ¿`GcAntagonistComponentData` en el huevo salvaje? | Aplazado: exige **añadir** un componente, no cambiar un valor |
 
 ---
 
-## 4 · Qué está instalado — 2026-08-14
+## 4 · Qué está instalado — 2026-08-27 (tras desplegar las tres `PRUEBA` nuevas)
 
-Todo se mide con **`HorribleTerror_Infestation_4-Hardcore` 0.6.3**, que contiene al mod 1.
+Todo se mide con **`HorribleTerror_Infestation_4-Hardcore` 0.6.5**, que contiene al mod 1.
 `HorribleTerror_Predators` **no debe estar instalado**: escriben los mismos archivos.
 
-**Leído de `GAMEDATA\MODS` el 2026-08-14, carpeta por carpeta.** Son seis, y ninguno más
-nuestro:
+**Leído de `GAMEDATA\MODS` el 2026-08-27, carpeta por carpeta.** Nuestros son estos ocho, de
+un total de 94 carpetas:
 
-| Mod | MBIN | |
+| Mod | Qué entrega | |
 |---|---:|---|
-| `HorribleTerror_Infestation_4-Hardcore` **0.6.3** | 11 | |
+| `HorribleTerror_Infestation_4-Hardcore` **0.6.5** | 11 MBIN | |
 | `HT_EggMesh_PRUEBA05` — obelisco entero, con textura **y a su tamaño** | 1 + 5 `ADD_FILES` | |
-| **`HT_ScuttlerMesh_PRUEBA11`** — el SkrullCrawler con difuso y máscaras propias | 0 (**7** `ADD_FILES`) | 🏁 la configuración buena |
-| `HT_CeilingPlague_PRUEBA01` | 1 | sin medir |
-| `HT_DerelictBugs_PRUEBA02` | 1 | |
-| `HT_PredatorParts_PRUEBA03` | 1 | |
+| **`HT_ScuttlerMesh_PRUEBA17`** — la `16` con el `AttackLight` de vuelta a cero | **8** `ADD_FILES` | 🆕 desplegado el 27/08, **sin medir**. La geometría va byte a byte como la `16`, verificado con `cmp`. La `16` baja a `MODS_Retirados` |
+| **`HT_FiendMesh_PRUEBA04`** — el necromorfo **con piel de mapa a mano**, normal rehecho y máscaras propias | **7** `ADD_FILES` | 🆕 desplegado el 27/08, **sin medir**. Sustituye a la `02` y a la `03` |
+| **`HT_ZombieMesh_PRUEBA04`** — el zombie **con piel de mapa a mano** y máscaras propias en ruta propia | **8** `ADD_FILES` | 🆕 desplegado el 27/08, **sin medir**. Sustituye a la `02` y a la `03` |
+| `HT_CeilingPlague_PRUEBA03` — la `02` **más** el campo que hace brotar | 2 MBIN | desplegado el 21/08, **sigue sin medir** |
+| `HT_DerelictBugs_PRUEBA02` | 1 MBIN | |
+| `HT_PredatorParts_PRUEBA03` | 1 MBIN | |
 
-**Retirados a `GAMEDATA\MODS_Retirados\`** — 16 carpetas: las diez `HT_ScuttlerMesh_PRUEBA01`
-a `10`, que escriben los mismos archivos que la `11`; `HT_EggMesh_PRUEBA02`, `03` y `04`;
-`HT_LocatorTest_PRUEBA01` (los `.LSYSTEM` que toca la plaga del techo);
-**`HT_FiendMarkers_PRUEBA04`**, que escribe el mismo `FREIGHTERFIEND.SCENE.MBIN` que la malla;
-y **`HorribleTerror_NecroSkin`**.
+Y aparte, nuestro pero de calidad de vida: **`BetterExtractorsDepots`**, 1 MBIN
+(`BASEBUILDINGOBJECTSTABLE`). Es el **único** archivo de esa tabla en toda la carpeta `MODS`
+—comprobado el 27/08— y no hay **ningún** `.pak`: los demás mods que la tocan son carpetas de
+Vortex con sólo `.EXML`, que el juego no lee. Ver §1.
+
+**Los tres despliegues del 27/08 están verificados descompilando el `.MBIN` de
+`GAMEDATA\MODS`**, no el de `ModBackups`: `Check-NMSGraft.py` da **salida 0** en los tres, con
+stride 20 y los canales 2, 3, 5 y 6.
+
+**Retirados a `GAMEDATA\MODS_Retirados\`** — 28 carpetas, con `HT_ScuttlerMesh_PRUEBA16`,
+`HT_FiendMesh_PRUEBA02` y `HT_ZombieMesh_PRUEBA02` añadidas el 27/08. Todas escriben los
+mismos archivos que su sustituta, así que **no pueden convivir**.
 
 `NoDerelictMiniHorrors` **ya no está** en `GAMEDATA\MODS`: apuntaba a las dos carpetas donde
 escribe nuestro `Infestation`.
 
-✅ `DisableAllMods` = **`false`** el 2026-08-14. La última sesión no dejó el interruptor
+✅ `DisableAllMods` = **`false`** el 2026-08-27. La última sesión no dejó el interruptor
 general apagado.
+
+**Fuera de `GAMEDATA\MODS` desde el 21/08, y no son nuestros:** `Better Extractors 10x`,
+`Better Supply Depots 10x` y `Biogenerator PowerupX1000`. Eran carpetas de Vortex con **sólo
+`.EXML`**, y los tres están reconstruidos a `.MBIN` dentro de `BetterExtractorsDepots`.
 
 ---
 

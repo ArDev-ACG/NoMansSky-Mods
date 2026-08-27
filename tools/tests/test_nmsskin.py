@@ -74,7 +74,8 @@ class TestCasado(unittest.TestCase):
     def test_casa_aunque_la_posicion_no_sea_exacta(self):
         # El caso real: el buffer guarda en half y pesos.json en float, asi
         # que el mismo vertice sale movido un ULP. Casar por clave exacta
-        # fallaba aqui, y fallaba en 10014 de los 11357 de la malla buena.
+        # fallaba aqui, y fallaba en 10014 de los 11357 de la malla de
+        # entonces, la de antes del arreglo del index buffer.
         destino = np.array([[1.0008, 0.0, 0.0]], dtype=np.float32)
         self.assertEqual(list(nmsskin.casar(destino, PESOS_JUGUETE)), [1])
 
@@ -123,11 +124,11 @@ class TestSobreLaMallaReal(unittest.TestCase):
         self.assertEqual(max(joints.values()), 114)
         self.assertEqual(joints["RootJNT"], 2)
 
-    def test_el_stream_de_posiciones_da_11357_puntos(self):
+    def test_el_stream_de_posiciones_da_7627_puntos(self):
         s = nmsgeom.leer_streams(nmsgeom.descompilar(self._copia(DATA)))
-        self.assertEqual(nmsskin.posiciones(s).shape, (11357, 3))
+        self.assertEqual(nmsskin.posiciones(s).shape, (7627, 3))
 
-    def test_los_11357_casan_y_ningun_indice_se_sale_de_la_paleta(self):
+    def test_los_7627_casan_y_ningun_indice_se_sale_de_la_paleta(self):
         # La prueba de verdad, la que los tests de juguete no hacen: pesos.json
         # contra el buffer real. Aqui se vio que el casado exacto no valia.
         pesos = nmsskin.leer_pesos(PESOS)
@@ -146,14 +147,14 @@ class TestSobreLaMallaReal(unittest.TestCase):
         self.assertIn(joints["RootJNT"], palet)
 
         mapa = nmsskin.casar(nmsskin.posiciones(s), pesos)
-        self.assertEqual(len(mapa), 11357)
-        # Los 4820 origenes se alcanzan todos: es el reparto 4820 -> 11357.
+        self.assertEqual(len(mapa), 7627)
+        # Los 4820 origenes se alcanzan todos: es el reparto 4820 -> 7627.
         self.assertEqual(len(set(mapa.tolist())), 4820)
 
         idx, w = nmsskin.canales(pesos, palet, joints, mapa)
         self.assertLess(int(idx.max()), len(palet))
         np.testing.assert_allclose(w.sum(axis=1).astype(np.float32),
-                                   np.ones(11357), atol=1e-3)
+                                   np.ones(7627), atol=1e-3)
 
 
 if __name__ == "__main__":

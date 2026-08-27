@@ -9,6 +9,131 @@ Formato: [Keep a Changelog](https://keepachangelog.com/). Versionado: SemVer.
 Cada entrada de release debe anotar la **versión de NMS** contra la que se probó —
 los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
 
+## [2.1.0] — 2026-08-18 · mod 1
+
+**Fácil y Normal dejan de ser abrumadores.** Corrige la queja de Nexus: *«even on easy,
+nearly every single species on the Planet where I last saved the game turn hostile now»*.
+
+### Changed — solo Fácil y Normal
+
+| Campo | Vanilla | Fácil | Normal |
+|---|---:|---|---|
+| `Generic → Ground → DANGEROUS → "Weight "` | 1 | 3 → **no se escribe** | 10 → **4** |
+| → % de planetas hostiles | 9,1 % | 23,1 % → **9,1 %** | 50,0 % → **26,7 %** |
+| `PercentagePlayerPredators` | 0.5 | 0.6 → **no se escribe** | 0.75 → **0.6** |
+| `PredatorRunAwayHealthPercent` | 40 | 30 → **no se escribe** | 15 → **25** |
+| `GroundGroupsPerKm` (los 4) | ×1 | ×2 *(igual)* | ×5 → **×3** |
+| `MinGroupSize` / `MaxGroupSize` | 1/1 | 1/2 *(igual)* | 2/3 → **1/2** |
+
+**Difícil y Hardcore no se tocan.** Quien elige esos tiers quiere justo lo que dan, y sus
+conteos lo demuestran: 40 y 61, idénticos a los de la 2.0.0.
+
+### Changed — el mod pasa a llamarse **More Aggressive Predators**
+
+Título de la página de Nexus, antes `Horrible Terror - Aggressive Predators`.
+
+**La carpeta instalable NO se renombra: sigue siendo `HorribleTerror_Predators_<tier>`.**
+Está publicada con ese nombre desde 1.0.0. Renombrarla no da error — da algo peor: quien
+actualiza extrayendo el zip se queda con **dos** carpetas, la vieja no se borra sola, las
+dos escriben los mismos archivos y NMS carga una y descarta la otra **sin avisar**. El
+jugador seguiría con los valores de 1.1.0 creyendo que actualizó, que es exactamente la
+queja que esta versión viene a arreglar. Con el nombre intacto, extraer encima sobrescribe.
+
+El zip, el `.pak` y el `.lua` de `Source\` llevan también el nombre viejo, por la misma
+razón: un solo nombre para todo, cero ambigüedad. El detalle y el comando de empaquetado,
+en [`NEXUS.md`](NEXUS.md) § *Excepción — un mod ya publicado no renombra su carpeta*.
+
+### Por qué era el peso de `DANGEROUS` y no otra cosa
+
+El peso **no** decide cuántos bichos hostiles hay en un planeta: decide **si el planeta
+entero** cae en ese arquetipo. Y un planeta `DANGEROUS` saca toda su fauna terrestre de
+`GROUNDTABLEPLAYERPREDATORMED` y `...LARGE` — allí no hay ni una especie pacífica. Con Fácil
+en 23 % un jugador tenía **casi 1 de 4** de que el planeta donde tenía la partida guardada se
+re-rodara a hostil de golpe. Eso es literalmente lo que describe la queja.
+
+Fácil vuelve a la selección de planeta del juego base y se queda con su identidad real:
+**más fauna, manadas de dos y detección un poco más larga**, sin infestar mundos.
+
+### Verificación
+
+Construido contra NMS **170671**, MBINCompiler 6.45.0.1, AMUMSS 5.6.2.0w — 0 errores, 0
+warnings, 0 notices. Conteos de `!# CHANGED` en el EXML delta: **10 / 35 / 40 / 61**.
+
+- Fácil baja de 13 a **10**: los tres campos que ahora coinciden con vanilla dejan de
+  escribirse, no se escriben con su valor vanilla. Sigue tocando **3 rutas**.
+- Normal se queda en **35**: cambian los valores, no el número de campos.
+- Difícil **40** y Hardcore **61**, sin tocar.
+
+Los cuatro tiers del mod 2 se reconstruyeron el mismo día para no separarlos: **20 / 45 /
+50 / 71**, o sea **+10 exactos** sobre el mod 1 en los cuatro. Detalle en
+[`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md).
+
+**Construido, no desplegado** — este mod no se instala en la máquina de desarrollo.
+
+### Release
+
+Reconstruido y empaquetado el 2026-08-18 con `Build-Tiers.ps1` + `Package-Release.ps1`:
+`releases.1.0\`, cuatro zips, **un solo `.lua` por zip** (1.1.0 metía los cuatro).
+
+| Zip | Carpeta instalable | EXML |
+|---|---|---:|
+| `HorribleTerror_Predators_1-Facil_v2.1.0.zip` | `HorribleTerror_Predators_1-Facil` | 4 |
+| `HorribleTerror_Predators_2-Normal_v2.1.0.zip` | `HorribleTerror_Predators_2-Normal` | 6 |
+| `HorribleTerror_Predators_3-Dificil_v2.1.0.zip` | `HorribleTerror_Predators_3-Dificil` | 6 |
+| `HorribleTerror_Predators_4-Hardcore_v2.1.0.zip` | `HorribleTerror_Predators_4-Hardcore` | 9 |
+
+`Package-Release.ps1` aprendió a sacar el tier del nombre español de la carpeta: con
+`-Nombres` forzando los nombres viejos, el `README.txt` decía *configuration installed:
+single* en los cuatro zips. Ahora dice Easy / Normal / Hard / Hardcore.
+
+**Sin subir a Nexus todavía.**
+
+## [2.0.0] — 2026-08-09 · mod 1
+
+**Cambio mayor: el mod 1 pasa a ser el mod de conducta de todo lo que caza.** Absorbe toda
+la conducta de los Horrores Biológicos que estaba en Infestation 0.3.3.
+
+### Added — se muda desde el mod 2
+
+- `GCCREATUREGLOBALS`: presión de Fiends, percepción, eclosión en oleada, separación y radio
+  del gusano, sin-acecho, steering y giro, horda, tenacidad del aggro, distancias de carguero.
+- `CREATUREDATATABLE`: ataque de `FIEND` y de `BUGFIEND`, y el brood (`BUGFIENDS`, timer 10,
+  `ROAR`).
+- `CREATUREBEHAVIOURTREES`: árbol `MELEE`.
+- `GCUIGLOBALS`: `ShowOnscreenPredatorMarkers`.
+- Los dos `*SLIME.ENTITY` de nido de carguero: `AgroTorch` y `GunfireAgro`.
+
+De 4 rutas a **7**. Fácil sigue tocando 3: no coge ni un campo de Fiend.
+
+### Changed
+
+- Descripciones de los cuatro tiers reescritas: ya no dicen «depredadores», dicen conducta.
+
+### ⚠️ Corrección del mismo día — sigue sin poder instalarse junto al mod 2
+
+La primera versión de esta entrada decía que los dos mods ya se podían instalar a la vez. **Se
+revirtió esa tarde:** el mod 2 vuelve a **contener** a este mod, así que siguen escribiendo los
+mismos 7 archivos y se instala uno **o** el otro.
+
+**Lo que diferencia a los dos mods son los modelos de los monstruos, no el tipo de campo.** La
+conducta la comparten por definición: este es el producto de entrada (solo dificultad) y el mod
+2 es el completo.
+
+**Este mod NO está instalado en la máquina de desarrollo** — lo que se juega y se prueba es el
+mod 2. Este existe como producto aparte para Nexus.
+
+⚠️ **Es el archivo fuente de la conducta.** El mod 2 se compone como *bloques de este mod +
+bloques de mundo*. Cambiar un valor aquí sin recomponer el mod 2 los separa en silencio; el
+conteo lo delata (mod 2 = este + 10, y + 40 en Hardcore).
+
+### Verificación
+
+Construido contra NMS **170671**, MBINCompiler 6.45.0.1. Conteos **13 / 35 / 40 / 61**, 0
+errores. Sumados a los del mod 2 (10 / 10 / 10 / 40) dan **23 / 45 / 50 / 101**, idénticos a
+los de Infestation 0.3.3 — prueba de que la mudanza no perdió ni duplicó un campo.
+
+**Construido, no desplegado.**
+
 ## [Unreleased]
 
 ### Added
@@ -446,3 +571,37 @@ Probado contra NMS <version>.
 - Versión de NMS de la prueba: **170671** (`Binaries\NMS.exe`), rama Public.
 - Con esto queda cerrada la checklist previa de `docs/NEXUS.md` salvo las capturas,
   que es lo único que falta antes de subir.
+
+### Empaquetado — convención de nombres de release (2026-08-07)
+
+- **Los nombres de release pasan a camelCase e inglés**, sin guion bajo y sin el
+  ordinal del tier: `HorribleTerror_Predators_3-Dificil` → `horribleTerrorPredatorsHard`.
+  El mismo nombre en las cuatro cosas: carpeta instalable, `.pak`, `.lua` de `Source\`
+  y zip.
+- **La traducción ocurre solo al empaquetar.** Los `.lua` de `work\scripts` y su
+  `MOD_FILENAME` se quedan en español con ordinal: ese nombre es el de la carpeta
+  desplegada en `GAMEDATA\MODS\` durante el desarrollo, y cambiarlo obligaría a borrar
+  y redesplegar cada mod en pruebas.
+- `Package-Release.ps1`: función `Convert-ToReleaseName` (corta por `_` y `-`, tira el
+  ordinal, traduce por diccionario español→inglés, respeta el CamelCase que ya venga
+  bien, pega junto con la inicial en minúscula). Parámetro `-Nombres` para forzar el
+  nombre de un mod concreto cuando la traducción no acierte.
+- **Un `.lua` por zip**, el de esa configuración. Hasta 1.1.0 iban los cuatro tiers en
+  cada zip: invita a que el jugador construya el que no instaló.
+- **Revisión de comentarios antes de empaquetar.** El script mira los `.lua` que irían
+  a `Source\` y aborta con archivo y línea si alguno trae comentarios — vacía las
+  cadenas antes de buscar `--`, para no marcar un guion doble que viva dentro de un
+  valor de AMUMSS. Escape: `-PermitirComentarios`.
+- Limpieza de la carpeta instalable ampliada: además de `*.lua` y `AMUMSS_v*.txt`,
+  ahora también `*.log`, `REPORT*.txt`, `_REPORT_*`, `*.bak`, `Thumbs.db` y
+  `desktop.ini`.
+- `README.txt`: el bloque «WHAT IS IN THIS ZIP» pasa a descripción en línea aparte
+  (con nombres largos la columna alineada se rompía), el bloque del `.pak` desaparece
+  cuando se usa `-SinPak`, y la frase de incompatibilidad y la build de NMS salen a los
+  parámetros `-Incompatibilidad` y `-VersionNMS` en vez de estar fijas al mod 1.
+- Borrada `releases\1.1.0 - copia`, que era el ejemplo a mano de la convención.
+- `releases\1.0.0` y `releases\1.1.0` se quedan como están: ya están subidos a Nexus
+  con esos nombres. La convención arranca en el siguiente release.
+- Verificado sobre `build\infestacion_2026-08-06` y `build\derelict_2026-08-06`: los 4
+  tiers y el mod de una sola configuración salen con el nombre correcto, un solo `.lua`
+  y sin basura de AMUMSS dentro.

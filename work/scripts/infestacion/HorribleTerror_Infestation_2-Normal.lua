@@ -1,18 +1,16 @@
-DENSITY_MULT     = 5
-DANGEROUS_WEIGHT = "10.000000"
-PACK_MIN         = "2"
-PACK_MAX         = "3"
+DENSITY_MULT     = 3
+DANGEROUS_WEIGHT = "4.000000"
+PACK_MIN         = "1"
+PACK_MAX         = "2"
 PERCEPTION       = "50.000000"
-RUNAWAY_HP       = "15.000000"
-PCT_HOSTILE      = "0.750000"
+RUNAWAY_HP       = "25.000000"
+PCT_HOSTILE      = "0.600000"
 MAX_CREATURE     = "50"
 
-EGG_MULT         = "5"
 FIEND_ATTACKERS  = "3"
 FIEND_ENGAGED    = "8"
 FIEND_SPAWN      = "8"
 FIEND_AGGRO      = "60.000000"
-
 FIEND_PERCEPTION = "65.000000"
 HATCH_MIN        = "0.200000"
 HATCH_MAX        = "2.000000"
@@ -32,13 +30,14 @@ PUSH_SMALL       = "9.000000"
 PUSH_MEDIUM      = "9.000000"
 PUSH_LARGE       = "4.500000"
 MELEE_SLOWDOWN   = "3.000000"
+EGG_MULT = "5"
 
 NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_2-Normal",
 ["MOD_AUTHOR"]      = "AldrichDDD",
 ["NMS_VERSION"]     = "6.45",
-["MOD_DESCRIPTION"] = "[NORMAL] Infestacion 0.2.0: huevos de Horror Biologico x5, eclosion mas junta, mas los depredadores del mod de dificultad.",
+["MOD_DESCRIPTION"] = "[NORMAL] Terror 0.6.4: contiene el mod de conducta (27% de planetas hostiles, manadas de 1-2, Horrores que te ven a 65 m, eclosionan mas juntos y vienen derechos y en grupo) y ademas siembra el mundo con huevos x5 y gusanos x5. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {
     {
@@ -114,11 +113,11 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - percepcion de Fiend a "..FIEND_PERCEPTION,
+              ["COMMENT"]            = "Percepcion de Fiend a "..FIEND_PERCEPTION,
               ["VALUE_CHANGE_TABLE"] = { {"FiendPerceptionDistance", FIEND_PERCEPTION} }
             },
             {
-              ["COMMENT"]            = "0.2.0 - eclosion mas junta",
+              ["COMMENT"]            = "Eclosion mas junta",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FiendMinSpawnTime", HATCH_MIN},
@@ -126,7 +125,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.2.0 - separacion entre criaturas y gusano por cercania",
+              ["COMMENT"]            = "Separacion entre criaturas y gusano por cercania",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"AvoidCreaturesWeight",            AVOID_WEIGHT},
@@ -134,7 +133,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - menos acecho",
+              ["COMMENT"]            = "Menos acecho",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"PredatorNoticePauseTime",  NOTICE_PAUSE},
@@ -144,7 +143,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - rumbo directo: mas refresco de steering y giro mas cerrado",
+              ["COMMENT"]            = "Rumbo directo: mas refresco de steering y giro mas cerrado",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"SteeringUpdateRate", STEER_RATE},
@@ -152,7 +151,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]            = "0.3.0 - horda: la manada se mantiene mas junta",
+              ["COMMENT"]            = "Horda: la manada se mantiene mas junta",
               ["VALUE_CHANGE_TABLE"] =
               {
                 {"FollowLeaderCohereWeight", COHERE_WEIGHT},
@@ -160,7 +159,7 @@ NMS_MOD_DEFINITION_CONTAINER =
               }
             },
             {
-              ["COMMENT"]             = "0.3.0 - horda: menos empujon mutuo (struct por tamano)",
+              ["COMMENT"]             = "Horda: menos empujon mutuo (struct por tamano)",
               ["PRECEDING_KEY_WORDS"] = {"SpherePusherWeight"},
               ["VALUE_CHANGE_TABLE"]  =
               {

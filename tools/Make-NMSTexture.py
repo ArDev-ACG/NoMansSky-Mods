@@ -29,11 +29,13 @@ Uso:
     --canales   solo BC5: que dos canales del origen van a los dos bloques.
                 Por defecto RG (X en el primero, Y en el segundo, como DXGI BC5)
     --canal C   solo BC4: que canal del origen va al bloque. Por defecto R
+    --rellenar  derrama cada isla de UV sobre el fondo negro antes de hacer
+                los mips, para que el negro no sangre en los bordes. Ver dilatar()
     --invertir  da la vuelta al valor (255-x) antes de codificar. Para cuando el
                 mapa de un canal viene al reves de lo que espera el shader,
                 rugosidad frente a suavidad
 
-Requiere: Pillow, numpy.
+Requiere: Pillow, numpy. Y scipy, pero solo con --rellenar.
 """
 import struct
 import sys
@@ -206,6 +208,36 @@ def decode_bc4_blocks(data):
     return np.take_along_axis(pal, k, axis=1)
 
 
+def dilatar(im):
+    """Derrama el color de cada isla de UV sobre el fondo sin usar.
+
+    NMS construye 12 mips hasta 1x1, y cada reduccion promedia el borde de la
+    isla con lo que tenga al lado. En un atlas de Meshy ese lado es NEGRO: el
+    12,34% de la textura del SkrullCrawler es hueco, y la isla mediana solo
+    tiene 34 px hasta el borde. A partir del mip 3 el negro ya ha entrado en el
+    9,3% de la superficie util, y en el mip 5 en el 46,6%. Ademas el remuestreo
+    LANCZOS tiene lobulos negativos, asi que un salto duro de carne a negro
+    repica y deja anillos.
+
+    El arreglo estandar: rellenar el hueco con el color del pixel util mas
+    cercano, para que no haya salto que promediar. Solo mira el fondo NEGRO
+    PURO, que en este asset es exactamente el hueco -medido: 12,34% a 0 y
+    12,40% por debajo de 8, o sea una meseta limpia-.
+    """
+    from scipy import ndimage  # solo aqui: el resto del guion es numpy y PIL
+
+    px = np.asarray(im, dtype=np.uint8)
+    fondo = px[..., :3].max(2) == 0
+    if not fondo.any():
+        print("  --rellenar: no hay fondo negro que rellenar")
+        return im
+    # EDT mide de lo no-cero a lo cero, asi que los indices que devuelve
+    # apuntan al pixel UTIL mas cercano. Los utiles se apuntan a si mismos.
+    _, (yi, xi) = ndimage.distance_transform_edt(fondo, return_indices=True)
+    print(f"  --rellenar: {fondo.mean() * 100:.2f}% de fondo derramado desde la isla vecina")
+    return Image.fromarray(px[yi, xi], "RGBA")
+
+
 def opcion(nombre, defecto=None):
     """Lee --nombre=valor o --nombre valor de sys.argv."""
     for i, a in enumerate(sys.argv[1:], start=1):
@@ -236,6 +268,8 @@ def main():
     canales = opcion("canales", "RG")
     canal = opcion("canal", "R")
     invertir = any(a == "--invertir" or a.startswith("--invertir=")
+                   for a in sys.argv[1:])
+    rellenar = any(a == "--rellenar" or a.startswith("--rellenar=")
                    for a in sys.argv[1:])
 
     head, width, height, mips, formato = read_dds_header(vanilla)
@@ -268,6 +302,9 @@ def main():
         px = np.asarray(im, dtype=np.uint8).copy()
         px[..., :3] = 255 - px[..., :3]
         im = Image.fromarray(px, "RGBA")
+
+    if rellenar:
+        im = dilatar(im)
 
     chunks = []
     w, h = width, height

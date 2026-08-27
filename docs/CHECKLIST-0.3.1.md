@@ -68,19 +68,39 @@ Lo que hay que comprobar jugando **antes** de dar por buena la 0.3.1 y antes de 
 
 | # | Qué se prueba | Cómo | Esperado | ⬜ |
 |---|---|---|---|---|
-| 4.1 | `AllowSpawnBrood` (#27-29) | **Hace falta un sitio con Horrores pero sin huevos cerca**: con huevos ×20 una cría es indistinguible de un recién eclosionado | Aparecen `BUGFIEND` de la nada cada ~10 s. Si no: probar `SpawnBroodAnim = BIRTHING`; si tampoco, revertir el brood entero | ⬜ |
+| 4.1 | `AllowSpawnBrood` (#27-29) | **Hace falta un sitio con Horrores pero sin huevos cerca**: con huevos ×20 una cría es indistinguible de un recién eclosionado | Aparecen `BUGFIEND` de la nada cada ~10 s. Si no: probar `SpawnBroodAnim = BIRTHING`; si tampoco, revertir el brood entero | ✅ **FUNCIONA** — ver abajo |
 | 4.2 | `SCUTTLER_PET` intacta | Sacar la mascota domesticada | Se comporta igual que antes. Los anclajes `_id="FIEND"` la protegen | ⬜ |
 | 4.3 | Que escapar siga siendo posible | Percepción 80 + aburrimiento 150 en depredadores | Si es imposible escapar: **subir el aburrimiento**, no bajar la percepción | ⬜ |
 | 4.4 | Gusano a 10 m (#22) | Cruzar una zona con `WORMSPAWNER` | Sale cuando ya lo tienes encima, no a 100 m | ⬜ |
 
 ---
 
+### ✅ 4.1 resuelta el 2026-08-09 — el brood funciona
+
+Observado en partida: rompes un huevo, salen los Horrores, y **al rugir llaman a una
+segunda tanda** que no venía del huevo. Eso es `AllowSpawnBrood`, y cierra tres preguntas
+que llevaban abiertas desde `COMPORTAMIENTO.md` §3:
+
+| Pregunta abierta | Respuesta |
+|---|---|
+| ¿`SpawnBroodID = BUGFIENDS` resuelve fuera del contexto de `BUGQUEEN`? | **Sí.** Es un identificador de grupo global, no algo atado a la reina |
+| ¿Hacía falta `SpawnBroodAnim = BIRTHING`? | **No.** `ROAR`, que es lo que el `FIEND` ya traía, dispara el parto igual. **Un cambio por intento, y el primer intento valió** |
+| ¿`AllowSpawnBrood` es un interruptor suelto o necesita compañía? | Suelto. A diferencia de `AllowPushBackAttack` —que sí necesita `PushBackAttackFrame`— aquí bastó el booleano + ID + timer |
+
+**Consecuencia directa, y es lo que motiva 0.3.3:** las crías son entradas `BUGFIEND` del
+datatable, no `FIEND`. Salían con estadísticas **vanilla** (2-4 golpes, salto 2.0 s, anim
+1.0) mientras sus padres iban a 3-6 / 1.2 / 1.2. 0.3.3 las iguala.
+
+`AllowSpawnBrood` sale de la lista de reversión: **deja de ser el cambio con menos respaldo
+vanilla, ya es un cambio verificado en partida.**
+
 ## 5 · Orden de reversión si algo va mal
 
 1. `SteeringUpdateRate` (#44) — si caen los FPS.
 2. `MaxTurnRadius` (#45) — si se atascan en el terreno o giran raro.
 3. Las dos filas del árbol `MELEE` (#51-52) — si la IA de ataque hace algo extraño.
-4. `AllowSpawnBrood` (#27-29) — es el cambio con menos respaldo vanilla.
+4. ~~`AllowSpawnBrood` (#27-29) — es el cambio con menos respaldo vanilla.~~
+   **Verificado en partida el 2026-08-09. Ya no es candidato a revertir.**
 
 ## 6 · Al terminar
 

@@ -15,6 +15,958 @@ Cada entrada anota la **versión de NMS** contra la que se probó.
 
 ---
 
+## [0.6.7] — 2026-08-22 · NMS 170671
+
+### Fixed — `M-BABA`: el `gMasksMap` no estaba flojo, estaba al revés
+
+`HT_ScuttlerMesh_PRUEBA13`. Es la `PRUEBA12` con **un solo archivo cambiado** —los otros
+siete salen byte a byte iguales, verificado por md5 contra `ModBackups`—, así que lo que mide
+es una cosa y no dos. Construida con 0 errores / 0 warnings / 0 notices y desplegada con los
+ocho archivos verificados por md5 en `GAMEDATA\MODS`.
+
+| `ATI1` de un canal | media | útil media | p1 | p99 | máx |
+|---|---:|---:|---:|---:|---:|
+| `FIEND` vanilla | 85,4 | 86,9 | 5 | 156 | 192 |
+| Nuestro, `PRUEBA12` | 173,6 | 199,5 | 69 | 236 | 255 |
+| Nuestro, `PRUEBA13` | 47,3 | **54,0** | 17 | 105 | 255 |
+
+**La causa, y no es la que se había anotado.** Desde el 20/08 estaba escrito que nuestras
+máscaras daban «el doble de brillo» que las del vanilla, lo cual invitaba a atenuarlas. Al
+medirlas otra vez sale algo más concreto: el asset de Meshy entrega **`roughness`** —valor
+alto = áspero = **mate**— y el shader lee ese canal como **brillo** —valor alto = **mojado**—.
+El mapa viene **al revés**, no flojo. La aritmética lo ata: **255 − 173,6 = 81**, contra los
+**85** del vanilla.
+
+Por eso se **invierte** y no se atenúa: atenuar dejaría las grietas brillantes y los bultos
+mates, que es el mismo mapa del revés y sólo un poco más flojo.
+
+> **El `--invertir` del conversor no basta, y por eso el PNG se prepara aparte.** El **13,3 %**
+> de nuestra textura es UV sin usar y está a 0; invertirla lo pondría a **255**, brillo máximo
+> pegado al borde de cada isla, que a partir del cuarto mip sangra hacia dentro. Que ese 13,3 %
+> es hueco de verdad está comprobado: **donde la rugosidad vale 0 el color base también es
+> negro** (RGB 2,8 / 1,8 / 1,7 con desviación 15, contra 106,7 / 68,3 / 65,3 en la parte útil).
+> Se invierte sólo lo útil y el fondo se queda a 0.
+
+**Contesta a `Q-MASCARAS` a medias:** no dice qué nombre tiene el canal, pero sí que se
+comporta como brillo y no como rugosidad, que es lo que hacía falta para arreglarlo.
+
+**Y le queda la otra mitad**: el necromorfo y el zombie no llevan máscaras propias —usan las
+del vanilla cayendo en nuestras UV— y en las capturas el zombie sale mojado. Mismo arreglo,
+prueba aparte, y **después** de que la `PRUEBA13` diga si la inversión es la buena.
+
+### 🔓 El SkrullCrawler nunca se decimó, así que `M-NUCA` no es el presupuesto
+
+Se pidió subirlo a 30 000 triángulos, por lo mismo que arregló el confeti del necromorfo y del
+zombie. **No se puede, y no haría nada:** el FBX de Meshy trae **9 592 triángulos** y la malla
+que está en el juego trae los mismos **9 592**. Este bicho entró por el conducto manual de las
+once primeras pruebas, antes de que existiera `Decimate-NMSMesh.py`, y **nunca pasó por un
+decimador**. El colapso de UV que puso a confeti a los otros dos no le aplica.
+
+Con eso `M-NUCA` —la nuca con la textura estirada— pierde a su sospechoso principal y se queda
+donde ya apuntaba: el desenvuelto del asset. Queda escrito en el propio
+`tools/Decimate-NMSMesh.py`, con presupuesto 30 000 que no dispara nunca, para que nadie
+vuelva a proponerlo.
+
+### Fixed — `M-CONFETI` cerrado, medido en partida
+
+Capturas del 2026-08-22 en `asset/Errores/`. Ni el necromorfo ni el zombie salen ya con el
+color a confeti: los dos van en gris hueso y **la silueta se lee** —al zombie se le distinguen
+cráneo, costillas y dedos; al necromorfo, el cráneo y los miembros con garra—. El diagnóstico
+del horneado por triángulo de la 0.6.6 queda **validado en partida**.
+
+**Y el juego no se cerró al parir el Horror**, que era la otra mitad de lo que medía la
+`HT_ZombieMesh_PRUEBA02`: el `.DESCRIPTOR` recortado aguanta.
+
+Las capturas dejan además dos cosas que no se preguntaban, y las dos **desbloquean cola**:
+
+| Lo que se ve | Qué desbloquea |
+|---|---|
+| El **zombie se deforma** — tres capturas, tres posturas: brazo alzado, zancada, brazos recogidos | `M4-PIEL`. La cría **sí** aplica el esqueleto |
+| El **necromorfo va rígido**, abierto en estrella e idéntico en las tres | `M3-PIEL`. Es la firma exacta de la malla sin `_F02_SKINNED`, o sea que se entregó como se quería |
+
+---
+
+## [0.6.6] — 2026-08-21 · NMS 170671
+
+### Changed — `HT_FiendMesh_PRUEBA02` y `HT_ZombieMesh_PRUEBA02`: el presupuesto de triángulos
+
+Sustituyen a las dos `PRUEBA01`, que ya entraron en partida el 21/08. **Misma malla, misma
+textura, mismo injerto: lo único que cambia es cuántos triángulos se conservan.** Construidas
+con 0 errores / 0 warnings / 0 notices, `Check-NMSGraft` en salida 0 las dos, y los `.MBIN`
+verificados por md5 y descompilados desde `GAMEDATA\MODS` tras desplegar.
+
+| | Origen FBX | `PRUEBA01` | `PRUEBA02` | Vértices exportados |
+|---|---:|---:|---:|---:|
+| Necromorfo → `FIEND` | 278 381 | 5 999 (2,2 %) | **30 000 (10,8 %)** | 14 233 → **59 384** |
+| Zombie → `BUGFIEND` | 349 911 | 5 999 (1,7 %) | **36 000 (10,3 %)** | 8 172 → **31 475** |
+| *`FIEND` vanilla* | | | *36 590* | *20 508* |
+
+**Por qué: la textura no estaba mal elegida, estaba bien puesta sobre una malla que ya no era
+la suya.** En partida la `PRUEBA01` salió bien plantada y del tamaño correcto pero con el color
+raro. Los assets de Tripo y Meshy vienen **horneados por triángulo** —una isla de UV por cara,
+por eso el atlas se ve a confeti cuando se mira suelto—, así que al colapsar 46:1 y 58:1 cada
+cara superviviente muestrea a caballo entre islas que ya no le corresponden. El atlas se
+verificó por md5: es **el mismo archivo** que la `PRUEBA01`. No depende de la malla, sólo las
+UV, y ésas viajan en el `.GEOMETRY`.
+
+### 🔓 El techo no es el vanilla, es el formato: `Indices16Bit`
+
+**Hallazgo que costó un export.** El `.GEOMETRY` se escribe con `Indices16Bit = 1` —índices de
+dos bytes, **65 536 vértices como máximo**— y **NMSDK no lo comprueba**: a 36 000 triángulos el
+necromorfo salió con `VertexCount 69261` y la bandera de 16 bits puesta, **sin una sola queja**.
+Eso son índices que dan la vuelta, y se habría llevado al juego una malla rota sin aviso.
+
+Y el número **hay que medirlo después de exportar, no antes**: el exportador parte vértices, y
+cuánto depende del desenvuelto. El necromorfo da **1,92** exportados por triángulo (siete piezas
+y atlas, casi cada esquina se parte); el zombie **0,87** (un material, desenvuelto continuo).
+De ahí que quepan 36 000 en uno y sólo 30 000 en el otro.
+
+`tools/Check-NMSGraft.py` **comprueba ahora `VertexCount` contra el techo** y da salida 1.
+Comprobado que salta con el export de 69 261. `tools/Decimate-NMSMesh.py` pasa a presupuesto
+**por modelo** y acepta `-- <modelo>` para no reescribir el `.blend` de los otros.
+
+> **Las dos siguen rígidas a propósito**, sin `_F02_SKINNED`. `M3-PIEL` y `M4-PIEL` van
+> **después** de esta prueba y no antes: el `pesos.json` sale de la geometría, y rehacer la
+> malla obliga a repetir el pesado entero.
+
+---
+
+## [0.6.5] — 2026-08-21 · NMS 170671
+
+### Added — `HT_ZombieMesh_PRUEBA01`, un zombie en la cría y la primera ranura procedural
+
+Cuarta ranura, **primera fuera del `SPIDERRIG`**: el cuerpo del `BUGFIEND`, la cría que el
+Horror pare al rugir. Rig `ARTHROPOD`, 53 huesos, **once** nodos `MESH` y `.DESCRIPTOR` propio.
+`Check-NMSGraft` en salida 0 antes de construir; 0 errores / 0 warnings / 0 notices.
+
+**Lo nuevo es el descriptor, y es lo único que puede cerrar el juego.** El injerto borra diez
+de los once nodos `MESH` y **siete de las ocho entradas del descriptor los nombran**. Por eso
+esta prueba **entrega también el `.DESCRIPTOR`**, recortado a la forma exacta del `FIEND`: un
+grupo, una entrada (`_Arthropod_1`), sin hijos. El nodo conservado es `ArthropodThorax`, que
+no figura en el descriptor y por tanto siempre está.
+
+**Dos supuestos del proyecto caen, leyendo el archivo:**
+
+| Se creía | Lo que dice |
+|---|---|
+| El `BUGFIEND` sale distinto cada vez | Es **determinista**: ocho grupos, **una opción** cada uno, `Chance 0.0` |
+| `ReferencePaths` vacío en todos los descriptores (`Q-REFPATHS`) | **Aquí no**: los ocho apuntan a `ARTHROPOD.SCENE.MBIN`. Vacíos estaban los 172 del `TREX` |
+
+Escala **2,43 m**, sacada de una regla y no de un gusto: el necromorfo quedó a 0,727 de la
+dimensión mayor del `FIEND` (3,62 sobre 4,98), y la mayor del `BUGFIEND` es 3,34.
+
+Y **ninguna textura vanilla se pisa**: `ARTHROPODTHORAX01.BASE.DDS` lo comparte toda la fauna
+artrópodo, así que se reapunta el material —exclusivo del `BUGFIEND`— a `ZOMBIE.BASE.DDS` y
+`ZOMBIE.BASE.NORMAL.DDS`. El normal de este asset **sí viene esculpido**: desviación 51,8.
+
+### Changed — el necromorfo, al doble
+
+Salió entero, de pie y con los colores en su sitio, pero **se veía pequeño**. La causa estaba
+en la propia regla de escala: se midió contra la **altura** del `FIEND` vanilla (1,81 m), y ese
+bicho es bajo pero **5 m de largo**, así que un humanoide erguido a su altura se ve enano.
+Rehecho a **3,62 m**. La colisión sigue siendo la del vanilla: el bicho es ahora más alto que
+su caja.
+
+### Fixed — el nido no brotaba: ganaba el `Infestation`
+
+`HT_CeilingPlague_PRUEBA03` no llamó Horrores, y lo hizo **con la firma escrita de antemano**:
+el nido despertaba con la linterna pero romperlo no hacía nada. Prioridades del
+`GCMODSETTINGS.MXML`: `PRUEBA03` en **2**, `Infestation` en **18** — **gana el número más
+alto**, dato nuevo y medido.
+
+En vez de pelear con el orden de carga, el campo se puso **también** en el `Infestation`
+Hardcore. Los dos mods escriben ahora un MBIN **byte a byte idéntico** (`5c0bc001…`), así que
+el empate deja de existir en vez de resolverse a favor de alguien.
+
+### Added — `HT_FiendMesh_PRUEBA01`, el necromorfo en la ranura del `FIEND`
+
+Segunda malla propia dentro de una criatura, y la primera en el Horror **de superficie** —y
+en el `MINIFIEND`, que comparte modelo por `CREATUREFILENAMETABLE`—. Construida con AMUMSS
+5.6.2.0w, **0 errores / 0 warnings / 0 notices**, y desplegada a `GAMEDATA\MODS` con los seis
+archivos verificados por md5 contra la fuente que pasó `Check-NMSGraft` con salida 0.
+
+Va **rígida a propósito**: `FIEND_MAT` sin `_F02_SKINNED`, que es el equivalente de la
+`PRUEBA02` del SCUTTLER. Pesar contra el `SPIDERRIG` es `M3-PIEL` y va en su propia prueba.
+
+**Las once pruebas del SCUTTLER se comprimen en una** porque la receta quedó automatizada:
+`Atlas-NMSMesh.py` funde los siete colores del asset en un atlas de 2048² y mueve las UV, y
+`Graft-NMSScene.py` reescribe los diecisiete atributos del nodo de malla.
+
+### Fixed — `M-ANIM` cerrado: el SkrullCrawler se mueve con el esqueleto
+
+`HT_ScuttlerMesh_PRUEBA12`, medida en partida el **2026-08-20**. La malla **se deforma con el
+`SPIDERRIG`** en vez de deslizarse rígida, y el movimiento se ve natural. Con eso el conducto
+de piel —`Weight-NMSMesh` → `Skin-NMSGeometry` → `Check-NMSGraft`— queda **validado en
+partida**, no solo en disco, y con él la receta de [`RECETA-PIEL.md`](RECETA-PIEL.md).
+
+**El desempate escrito de antemano acertó.** La prueba llevaba `M-ANIM` y `M-TEX` en el mismo
+`.lua`, con la regla «bicho estirado sin forma = la piel; bicho bien plantado con la textura
+rara = el normal». Salió lo segundo, así que **una sola entrada al juego cerró una y descartó
+la otra** sin volver a entrar.
+
+### Known issues — lo que la `PRUEBA12` deja abierto
+
+| ID | Qué se ve | Qué está medido |
+|---|---|---|
+| **`M-BABA`** | El bicho se ve **húmedo, como baba**, en vez de hueso y piel | **No es el normal.** El nuestro tiene desviación 17,8 y el vanilla 17,2: el relieve es correcto. El que se sale es el `gMasksMap` — `ATI1` de un canal, media **174** contra los **85** del `FIEND` vanilla |
+| **`M-NUCA`** | **La nuca sale con la textura estirada.** De frente, patas y cráneo están bien | Es UV: no hay estirón de malla ni desgarro |
+
+### Added — `HT_CeilingPlague_PRUEBA03`, el nido del techo llama Horrores
+
+Un campo. `MEDIUMHANGSLIME.ENTITY.MBIN` ya venía cableado como un huevo —
+`IncreaseFiendCrime = EggDestroyed`, `IncreaseFiendWantedChance 1.0`, `GcShootableComponentData`,
+escena `_DESTROYED` propia, locator `SPAWNPOS_` y un `GcAlienPodComponentData` con agro por
+movimiento a 8,5 m, linterna a 10 m y disparo a 20 m— y **solo tenía `IncreaseFiendWanted` en
+`false`**. Se pone en `true`.
+
+Los Horrores no salen del prop: los suelta el sistema de *fiend wanted* al cometerse el crimen
+`EggDestroyed`, que es exactamente como funcionan los huevos del suelo. La explosión se queda
+en `INFESTPILLAREXP` a propósito: lo que se mide es si brotan, no cómo se ve el reventón.
+
+**Contiene entera a la `PRUEBA02`**, que ya pasó, y la sustituye — escriben el mismo
+`INTERIOR_TENTACLEPLANT.SCENE.MBIN`. Construida con 3 + 1 cambios, 0 errores / 0 warnings /
+0 notices, y los dos `.MBIN` verificados por md5 tras desplegar.
+
+⚠️ **Alcance compartido:** el `.ENTITY` lo usa también la infestación de cargueros
+abandonados, así que allí romper baba también llamará Horrores. Es deliberado, y es la mitad
+de lo que hay que mirar en partida.
+
+⚠️ **Y el archivo lo escribe también `HorribleTerror_Infestation_4-Hardcore`** — las filas
+#61 y #62 de [`MODIFICACIONES.md`](MODIFICACIONES.md) §10. Dos mods sobre un MBIN: el segundo
+que cargue gana entero y en silencio. Se resolvió **por superconjunto**: la `PRUEBA03` escribe
+también `AgroTorch` 12 y `GunfireAgro` 8, y el `diff` contra el MBIN desplegado del Infestation
+deja **una sola línea**, la del campo nuevo. Si aun así gana el Infestation, la firma es que el
+nido despierte con la linterna pero romperlo no llame Horrores.
+
+### Verificación — `HT_CeilingPlague_PRUEBA02` cerrada de sitio
+
+Medida en partida el **2026-08-20**: el nido queda pegado al techo y la vaina cuelga de
+cabeza. **De posición no se toca nada más.** Lo que quedaba —que broten Horrores— lo recoge
+la `PRUEBA03` de arriba. El detalle, en [`PENDIENTES.md`](PENDIENTES.md) §2.1.
+
+---
+
+## [0.6.4] — 2026-08-18 · NMS 170671
+
+### Changed — Fácil y Normal, en sincronía con el mod 1 · 2.1.0
+
+**Este mod contiene al mod 1, así que el reequilibrio de Fácil y Normal entra aquí igual.**
+Los seis campos y sus valores están en [`CHANGELOG.md`](CHANGELOG.md), entrada `[2.1.0]`;
+no se repiten para que no puedan divergir. En corto: Fácil deja de sesgar qué planetas son
+hostiles, Normal pasa de la mitad a uno de cada cuatro, y los dos bajan manada, densidad y
+tenacidad.
+
+**Los bloques de mundo de este mod no se tocan.** Huevos de Horror y gusanos de arena
+siguen con sus multiplicadores; los Fiends de Normal, igual.
+
+### Verificación — la invariante, medida y no supuesta
+
+Construido el mismo día que los cuatro tiers del mod 1, misma AMUMSS 5.6.2.0w, 0 errores /
+0 warnings / 0 notices. Conteos de `!# CHANGED`:
+
+| Tier | Mod 1 (2.1.0) | Mod 2 (0.6.4) | Diferencia |
+|---|---:|---:|---:|
+| Fácil | 10 | 20 | **+10** |
+| Normal | 35 | 45 | **+10** |
+| Difícil | 40 | 50 | **+10** |
+| Hardcore | 61 | 71 | **+10** |
+
+**Los 10 son siempre los mismos**: cinco `FlatDensity` y cinco `SlopeDensity`, el huevo de
+Horror y el gusano de arena. Ésa es la comprobación que sustituye a la vieja «suma igual a
+Infestation 0.3.3», que dejó de valer cuando la 0.6.1 retiró los huevos de interior y la
+0.6.2 devolvió tres campos a vanilla.
+
+### Known — cadena de versión desfasada en las descripciones
+
+`2-Normal` y `1-Facil` pasan a decir **0.6.4**. `3-Dificil` **sigue diciendo `Terror
+0.5.0`** en su `MOD_DESCRIPTION` y no se ha tocado en esta pasada: es una cadena vieja, no
+un mod viejo. Corregirla exige reconstruir ese tier y no había motivo en esta entrada.
+
+## [0.6.3] — 2026-08-13 · NMS 170671
+
+### Fixed — la banda de ataque vuelve a vanilla, porque el arreglo era peor que el problema
+
+`FIEND`: `NearDist` 1.0 → **6.0** y `FarDist` 3.0 → **10.0**. Se borra el bloque entero del
+`.lua`: no escribir el campo *es* dejarlo en vanilla.
+
+**Lo que se vio jugando:** «los fiends me están ignorando completamente, y también sus
+hijos». Con el límite lejano en 3 m, el Horror no se comprometía con nada que estuviera más
+lejos, y el bicho más agresivo del mod se volvió decorado.
+
+**Es el efecto secundario de 0.6.1.** Aquella versión estrechó la banda a 1/3 para que el
+padre no retrocediera al rugir, y el 12/08 se dio por buena: «todo correcto, ya no salen
+corriendo». Pasó la prueba que se le puso — **y la prueba estaba mal planteada**: medía si el
+padre se alejaba, no si atacaba. Un ✅ solo cubre lo que mira.
+
+Las crías nunca tuvieron la banda tocada (`BUGFIEND` siempre en 6/10, anclado por
+`SPECIAL_KEY_WORDS`). Que también parecieran pasivas encaja con que el padre no llegaba a
+entrar en combate. **Si tras esto la cría sigue ignorándote, es otro problema.**
+
+Construido con 0 `[ERROR]` / 0 `[WARNING]` / 0 `[NOTICE]`, 71 cambios en 11 MBIN.
+Verificado **descompilando el MBIN de `GAMEDATA\MODS`**, no el `.EXML` del build.
+
+> **Trampa de herramienta que costó dos builds fallidos.** AMUMSS llama a `MBINCompiler.exe`
+> y a media docena de `.bat` por **ruta relativa**. Si en el entorno está
+> `NoDefaultCurrentDirectoryInExePath=1`, `cmd` no busca en el directorio actual, **todas**
+> esas llamadas fallan con «no se reconoce como un comando», y el build muere con un
+> `attempt to compare nil with number` que no dice nada. Y hay que lanzarlo con **codepage
+> 850**: con 65001 AMUMSS se planta en «Bad Active Code Page Detected».
+
+---
+
+## Pruebas in-game — 2026-08-13 · NMS 170671
+
+### ✅ La 0.6.3 se mide entera y pasa — y de paso cae `Q-BICHO`
+
+| ID | Qué se miraba | Veredicto |
+|---|---|---|
+| `F-BANDA` | Que los Horrores vuelvan a atacar de lejos, no solo si los tocas | ✅ **correcto** |
+| `F-CRIAS` | Que las crías también ataquen | ✅ **correcto** |
+| `Q-BICHO` | Qué bicho sale de verdad de los nidos del carguero | ✅ **los mini-Fiends** |
+
+**`F-CRIAS` confirma lo que la 0.6.3 apostó.** El changelog de esa versión dejó escrito: «si
+tras esto la cría sigue ignorándote, es otro problema». No sigue. La cría parecía pasiva
+porque el padre no llegaba a entrar en combate, no porque tuviera nada roto — y el mod nunca
+le tocó la banda al `BUGFIEND`, que siempre estuvo en 6/10. **Una hipótesis escrita antes de
+la prueba, y que la prueba podía haber tumbado.**
+
+**`Q-BICHO` cierra cuatro pruebas de tinte gastadas pintando un bicho ausente**, pero deja un
+fleco: «mini-Fiend» es lo que se ve, no un `CreatureID`. La `CREATUREFILENAMETABLE` dice que
+del nido sale `SCUTTLER` —modelo `FREIGHTERFIEND.SCENE`, `MinScale = MaxScale = 1.0`— y que
+`MINIFIEND` usa `FIEND.SCENE`. Atar el nombre visto al ID sigue siendo trabajo de
+`HT_FiendMarkers_PRUEBA05`.
+
+### ✅ La Etapa 2 de Blender pasa — **hay geometría nuestra dentro de No Man's Sky**
+
+`HT_EggMesh_PRUEBA02`: el obelisco del marker (822 vértices, 1636 triángulos, importado en
+FBX) en el sitio del huevo de Fiend. **Sale en el mundo.** No es la ida y vuelta de la
+Etapa 1: es una malla que no existía en el juego.
+
+Del huevo se conservaron las tres cosas que no son geometría —el material `EGGSHELL_MAT`, la
+`FIENDEGG.ENTITY` (`FIENDHATCH`, `IncreaseFiendWanted`, `Health 125`) y la esfera de colisión
+de radio 0.395—, y por eso el mod lo reparte por el mundo **sin escribir ninguna regla
+nueva**. Plan y etapas en [`ASSETS.md`](ASSETS.md) §4.3.
+
+### Construido y desplegado, sin medir — la textura propia y la plaga del techo
+
+| ID | Qué hace |
+|---|---|
+| `HT_EggMesh_PRUEBA03` | La misma malla **con su textura**: `MARKER.BASE.DDS` (BC7 2048² 12 mips) y `MARKER.BASE.NORMAL.DDS` (ATI2/BC5), reapuntando `gDiffuseMap` y `gNormalMap` del `EGGSHELL_MAT` del huevo de superficie, que es un archivo exclusivo suyo |
+| `HT_CeilingPlague_PRUEBA01` | El nido colgante del carguero en el techo de los edificios abandonados, **sin tocar ningún `.LSYSTEM`** |
+
+### 🔴 A la malla del obelisco le faltan caras — y la Etapa 2 no estaba tan cerrada
+
+Mirado de cerca en partida el 13/08: **el obelisco está incompleto**. El original en
+`asset/Modelos Descomprimidos/` sí lo está — 822 vértices, 830 polígonos, 1636 triángulos.
+
+Lo que reparte el mod se contradice consigo mismo: la cabecera del `.GEOMETRY` declara 1708
+vértices y 4908 índices (1636 tris), pero el `StreamMetaData` dice `IndexDataSize 6592` y el
+buffer real trae 3294 índices numerados hasta el vértice 821 — **1098 triángulos**. Por eso
+NMSDK tampoco puede reimportarlo: lanza `MeshError` e `import_scene.py:464` se lo traga con
+un `except ... pass`, así que la escena entra vacía sin decir nada.
+
+**El culpable es la rama de triangulación del exportador** (`addon_script.py:633`): con quads
+en la malla —el marker tiene 806— saca los índices del `face_map` de `bmesh.ops.triangulate`
+y los reordena con un `sort` que el propio addon documenta como aproximado. Detalle en
+[`../BLENDER/README.md`](../BLENDER/README.md) §2b.
+
+### ✅ `HT_EggMesh_PRUEBA04` — el obelisco entero
+
+Triangulada la malla **antes** de exportar (1636 caras, todas de 3 lados), el exportador toma
+la rama que copia los índices tal cual y las cuentas cuadran:
+
+| | `PRUEBA03` | `PRUEBA04` |
+|---|---:|---:|
+| `IndexDataSize` | 6592 B | **9816 B** = 4908 × 2 |
+| Triángulos repartidos | 1098 | **1636** |
+| `.GEOMETRY.DATA` | 47 713 B | 50 937 B = 129 + 13 664 + 9816 + 27 328 |
+
+**El `.SCENE` no se tocó.** Sigue siendo el vanilla del huevo —con `EGGSHELL_MAT`, la
+`FIENDEGG.ENTITY` (`FIENDHATCH`, `Health 125`) y la colisión de radio 0.395— y sus
+`BATCHCOUNT 4908` y `VERTRENDGRAPHIC 1707` ya describían la malla entera. Para que encajaran
+solo hacía falta que el `IdString` del `.GEOMETRY` volviera a ser `FIENDEGG`: el juego ata el
+nodo de malla a su stream por **hash**, y el `1391952726` del nodo tenía que coincidir. Se
+consigue nombrando `FiendEgg` al objeto en Blender — con el nombre que trae el FBX salía
+`LOW_MARKER`, y el juego no habría encontrado la geometría.
+
+Construido con 0 `[ERROR]` / 0 `[WARNING]` / 0 `[NOTICE]`. Desplegado y verificado por md5.
+`PRUEBA02`, `PRUEBA03` y `HT_LocatorTest_PRUEBA01` movidos a `GAMEDATA\MODS_Retirados\`.
+
+**Medido el 13/08: sale entero y con su textura.** Y sale del tamaño de una montaña.
+
+### ✅ `HT_EggMesh_PRUEBA05` — y el obelisco a su tamaño
+
+`ob.scale` valía **0.01**. El exportador escribe `data.vertices[vi].co`, que son coordenadas
+**locales**, e ignora la escala del objeto: en Blender el obelisco medía 1,63 m y al juego iba
+de **163**.
+
+El `.SCENE` lo decía desde el principio y nadie lo leyó: su AABB va de `0.008757` a
+`1.642224`, que son exactamente las coordenadas locales divididas por 100. **El `.SCENE`
+describía una malla que el `.GEOMETRY` no contenía** — igual que con los índices, y por el
+mismo motivo: el exportador calcula la cabecera de una manera y los buffers de otra.
+
+Aplicada la escala antes de exportar (`transform_apply(scale=True)`, sin tocar la rotación,
+que es la que deja el eje alto en Y), la malla mide **1,6335** en local: cuadra con el AABB y
+es algo más del doble del huevo vanilla, que mide 0,7615. `tools/Export-NMSMesh.py` ahora la
+aplica y **aborta si la malla mide más de 10 en local**.
+
+Construido con 0 `[ERROR]` / 0 `[WARNING]` / 0 `[NOTICE]`, desplegado y verificado por md5.
+La `PRUEBA04` se retira a `MODS_Retirados\`.
+
+> **Tres pruebas seguidas para una malla, y cada fallo escondía al siguiente:** primero
+> faltaban caras, y sólo al verla entera se pudo ver que era gigante. Las dos veces la
+> comprobación que hubiera avisado sin entrar al juego estaba dentro del propio archivo —
+> `IndexDataSize` frente a `IndexCount`, y el AABB frente a las coordenadas. Las dos están
+> ahora en `Export-NMSMesh.py` como asserts.
+
+### 🏁 La Etapa 2 se cierra — el conducto de Blender está terminado
+
+Medido el 13/08: **el obelisco sale perfecto.** Malla completa, tamaño correcto y las
+texturas propias se ven bien. La `PRUEBA05` es la versión buena de la Etapa 2.
+
+Con esto la vía Blender queda cerrada de punta a punta y es **repetible sin criterio
+humano**: `tools/Export-NMSMesh.py` hace FBX → triangular → aplicar escala → raíz NMS →
+`material_path` → nombre del nodo → export, y aborta si la malla no está triangulada o si se
+va de tamaño. Lo que queda del conducto está en
+[`../BLENDER/README.md`](../BLENDER/README.md) §3.
+
+**Lo que desbloquea:** `M3`, la segunda malla propia. `ScrullCrawler_max_hd` y
+`Necro_partes_7_own_2` son estáticos y entran por aquí; lo único pendiente antes es decimar,
+porque pesan 14,3 y 6,1 MB frente a los 822 vértices del marker. Lo que **no** desbloquea es
+la criatura propia: NMSDK sigue sin poder exportar pesos de hueso.
+
+### 🔬 Etapa 3 — `HT_ScuttlerMesh_PRUEBA01`: la malla entra en una criatura, y se estira
+
+Primera malla propia en un bicho animado, no en un prop: el SkrullCrawler (9 592 tris) en el
+sitio del cuerpo del SCUTTLER de los cargueros. El `.SCENE` es el vanilla injertado —se
+conservan los **114 nodos `JOINT`**, las colisiones, las luces, `FFIENDMAT` y el `ATTACHMENT`
+con la `FREIGHTERFIEND.ENTITY`—, cambiando sólo los 17 atributos que describen la malla y
+borrando el nodo del ojo, que se habría quedado sin stream.
+
+**Medido el 13/08:** el bicho sale, se mueve y **sigue atacando** — la geometría entra y la
+entidad funciona. Pero la malla **se estira sin forma** siguiendo el movimiento.
+
+Eso contesta la pregunta que se le puso, y con más precisión de la que se esperaba: **el
+juego sí aplica el skinning.** No es que ignore los huesos y pinte la malla rígida; es que
+transforma cada vértice por una matriz de hueso, y como nuestra geometría no trae los
+`SemanticID` 5 y 6 —índices y pesos— cada vértice recibe una que no le corresponde.
+
+| | Vanilla `FREIGHTERFIEND` | Nuestra exportación |
+|---|---|---|
+| `VertexLayout` | `0` pos · `1` UV · `2` normal · `3` tangente · **`5` índices de hueso** · **`6` pesos** | `0` · `1` · `2` · `3` |
+
+Descartado el desenlace bueno, queda uno intermedio que la `PRUEBA02` prueba: **quitarle al
+material la bandera `_F02_SKINNED`**, que es la que enciende ese camino en el shader. Sin
+ella, la malla debería pintarse con la transformación del nodo y ya — rígida, pero entera.
+
+> **Trampa al editar un `.MATERIAL`:** borrar el `MaterialFlag` de dentro deja el contenedor
+> `TkMaterialFlags` vacío, y **MBINCompiler lo rellena con un valor por defecto** — salió la
+> lista con `_F01_DIFFUSEMAP` duplicado. Hay que borrar el contenedor entero y renumerar los
+> `_index`. Se cazó verificando el `.MBIN` construido, no en partida.
+
+### 🏁 `HT_ScuttlerMesh_PRUEBA02` — hay criaturas propias en el mod
+
+**Medido el 13/08: sale entero y rígido.** Quitar `_F02_SKINNED` del material apaga el camino
+que deformaba la malla, y el SkrullCrawler aparece con su volumen, se mueve por el mundo con
+la animación de la raíz y sigue atacando. Captura en
+`asset/Errores/modelo_scruttler_.jpg`.
+
+**Lo que esto abre.** Se pueden sustituir criaturas por modelos propios. Lo que se pierde es
+la deformación: el bicho no dobla las patas al andar, se desplaza entero. A cambio conserva
+comportamiento, colisión, IA y sonido, porque el `.SCENE` sigue siendo el vanilla.
+
+**Lo que no arregla.** Los pesos de hueso siguen sin poder escribirse; esto los rodea, no los
+resuelve. Una criatura que dependa de doblarse para leerse bien —un bípedo andando— se va a
+notar más rara que un bicho que repta.
+
+### `HT_ScuttlerMesh_PRUEBA03` y `PRUEBA04` — la orientación, y una lección de método
+
+La `PRUEBA02` salía **de pie pero mirando al lado contrario**. Se leyó como «al revés» y se
+le dieron 180° en **X** — que no gira el bicho, lo **tumba**: la `PRUEBA03` salió patas
+arriba. El giro bueno es **−90 en X** (de Z-arriba a Y-arriba) **+ 180 en Y** para la media
+vuelta. Es la `PRUEBA04`.
+
+**Lo que cambió el método:** en vez de averiguarlo con un tercer viaje al carguero, se
+renderizaron las tres candidatas en Blender headless, mirándolas ya en ejes de NMS. Un
+vistazo descartó dos. Hasta entonces cada intento de orientación costaba construir,
+desplegar, reiniciar, volar a un carguero y provocar un nido.
+
+> **Dos verificaciones que ya no se saltan**, porque las dos han cazado algo hoy: el md5 del
+> `.GEOMETRY.DATA` **tiene que cambiar** entre versiones —si no, se construyó lo mismo— y la
+> orientación se mira en un render antes de construir.
+
+### 🔴 `HT_ScuttlerMesh_PRUEBA05` — matar uno tiraba el juego
+
+Con la `PRUEBA04` el bicho salía entero, rígido y bien orientado. **Al destruir uno, crash**
+—diálogo «Desactivar mods», incidencia `170671M_0x16F9CB7`—, y con el nido reventado había
+unos cuantos a los que disparar.
+
+El momento lo delataba: sólo al morir. La `FREIGHTERFIEND.ENTITY` trae
+**`GcRagdollComponentData`** y **`GcEasyRagdollSetUpData`**, y el ragdoll recorre los huesos.
+El `.SCENE` conserva los **114 nodos `JOINT`** del vanilla; el `.GEOMETRY` es nuestro, y
+NMSDK **no escribe los arrays por hueso**:
+
+| | Vanilla | Nuestra exportación |
+|---|---:|---:|
+| `JointExtents` | 115 | **vacío** |
+| `JointMirrorPairs` | 115 | **vacío** |
+| `SkinMatrixLayout` | 23 | vacío |
+
+114 huesos buscando su extensión en un array de cero entradas. Devueltos los dos arrays del
+vanilla —**son datos por hueso, no por malla**, y los huesos son los suyos sin tocar, así que
+se corresponden uno a uno—, el `.GEOMETRY` pasa de 4 214 a 10 188 bytes.
+
+**`SkinMatrixLayout` y `MeshBaseSkinMat` no se copian**: esos sí describen cómo se reparte
+una malla concreta sobre los huesos, y la nuestra no es la de ellos. Copiarlos sería volver
+al problema del que nos sacó quitar `_F02_SKINNED`.
+
+> **Lo que enseña este fallo:** injertar en un `.SCENE` vanilla no es sólo cuadrar las
+> cuentas de la malla. Todo lo que el vanilla conserva —huesos, entidad, ragdoll— sigue
+> esperando encontrar sus datos en **nuestro** `.GEOMETRY`. Lo que no exporta NMSDK hay que
+> devolverlo a mano.
+
+### 🏁 `HT_ScuttlerMesh_PRUEBA06` — el injerto aguanta la muerte. Cierra la Etapa 3
+
+**Pasó el 2026-08-14.** El SkrullCrawler sale entero y **matar SCUTTLERs ya no tira el
+juego**. Con esto hay criaturas propias en el mod de punta a punta: aparecen, se comportan
+como el vanilla y se mueren sin llevarse la partida.
+
+Lo que faltaba no eran dos arrays, eran **cinco**. La `PRUEBA05` devolvió `JointExtents` y
+`JointMirrorPairs` y seguía cerrando:
+
+| Va **por hueso** — se copia del vanilla | Va **por malla** — se calcula de la nuestra |
+|---|---|
+| `JointBindings`, `JointExtents`, `JointMirrorAxes`, `JointMirrorPairs` — 115 cada uno | `MeshBaseSkinMat`, del `FIRSTSKINMAT` de nuestro nodo |
+
+`SkinMatrixLayout` se queda **vacío a propósito**: el nodo lo pide de `FIRSTSKINMAT` 0 a
+`LASTSKINMAT` 0, que es un rango vacío y no lee nada. El `.GEOMETRY` pasa de 10 188 a
+27 212 bytes.
+
+**Lo que cambió el método:** dos herramientas nuevas, las dos sin entrar al juego.
+`tools/Patch-NMSGraft.py` devuelve los arrays, y `tools/Check-NMSGraft.py` cruza cada índice
+del `.SCENE` contra la longitud del array que lo recibe — pasa con el vanilla intacto y
+fallaba con la `PRUEBA05`, que es lo que la hace valer. Rellenarlos de uno en uno, según iba
+crasheando, había costado dos sesiones de juego.
+
+> 🔴 **La primera lectura de esta prueba fue falsa, y la trampa vale más que la prueba.** El
+> crash de la `PRUEBA05` sacó el diálogo «Desactivar mods», que escribe `DisableAllMods=true`
+> en `Binaries\SETTINGS\GCMODSETTINGS.MXML`. La sesión siguiente corrió **sin un solo mod**:
+> salió el SCUTTLER vanilla, no crasheó, y parecía que la prueba había pasado. Los 93 mods
+> seguían en `Enabled=true` — lo cortado era el interruptor general, así que daba igual
+> arrancar por Steam o por Vortex. Queda como cuarta trampa en [`README.md`](README.md).
+
+> **El injerto ya no lleva números a mano.** `patch_scene.py` lee las cuentas y el AABB de
+> nuestra escena exportada en vez de tenerlos escritos: cada reexportación los cambia, y
+> copiarlos era pedir un error de los que no avisan.
+
+**Tres cosas que ninguna herramienta dijo, y que valen para la próxima malla:**
+el `IdString` del `.GEOMETRY` sale del **nombre del objeto en Blender**, y el juego ata nodo y
+stream por su hash — si se entrega un `.SCENE` vanilla, el objeto tiene que llamarse como su
+nodo de malla · el exportador escribe coordenadas **locales**, así que la escala hay que
+aplicarla · con quads, los índices salen incompletos.
+
+> **Tres trampas de NMSDK que costaron la tarde**, ninguna con mensaje de error:
+> sus paneles llevan `bl_context = 'objectmode'`, así que **en modo edición la pestaña NMSDK
+> desaparece** · `Create empty NMSDK scene` **no tiene botón** en ningún panel, solo sale por
+> `F3` · y sin esa raíz el export escribe una escena con `Children` vacío y `VertexCount 0`
+> sin quejarse. El export bueno se acabó haciendo con Blender en headless.
+
+**Lo que esto cambia del 12/08.** «Hay geometría nuestra dentro de No Man's Sky» sigue siendo
+cierto, y sigue siendo el hito. Lo que no vale es el «quedó perfecto»: la prueba miró si la
+malla aparecía, no si aparecía entera. Van dos veces que un ✅ cubre menos de lo que parecía.
+
+Construidos con 0 `[ERROR]` / 0 `[WARNING]` / 0 `[NOTICE]`: 2 cambios y 5 archivos añadidos
+en la `PRUEBA03`, 1 cambio en la plaga. Ya están en `GAMEDATA\MODS` y el md5 del `.MBIN`
+desplegado coincide con el de `ModBackups`. Falta **quitar `HT_EggMesh_PRUEBA02` y
+`HT_LocatorTest_PRUEBA01`**, que escriben encima de cada uno.
+
+> **`BUILDMOD_AUTO.bat` ya no pregunta nada.** Las seis opciones que estaban en `ASK`
+> —`DEV_MODE`, `GameVersion`, `CombineModPak`, `CopyToGamefolder`, `UseExtraFilesInPAK`,
+> `UseLuaScriptInPak`— tienen valor fijo, así que el build corre sin consola interactiva. Con
+> `CopyToGamefolder N` **no despliega**, que es lo que queremos: desplegar es un paso aparte.
+> Sigue exigiendo **codepage 850** y un `PATH` de Windows de verdad — lanzado desde el `PATH`
+> estilo POSIX de Git Bash, AMUMSS aborta con «Your System Path is missing important system
+> paths».
+
+**`tools/Make-NMSTexture.py` ahora produce también ATI2/BC5**, que es el formato de normales
+y máscaras. Elige codificador leyendo el `fourcc` del `.DDS` vanilla de referencia. El orden
+de canales no se adivinó: Pillow decodifica `FIEND.BASE.NORMAL.DDS` vanilla como
+`R≈126 G≈127 B=0`, o sea primer bloque X, segundo Y. Nuestro decodificador coincide con
+Pillow con error máximo **0,86 sobre 255**, y los dos archivos generados pesan **exactamente
+lo mismo que sus donantes vanilla**.
+
+Sin mapa de máscaras a propósito: el vanilla del huevo mide `R` media 179 y `G` media 73, que
+no cuadra con la convención «R = metalicidad» que circula, así que **no sabemos qué canal es
+qué**. Queda como `Q-MASCARAS` en [`PENDIENTES.md`](PENDIENTES.md) §3.
+
+### 🔴 El tentáculo del techo no tiene malla — y eso desatasca la vía 5
+
+Descompilado `INTERIOR_TENTACLEPLANT.SCENE.MBIN`: **cero nodos `MESH`.** Es un envoltorio con
+un `LOCATOR` y dentro un nodo `REFERENCE` que apunta por `SCENEGRAPH` a
+`TENTACLEPLANT.SCENE.MBIN`, **girado 180° en Z** para colgar boca abajo.
+
+Eso da una puerta que no pasa por el `.LSYSTEM` —cambiar ese `SCENEGRAPH` cuelga otra cosa
+del techo, un solo valor— y de paso explica el fallo de 0.3.2: al sustituir el `Model` desde
+el `.LSYSTEM` se tira el envoltorio **y con él la compensación de giro**, así que el huevo se
+colocaba metido en el techo. `[Inferencia]`
+
+El candidato es `MEDIUMHANGSLIME`, el nido colgante del carguero, que trae
+`GcDestructableComponentData` (Health 600, `INFESTPILLAREXP`, `DE_FATSLIME`),
+`GcAlienPodComponentData` y `GcScannableComponentData` — y cuya `.ENTITY` **ya la retoca
+nuestro `Infestation`**, así que hereda gratis `AgroTorch` y `GunfireAgro`. Detalle en
+[`ASSETS.md`](ASSETS.md) §5.7.
+
+### 🔴 Al Fiend no se le puede hacer lo mismo que al huevo
+
+Contado sobre los `.SCENE` descompilados: el huevo tiene **0** nodos `JOINT`, `FIEND` tiene
+**44** y `TENTACLEPLANT` **13**. NMSDK no exporta pesos de hueso —verbatim en su propia
+documentación—, así que una malla nuestra sobre un esqueleto de 44 huesos sale sin pesar.
+
+Lo que sí: repintarlo (vía 1, ya hecho en `NecroSkin`), teñirlo (`gMaterialColourVec4`) y
+podar el descriptor del `BUGFIEND`. Cambiarle la silueta, no. El camino que sí escala es
+poner **mallas nuestras alrededor** del bicho, que es lo que la Etapa 2 acaba de abrir.
+Detalle en [`ASSETS.md`](ASSETS.md) §4.2.
+
+### ✅ La Etapa 1 de Blender pasa — NMSDK sirve
+
+`HT_EggMesh_PRUEBA01`: `FIENDEGG.SCENE.MBIN` importado a Blender con NMSDK
+`0.10.0-alpha13`, re-exportado **sin tocar un vértice** y entregado con `ADD_FILES` +
+`EXTERNAL_FILE_SOURCE`. **El huevo sale igual que siempre.**
+
+Cierra dos incógnitas de una: el formato que produce NMSDK (soporte declarado 6.2X) **carga
+en NMS 6.45**, y la ida y vuelta **no daña la geometría ni la escala**. Es la puerta que
+decidía si merecía la pena aprender a modelar. Plan y siguientes etapas en
+[`ASSETS.md`](ASSETS.md) §4.3.
+
+---
+
+## Pruebas in-game — 2026-08-12 · NMS 170671
+
+Tres pasan, y la cuarta da un dato mejor que un ✅.
+
+| Qué se miraba | Veredicto |
+|---|---|
+| Que el padre **no retroceda** al rugir (0.6.1) | ✅ pasa — **y ver 0.6.3: la prueba no cubría si atacaba** |
+| La puerta de «seguridad adicional» y que el juego cierre (`HT_DerelictBugs_PRUEBA02`, solo `BARR`) | ✅ pasa. Siguiente: devolver `CARG` y `MEDI` de a una |
+| `HT_PredatorParts_PRUEBA03` — podar el descriptor | ✅ pasa. Solo salieron cabezas de reptil/lagarto, cero mallas rotas. **`_HEAD_` de 8 a 2 se ve en pantalla** |
+| El Horror **grande** del carguero, rojo entero | 🔶 no se pudo medir, y por qué no se pudo es el hallazgo |
+
+### 🔴 El hallazgo: el Horror grande no existe donde lo buscábamos
+
+Lo que dijo el usuario: «el Horror grande **no sale**; el que se pintó como rojo es el que
+spawnea cuando se rompe el nido. En todos los cargueros solo salen los pequeños».
+
+`METADATA\SIMULATION\ECOSYSTEM\CREATUREFILENAMETABLE.MBIN` lo contesta sin jugar:
+
+| `CreatureID` | Modelo |
+|---|---|
+| `FIEND` **y** `MINIFIEND` | `SPIDERRIG/FIEND.SCENE.MBIN` — comparten modelo |
+| **`SCUTTLER`** | **`SPIDERRIG/FREIGHTERFIEND.SCENE.MBIN`** |
+| **`SCUTTLER_PET`** | **`SPIDERRIG/MINIFIEND_PET.SCENE.MBIN`** |
+
+1. `MINIFIEND_PET.SCENE` es de `SCUTTLER_PET`, **la mascota domesticada**. No pisa un
+   carguero: el azul nunca falló, **no había a quién pintárselo**.
+2. El del nido es `SCUTTLER`, con el modelo que pintamos de rojo. El «sale rojo» **era
+   nuestro tinte funcionando**, no la alarma.
+3. **No existe `CreatureID` `FREIGHTERFIEND`**, y `SCUTTLER` va a `MinScale = MaxScale = 1.0`:
+   no hay un «Horror grande» aparte.
+
+**Regla:** antes de pintar un bicho, mirar `CREATUREFILENAMETABLE`. El nombre del archivo de
+modelo **no** dice qué criatura lo usa. Cuatro pruebas de tinte se gastaron por saltárselo.
+
+### La lección del despliegue: el `.EXML` del build no verifica nada
+
+El `README` de `derelict` mandaba comprobar que en el `.EXML` del build **no apareciera**
+cierto ID. Dos cosas estaban mal: ese `.EXML` es un **informe** con marcas `!# CHANGED`, así
+que lo que no se toca no sale ahí jamás y la comprobación se cumple sola; y los IDs existen
+en vanilla, así que buscarlos en la tabla real acierta con el mod bien y con el mod mal.
+
+La comprobación buena es **contar contra el vanilla extraído con `hgpaktool`**. Así cuadró:
+`R_BUG_BARR` 10 → 26 y `R_S_BUG_BARR` 6 → 14, los 24 cambios.
+
+**Regla:** una verificación que no puede fallar no es una verificación.
+
+---
+
+## Pruebas in-game — 2026-08-11 · NMS 170671
+
+No es una versión: **es la sesión que midió lo desplegado.** Se jugó con
+`HorribleTerror_Infestation_4-Hardcore` 0.5.0 más los cuatro mods de prueba. Lista completa
+y siguientes pasos en [`PENDIENTES.md`](PENDIENTES.md).
+
+### Lo que pasa
+
+| Bloque | Versión | Veredicto |
+|---|---|---|
+| Crías `BUGFIEND` con las armas del padre (3/6 · 1.2 · anim ×1.2) | 0.3.3 | ✅ |
+| Que la cría **no** para | 0.3.3 | ✅ ninguna cría vista pariendo |
+| No sueltan la presa — los 10 campos | 0.3.1 §2 | ✅ |
+| Movimiento: sin acechar, derechos, en horda, árbol `MELEE` | 0.3.1 §3 | ✅ |
+| **Rendimiento** con `SteeringUpdateRate` 0.10 y huevos ×20 | 0.3.1 §3.5 | ✅ **no hay caída** |
+| `SCUTTLER_PET` intacta | 0.3.1 §4.2 | ✅ el ancla protege a la mascota |
+| Que escapar siga siendo posible | 0.3.1 §4.3 | ✅ en Difícil y en Hardcore |
+
+**3.5 era la única prueba que podía obligar a revertir algo por sí sola.** Pasa: los diez
+campos de 0.3.1 y los cuatro de 0.3.3 se quedan, y con ellos las dos versiones enteras.
+
+### 🎉 El verde cierra dos preguntas de una vez
+
+Las crías del rugido salieron **verde ácido**, el color que `HT_FiendMarkers_PRUEBA01`
+reserva a `BUGFIEND`:
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿`gMaterialColourVec4` tiñe criaturas **in-game**? | **Sí.** Estaba dado por bueno desde el 09/08 descompilando, sin jugarlo nunca |
+| ¿El brood engendra `BUGFIEND` o simplemente más `FIEND`? | **`BUGFIEND`** |
+
+Lo segundo es lo que importa: **sin el verde, los cuatro campos de 0.3.3 eran una impresión.**
+Con él, 0.3.3 mide lo que dice medir.
+
+### ✅ La textura funciona — el blanco del 09/08 está resuelto
+
+`HorribleTerror_NecroSkin` pinta el `FIEND` con su imagen, como se quería. Los tres candidatos
+que se abrieron el 09/08 (sin mipmaps, cabecera DX10/BC7, paleta de recoloreado) **no hicieron
+falta**: `tools/Make-NMSTexture.py` produce un `.DDS` válido y `ADD_FILES` lo entrega bien.
+
+Consecuencia para [`ASSETS.md`](ASSETS.md) §4.3: la mitad «cómo se entrega» de la vía
+Blender está probada de verdad, no supuesta.
+
+⚠️ Se cae de rebote la nota del README de `marcadores` que daba el blanco del `FIEND` por su
+marca de color. Ya no sale blanco; lo distingue la textura.
+
+### ❌ Retirado — los huevos dentro de los edificios abandonados (0.3.2)
+
+**No funciona, y ya no es «prueba incompleta»: es fallo confirmado con la causa acotada.**
+
+Dentro del edificio **la planta que colgaba del techo ya no está y el huevo tampoco**.
+
+**Que la planta desaparezca es lo que convierte esto en información.** Demuestra que el mod
+está activo, que el locator `TENTACLE_` se resuelve y que el `Model` se escribió. El fallo no
+está en la regla —verificada en el MXML construido, cinco reglas con `Probability 100`— sino
+en la **escena**: `FIENDEGG.SCENE` vive en `RARERESOURCE\GROUND\` y es un asset de superficie
+planetaria.
+
+[`ASSETS.md`](ASSETS.md) §5.2 lo eligió sobre la variante `SPACEBASE` por tener «cero
+incógnitas de contexto». **Era justo al revés**, y ésa es la lección de la entrada.
+
+Segundo intento planificado en [`PENDIENTES.md`](PENDIENTES.md) §N1, con un control primero:
+colgar del mismo locator un modelo que ese archivo ya usa (`DEBRISLARGE_COMMON`) antes de
+probar el huevo de interior. Sin el control, un segundo «no sale» volvería a ser ambiguo.
+
+> **Esto bloquea la Etapa 1 de Blender**, que usa el mismo locator como banco de pruebas del
+> cubo. Si el cubo no saliera hoy, no sabríamos si falló NMSDK o falló el conducto.
+
+### Abierto por esta sesión
+
+| Qué | Dónde |
+|---|---|
+| **El padre se aleja cuando ruge** y salen las crías; después vuelve. Se quiere que no se vaya | `PENDIENTES.md` §N2. Palanca candidata: `NearDist` 6 / `FarDist` 10 del `GcCreatureFiendAttackData`, que el mod nunca ha tocado |
+| **Puerta de carguero** que la terminal desbloquea pero no deja cruzar, con una cuenta de «seguridad» subiendo | `PENDIENTES.md` §N3. Nada nuestro toca puertas, pero `FreighterDespawnDist` 150 y `MaxFiendsToSpawn` 16 podrían impedir que una sala se considere limpia |
+
+---
+
+## [0.5.0] — 2026-08-09
+
+**Revierte el reparto de 0.4.0: el mod 2 vuelve a contener al mod 1.** Ni un valor cambia
+respecto a 0.3.3 — los cuatro tiers vuelven a dar **23 / 45 / 50 / 101**, que es la prueba.
+
+### La decisión, y por qué
+
+0.4.0 separó los mods **por tipo de campo**: conducta al mod 1, colocación al mod 2. Se
+construyó, se verificó, se desplegó… y el criterio era el equivocado.
+
+**Lo que tiene que diferenciar a los dos mods son los modelos de los monstruos, no el tipo de
+campo.** La conducta la comparten por definición: el mod 2 es el mod completo y el mod 1 es la
+puerta de entrada para quien solo quiera dificultad.
+
+| | Mod 1 · `HorribleTerror_Predators` 2.0.0 | Mod 2 · `HorribleTerror_Infestation` 0.5.0 |
+|---|---|---|
+| Qué es | la conducta sola | conducta + mundo + **modelos propios (lo que viene)** |
+| Rutas | 7 | 12 |
+| Instalado | **no** | **sí** |
+
+Se instala uno **o** el otro. `HorribleTerror_Predators` se retiró de `GAMEDATA\MODS`.
+
+### Cómo se compone ahora
+
+Mod 2 = **bloques del mod 1 + bloques de mundo**. Los de conducta son los mismos archivos
+fuente; si se cambia un valor en el tier del mod 1 hay que recomponer aquí. **El conteo lo
+delata:** mod 2 = mod 1 + 10, y + 40 en Hardcore.
+
+| Tier | Mod 1 | Mundo | Mod 2 | 0.3.3 |
+|---|---:|---:|---:|---:|
+| Fácil | 13 | 10 | **23** | 23 |
+| Normal | 35 | 10 | **45** | 45 |
+| Difícil | 40 | 10 | **50** | 50 |
+| Hardcore | 61 | 40 | **101** | 101 |
+
+### Desplegado y verificado
+
+Construido contra NMS **170671**, MBINCompiler 6.45.0.1, 0 errores. Desplegado y comprobado
+**descompilando el MBIN de `GAMEDATA\MODS`**: `SpawnBroodID = BUGFIENDS`,
+`FiendAggroDecreasePerSpawn` 0.0, `FiendBeingShotMemoryTime` 60, `FiendMinSpawnTime` 0.1 y
+`FlatDensity` 0.1 en los huevos. Conducta y mundo en el mismo mod.
+
+### ⚠️ Trampa nueva del despliegue
+
+**`ModBackups` deja `GCCREATUREGLOBALS.MBIN` y `GCUIGLOBALS.GLOBAL.MBIN` en la raíz de la
+carpeta del mod, no en `GLOBALS\`.** Copiados tal cual, el juego los ignora y se pierde media
+conducta **sin ningún error ni aviso**. Hay que moverlos a `GLOBALS\` al desplegar. El
+despliegue viejo funcionaba porque tenía las dos copias, la buena y la muerta.
+
+### Bug de composición que costó una build
+
+Al recomponer los tiers por concatenación, recortar un bloque buscando `"        },"` (8
+espacios) también casa **dentro** de `"            },"` (12), así que el corte cayó a media
+regla. Hardcore salió con 3 errores de sintaxis Lua (`unexpected symbol near '}'`, línea 412)
+y **no se construyó**. Se arregló componiendo con los bloques de mundo literales en vez de
+cirugía de cadenas.
+
+### Sonda de `ReferencePaths` — retirada de esta versión
+
+Iba en 0.4.0 y no aterrizaba (ver el README de la carpeta). **No está en 0.5.0**, y es lo
+correcto: escribía `TREX.DESCRIPTOR.MBIN` idéntico a vanilla, lo que habría pisado en silencio
+a `HT_PredatorParts_PRUEBA01`, que escribe el mismo archivo.
+
+## [0.4.0] — 2026-08-09
+
+**El reparto entre los dos mods cambia de eje.** No hay ni un valor nuevo: lo que hay es una
+mudanza, y el conteo lo prueba.
+
+### Por qué
+
+Hasta 0.3.3 el reparto era **por bicho** — mod 1 los depredadores, mod 2 los depredadores
+**más** los Fiends. Eso tenía dos costes: el mod 2 contenía al mod 1, así que **había que
+instalar uno o el otro**, y cada mejora de conducta de un Fiend había que decidir en cuál de
+los dos iba.
+
+El eje nuevo es **por tipo de cambio**:
+
+| | Mod 1 · `HorribleTerror_Predators` 2.0.0 | Mod 2 · `HorribleTerror_Infestation` 0.4.0 |
+|---|---|---|
+| Qué manda | conducta y agresividad de **todos** los bichos | **dónde** aparecen, cuántos, y cómo se ven |
+| Rutas | 7 | 3 |
+
+**No comparten ni un archivo, así que ahora se instalan los dos a la vez.** Eso era
+imposible antes.
+
+### Se muda al mod 1 — todo lo de conducta
+
+`GCCREATUREGLOBALS` (presión, percepción, eclosión, sin-acecho, steering, horda, tenacidad,
+distancias de carguero), `CREATUREDATATABLE` (`FIEND` + `BUGFIEND` + brood),
+`CREATUREBEHAVIOURTREES` (árbol `MELEE`), `GCUIGLOBALS` (marcador de depredador) y los dos
+`*SLIME.ENTITY` (el nido que reacciona a la linterna y a los disparos).
+
+El nido de carguero se va al mod 1 aunque sea una pieza de edificio: lo que cambia es su
+**agresividad**, no dónde está.
+
+### Se queda aquí — colocación en el mundo
+
+`FIENDEGGS`, `INFESTATION` y las tres `ABANDONDED*.LSYSTEM` (huevos dentro de los edificios,
+solo Hardcore).
+
+### ⚠️ Incompatible para quien tenga solo el mod 2
+
+Quien tenga Infestation instalado y no el mod 1 **pierde toda la conducta**: brood, tenacidad,
+sin-acecho, crías, marcadores. Hay que instalar los dos. Va en la primera línea de las dos
+páginas de Nexus.
+
+### Verificación — la suma tiene que cuadrar
+
+Construido contra NMS **170671**, MBINCompiler 6.45.0.1, **0 errores en los ocho**:
+
+| Tier | Mod 1 | Mod 2 | Suma | 0.3.3 |
+|---|---:|---:|---:|---:|
+| Fácil | 13 | 10 | **23** | 23 |
+| Normal | 35 | 10 | **45** | 45 |
+| Difícil | 40 | 10 | **50** | 50 |
+| Hardcore | 61 | 40 | **101** | 101 |
+
+**Que las cuatro sumas coincidan con los totales de 0.3.3 es la prueba de que la mudanza no
+perdió ni duplicó un solo campo.** Es la comprobación que sustituye a «compara el delta a
+mano» en un cambio que toca ocho archivos a la vez.
+
+### Sin desplegar
+
+Construido y verificado, **no copiado a `GAMEDATA\MODS`**. Construir no es desplegar.
+
+## [0.3.3] — 2026-08-09
+
+Construido y desplegado contra NMS **170671**, MBINCompiler 6.45.0.1. **Solo cambia
+Hardcore**: 97 → **101** cambios, 0 errores. Fácil, Normal y Difícil salen otra vez
+idénticos (23 / 45 / 50).
+
+Versión pequeña con una noticia grande detrás: **el brood de 0.3.1 funciona**, y probarlo
+destapó que estaba a medias.
+
+### 🎉 Confirmado — `AllowSpawnBrood` funciona
+
+Lo que se vio jugando: rompes un huevo, salen los Horrores, y **al rugir llaman a una
+segunda tanda** que no salió del huevo. Es el brood de 0.3.1, que llevaba desde el 05/08
+marcado `[SIN PROBAR]` y era **el primer candidato a revertir** por no tener respaldo
+vanilla fuera de `BUGQUEEN`.
+
+Cierra tres preguntas abiertas desde [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) §3:
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿`SpawnBroodID = BUGFIENDS` resuelve fuera del contexto de `BUGQUEEN`? | **Sí.** Es un identificador de grupo global |
+| ¿Hacía falta `SpawnBroodAnim = BIRTHING`? | **No.** `ROAR` —lo que el `FIEND` ya traía— dispara el parto igual |
+| ¿`AllowSpawnBrood` necesita compañía, como `AllowPushBackAttack` necesita su frame? | **No.** Booleano + ID + timer y ya |
+
+### Changed — las crías pegan como sus padres
+
+**El fallo que destapó la prueba:** las crías del brood no son `FIEND`, son **`BUGFIEND`**,
+otra entrada del mismo `CREATUREDATATABLE`. Todo lo que 0.2.0 subió estaba anclado a
+`{"Id","FIEND"}`, así que la segunda oleada llegaba con estadísticas **de vanilla**:
+
+| Campo | Padre (`FIEND`) | Cría (`BUGFIEND`) hasta 0.3.2 | Cría desde 0.3.3 |
+|---|---:|---:|---:|
+| `MinFlurryHits` / `MaxFlurryHits` | 3 / 6 | 2 / 4 | **3 / 6** |
+| `DelayBetweenPounceAttacks` | 1.2 | 2.0 | **1.2** |
+| `AnimSpeedModifier` | 1.2 | 1.0 | **1.2** |
+
+Cuatro cambios nuevos, el patrón anclado de siempre pero con `{"Id","BUGFIEND"}`.
+
+### Deliberadamente NO hecho — el brood de la cría
+
+`AllowSpawnBrood` **no** se copia a `BUGFIEND`. Si la cría pariese, cada parto añadiría
+paridoras: crecimiento exponencial **sin techo conocido**, porque `MaxFiendsToSpawn` (16)
+limita la eclosión del huevo, no el brood. La oleada se queda en dos escalones —
+huevo → `FIEND` → `BUGFIEND`— y ahí para.
+
+### Por qué solo Hardcore
+
+El brood es exclusivo de Hardcore, así que en Normal y Difícil **no hay crías que igualar**.
+Se llegó a escribir la regla en los tres tiers y se retiró de dos: allí solo habría tocado
+`BUGFIEND` salvajes que nadie pidió, y habría obligado a re-verificar y re-publicar dos
+tiers congelados desde 0.2.0.
+
+### Conteo
+
+| Tier | gen | med | large | globals | lsystem ×3 | nidos ×2 | uigl | árbol | **datatable** | eggs | infest | Total |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4 Hardcore | 5 | 2 | 2 | 34 | 10+10+10 | 2+2 | 1 | 2 | **11** | 4 | 6 | **101** |
+
+Los 11 de `datatable` son 4 de `FIEND` + 3 del brood + **4 de `BUGFIEND`**.
+
+**Verificado descompilando desde `GAMEDATA\MODS`**, no desde el delta: `FIEND` con 3/6 ·
+1.2 · brood activo, `BUGFIEND` con 3/6 · 1.2 · **brood en `false`**, y `SCUTTLER_PET`
+intacta en vanilla (2/4 · 2.0 · 1.0) — el ancla protege a la mascota del jugador con dos
+dueños igual que con uno.
+
+### Sin probar
+
+Los cuatro campos de `BUGFIEND`. Save respaldado:
+`NMS_saves_2026-08-09_1415_antes-033-crias-bugfiend`.
+
+**Cómo se comprueba:** hace falta ver la segunda oleada, no la primera. Romper un huevo,
+dejar que los Horrores rujan, y mirar a las crías: deberían encadenar 3-6 golpes en vez de
+2-4 y saltar a casi el doble de ritmo. Si se ve alguna cría pariendo a su vez, algo se coló
+y hay que revertir ya.
+
+---
+
 ## [0.3.2] — 2026-08-07
 
 Construido contra NMS **170671**, MBINCompiler 6.45.0.1. **Solo cambia Hardcore**: Fácil,
@@ -90,11 +1042,33 @@ Verificado descompilando desde `GAMEDATA\MODS`: 5 huevos por L-system, los otros
 que desactivarlo en Vortex antes de probar cargueros, o no se mide nada: ese mod les quita
 el `GcAlienPodComponentData` entero y el `DestroyedModel` que suelta los MiniFiends.
 
-### Sin probar
+### ✅ Probado el 2026-08-09 — NMS 170671
 
-Todo. Save respaldado: `NMS_saves_2026-08-07_0019_antes-032-huevos-en-edificios-y-skin`.
-Plan de prueba: [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md). Sigue pendiente **toda** la
-0.3.1: [`CHECKLIST-0.3.1.md`](CHECKLIST-0.3.1.md).
+Plan de prueba: [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md).
+
+| Qué | Veredicto |
+|---|---|
+| **Los nidos del carguero reaccionan** | ✅ **Pasa.** Linterna y disparos despiertan el nido, salen MiniFiends y también el Horror grande. `AgroTorch` 12 / `GunfireAgro` 8 contra un umbral de 15 **son la escala correcta**: deja de ser inferencia |
+| **Los Horrores de interior salen antes** | ✅ Más presión de la habitual dentro del carguero |
+| **Huevos dentro de los edificios abandonados** | ❌ **Sin medir.** No aparecieron, pero **no se visitaron los tres tipos de edificio**. Prueba incompleta, no fallo confirmado. Sigue siendo lo principal de 0.3.2 y sigue pendiente |
+
+**Los otros dos mods que iban en la misma tanda:**
+
+- `HorribleTerror_DerelictBugs` — ✅ **se queda.** La misión del carguero abandonado
+  **termina**: convertir los `ValidRoomIDs` de colocación de objetos de misión no la rompe.
+  Era la condición de desinstalación y pasa.
+- `HT_PredatorParts_PRUEBA01` — ✅ **se queda.** Ningún TREX crasheó ni salió con el modelo
+  roto. **Borrar secciones de un `.DESCRIPTOR` es vía válida**: el juego tolera huecos, no
+  hace falta sesgar. La respuesta a «¿sirve dejar solo 4 heads y 5 eyes?» es **sí**.
+- `HorribleTerror_NecroSkin` — ⚠️ **carga pero no sirve.** Los Horrores salen **blancos**,
+  no con las calaveras. La ruta del `.DDS` es válida —el bicho cambia— pero el DDS que
+  produce `Make-NMSTexture.py` no se muestrea. Candidatos por orden: sin mipmaps, cabecera
+  DX10/BC7 mal declarada, o que mande la paleta de recoloreado. Siguiente paso barato:
+  empaquetar el DDS **vanilla sin tocar** y ver si sigue blanco.
+
+De la 0.3.1 se cierra además **`AllowSpawnBrood`**: funciona. Ver la entrada 0.3.3 arriba y
+[`CHECKLIST-0.3.1.md`](CHECKLIST-0.3.1.md) §4.1. Del resto de 0.3.1 sigue casi todo
+pendiente.
 
 ---
 

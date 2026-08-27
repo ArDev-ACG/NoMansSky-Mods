@@ -1215,3 +1215,670 @@ mod 3.
 
 Los mods 1 y 2 no se ven afectados: ni un solo archivo compartido en ninguna de las seis
 pruebas.
+
+---
+
+## [Reabierto] — RUTA F, 2026-08-08
+
+### Por qué se reabre un mod que estaba cerrado
+
+Por un mod de terceros que ya estaba instalado en el juego: **`PSI_Terminus` v1.0**, de
+Astra Syndulla. Hace lo que aquí se dio por imposible —una interacción de contexto cerrado,
+disponible a pie y en cualquier sitio— y lo hace con **un solo archivo** que ninguna de las
+seis pruebas llegó a abrir:
+
+```
+METADATA\UI\EMOTEMENU.MBIN
+```
+
+### Qué hace, exactamente
+
+Añade una entrada al menú de emotes que es un **clon de `EMOTE_HOLO_SYS`** (el holograma del
+sistema solar) con cuatro campos cambiados:
+
+| Campo | `EMOTE_HOLO_SYS` vanilla | `PSI_TERMINUS` |
+|---|---|---|
+| `PropData.Model` | `...ACCESSORIES\HOLOSOLARSYSTEM.SCENE.MBIN` | `MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\PARTS\COMMONPARTS\TELEPORTER_STATION.SCENE.MBIN` |
+| `PropData.Scale` | 1.0 | 0.01 |
+| `PropData.IsHologram` | true | false |
+| `LinkedSpecialID` | `SPEC_EMOTE15` | *(vacío)* |
+
+Todo lo demás idéntico: misma animación `1H_IDLE_HOLO_01`, mismo icono `HOLOSYSTEM.DDS`,
+mismo `ScanEffect`, mismo `LoopAnimUntilMove = EMOTE_HOLO`.
+
+**El mecanismo es el modelo.** El emote invoca una `.SCENE` en la mano, y esa `.SCENE`
+arrastra su entidad con el componente de interacción dentro:
+
+```
+TELEPORTER_STATION.SCENE.MBIN
+    -> TELEPORTER_STATION\ENTITIES\TELEPORTERSTATIONINTERACTION.ENTITY.MBIN
+```
+
+No es una pieza construible, no es una misión, no es una recompensa. Es un prop de emote que
+trae su propia interacción puesta.
+
+`LinkedSpecialID` vacío es el otro detalle que importa: el emote **no necesita desbloqueo**.
+El vanilla `EMOTE_HOLO_SYS` sí lo lleva (`SPEC_EMOTE15`).
+
+### La ruta A estaba mal cerrada por segunda vez
+
+El cierre decía «no existe ningún `.MBIN` que liste las entradas del menú rápido». Sigue
+siendo verdad, y sigue sin ser la pregunta. **`METADATA\UI\EMOTEMENU.MBIN` lista las entradas
+del menú de emotes**, que cuelga del menú rápido — un nivel más abajo. El barrido de la ruta
+A no bajó ahí, y el de la ruta E, que sí barrió los 30 250 identificadores de `libMBIN`,
+buscaba palancas de mapa galáctico, no listas de menú.
+
+### Ruta F — el objetivo traducido a este mecanismo
+
+```
+EMOTEMENU: entrada nueva
+  PropData.Model -> MODELS\COMMON\SPACECRAFT\COMMONPARTS\HANGARINTERIORPARTS\BRIDGETERMINAL.SCENE.MBIN
+```
+
+**El paralelismo estructural está verificado, no supuesto.** La entidad del mapa galáctico
+vive en la carpeta hermana de su `.SCENE`, exactamente igual que la del teleportador:
+
+| | `.SCENE` | entidad hermana | `InteractionType` |
+|---|---|---|---|
+| Teleportador (PSI) | `...\COMMONPARTS\TELEPORTER_STATION.SCENE.MBIN` | `TELEPORTER_STATION\ENTITIES\TELEPORTERSTATIONINTERACTION.ENTITY.MBIN` | `Teleporter` |
+| Terminal del puente (nuestro) | `...\HANGARINTERIORPARTS\BRIDGETERMINAL.SCENE.MBIN` | `BRIDGETERMINAL\ENTITIES\GALAXYMAPTERMINAL.ENTITY.MBIN` | `FreighterGalacticMap` |
+
+La entidad se descompiló para confirmarlo: `FreighterGalacticMap`, `InteractDistance = 5.0`,
+`UseInteractCamera = true`.
+
+### Lo que la ruta F NO promete
+
+**PSI_Terminus no demuestra que se salte ninguna condición de contexto.** `Teleporter` ya
+funciona a pie en vanilla; lo que el mod consigue es *llevarlo encima*, no *desbloquearlo*.
+`FreighterGalacticMap` es otra cosa: la PRUEBA 04 demostró que en una pieza plantada en un
+planeta el juego la descarta antes de dibujar el cartel.
+
+Si esa puerta se cierra por **tipo de interacción**, la ruta F muere igual que la B. Si se
+cierra por **contexto de la pieza**, pasa. No hay dato que lo decida, y por eso hay prueba.
+Lo que sí ha cambiado es el precio: un archivo, una entrada.
+
+### PRUEBA 07 — construida, desplegada y verificada · **pendiente de probar in-game**
+
+Script: [`../work/scripts/mapa/MOD3_MapaGalactico_PRUEBA07.lua`](../work/scripts/mapa/MOD3_MapaGalactico_PRUEBA07.lua)
+
+```
+METADATA\UI\EMOTEMENU.MBIN
+    + MOD3_GALMAP     BRIDGETERMINAL.SCENE.MBIN      Scale 0.10
+    + MOD3_GALMAP_S   BRIDGETERMINAL.SCENE.MBIN      Scale 0.01
+    + MOD3_TELEPORT   TELEPORTER_STATION.SCENE.MBIN  Scale 0.01
+```
+
+Los tres son clones del `EMOTE_HOLO_SYS` vanilla con `IsHologram = false` y
+`LinkedSpecialID = ""`. Nada más se toca: 32 emotes vanilla intactos.
+
+**Por qué tres entradas y no una.**
+
+- **`MOD3_TELEPORT` es el control**, y replica los parámetros exactos de PSI_Terminus. Su
+  trabajo no es teletransportar: es demostrar que **nuestro `ADD` produce un emote que
+  funciona**. Sin él, un «no pasa nada» vuelve a dejar sospechosos empatados, que es el
+  error que ya costó las PRUEBAS 02 y 05.
+- **Las dos escalas matan el confundido de tamaño.** `TELEPORTER_STATION` es una sala entera
+  (~20 m) y a 0.01 queda en ~0.2 m en la mano. `BRIDGETERMINAL` es una consola (~2 m): a la
+  misma escala quedaría en ~2 cm, y si el juego calcula el alcance de interacción en espacio
+  de modelo, eso solo podría leerse como «la interacción está capada» cuando en realidad
+  sería «el prop es demasiado pequeño». `MOD3_GALMAP` a 0.10 iguala el tamaño final de PSI;
+  `MOD3_GALMAP_S` iguala la escala. Una de las dos cubre cada hipótesis.
+
+**Validado antes de construir.** El bloque generado por el propio script (ejecutado con el
+`lua.exe` de AMUMSS, no reescrito a mano) se injertó en una copia del `EMOTEMENU.MXML`
+vanilla y se pasó por MBINCompiler: MXML → MBIN compila, y el round-trip MBIN → MXML sale
+limpio — **35 emotes (32 + 3)**, modelos y escalas intactos. O sea que el XML era válido
+*antes* de que AMUMSS lo tocara.
+
+**Anclaje.** `ADD_OPTION = "ADDbeforeSECTION"` sobre `SPECIAL_KEY_WORDS
+{"EmoteID","EMOTE_WAVE"}` — par que aparece **una sola vez** en el archivo (línea 9,
+verificado). `EMOTE_WAVE` es el primer emote de la lista vanilla, así que los tres entran
+como primeros hijos de `<Property name="Emotes">`.
+
+Build: **1 ADD (líneas 5–175), 0 errores, 0 warnings, 0 notices.** 171 líneas = 3 × 57, el
+bloque exacto.
+
+**Desplegado como MBIN desde `ModBackups\`** —que esta vez sí reprodujo el árbol
+`METADATA\UI\`— y verificado descompilando de vuelta desde
+`GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA07\`: **19 053 bytes, los mismos que el MBIN
+validado a mano**, 35 emotes, las tres entradas con `LinkedSpecialID` vacío.
+
+Save respaldado antes de la prueba: `NMS_saves_2026-08-08_1304_antes-prueba07-mapa`.
+
+### Escaneo de conflictos
+
+- **Ningún `.pak` instalado toca `EMOTEMENU`** — de hecho no hay ni un `.pak` en
+  `GAMEDATA\MODS`: los 87 mods de terceros están todos como archivos sueltos.
+- El único que lo tocaba era **`PSI_Terminus`**, y **se ha retirado** a
+  `build\_desplegados_inertes_2026-08-08\`. Dos mods sobre el mismo archivo dejan el
+  resultado ilegible, que es la lección de la PRUEBA 04. Nuestro `MOD3_TELEPORT` cubre su
+  función mientras dure la prueba.
+
+> **Hay que devolverlo al terminar.** `PSI_Terminus` lo gestiona Vortex (sus archivos son
+> hardlinks a la carpeta de staging), así que lo limpio es volver a desplegarlo desde Vortex
+> en vez de arrastrar la carpeta de vuelta a mano.
+
+### Tabla de salidas
+
+Cuatro filas, y cada una dice algo distinto:
+
+| Lo que se observa | Qué significa |
+|---|---|
+| El mapa galáctico se abre con `MOD3_GALMAP` o `MOD3_GALMAP_S` | **Ruta F buena.** El mod 3 existe |
+| `MOD3_TELEPORT` abre el teletransporte; ninguno de los dos del mapa da cartel | El mecanismo funciona y `FreighterGalacticMap` está capada a pie. **Mod 3 muerto por datos, con diagnóstico bueno** |
+| Salen los tres emotes pero ninguno hace nada | El fallo es nuestro `ADD`, no el juego. Comparar contra el EXML de PSI_Terminus antes de concluir nada |
+| No sale ningún emote nuevo | El MBIN no se está cargando, o un ID de emote nuevo no aparece sin desbloqueo pese a `LinkedSpecialID` vacío |
+
+### Checklist de la prueba in-game
+
+Save de pruebas, **a pie, en un planeta y sin carguero cerca**. No hay que construir nada.
+
+| # | Qué hacer | Qué anotar |
+|---|---|---|
+| 1 | Cargar el save de pruebas | Que **no** sea la partida buena |
+| 2 | Abrir el menú rápido → emotes | **¿Salen los tres `MOD3 *`?** Están los primeros de la rueda |
+| 3 | Usar **`MOD3 Teleportador`** primero | Es el control. ¿Aparece algo en la mano? ¿Sale cartel de interacción? ¿Abre el teletransporte? |
+| 4 | Usar **`MOD3 Mapa Galactico`** (escala 0.10) | ¿Se ve la consola en la mano? ¿Sale cartel? Texto exacto |
+| 5 | Usar **`MOD3 Mapa Galactico S`** (escala 0.01) | Lo mismo. Si uno da cartel y el otro no, es dato de escala |
+| 6 | Si se abre el mapa | ¿Galaxia o pantalla rota? ¿La cámara queda bien? |
+| 7 | Dentro del mapa | ¿Deja **marcar destino**? |
+| 8 | Dentro del mapa | **Si ofrece SALTAR, no pulsarlo.** Anotarlo y salir |
+| 9 | Salir | ¿Vuelve el control del personaje? El README de PSI avisa de que la cámara se queda en tercera persona tras teletransportar; se sale moviéndose |
+| 10 | Si el juego se cuelga | Cerrar, decirlo, y **no** volver a entrar hasta retirar el mod |
+
+Para revertir: borrar `GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA07\` y redesplegar
+`PSI_Terminus` desde Vortex. No toca el save.
+
+### Nota para el mod, si la prueba sale bien
+
+PSI_Terminus manda el **archivo entero**: 33 emotes, los 32 vanilla más el suyo. Dos mods que
+hagan eso se pisan, gane el que cargue el último — y su README lo da por compatible con
+Meta-Mod, cosa que no se sostiene con una lista completa por cada lado. El precedente bueno
+sigue siendo `AddLSnPG v5.63`: **EXML parcial, solo su bloque, sin marcas `!#`**
+(`-IncludeTagsInEXML_MXML N`). Si esto llega a mod publicable, va así, no como MBIN entero ni
+como lista completa.
+
+---
+
+## PRUEBA 08 — icono propio en el menú de emotes, 2026-08-08
+
+Lo mismo que la 07 con una sola variable movida: **el icono**. Tres emotes idénticos —el
+mismo `BRIDGETERMINAL.SCENE.MBIN`, la misma escala 0.100000— que solo se diferencian en el
+`.DDS` que enseñan en la rueda. El objetivo no es la interacción, es contestar si un mod
+puede meter arte propio en `EMOTEMENU`.
+
+| Emote | Icono | Arte |
+|---|---|---|
+| `MOD3_GALMAP_A` | `MOD3_MAPA_01.DDS` | Galaxia espiral, fondo azul redondo |
+| `MOD3_GALMAP_B` | `MOD3_MAPA_02.DDS` | Sistema con planetas y órbitas |
+| `MOD3_GALMAP_C` | `MOD3_MAPA_03.DDS` | Trazo lineal turquesa sobre transparente |
+
+### Cómo salieron los .DDS
+
+El icono vanilla de referencia se sacó del pak con `hgpaktool.exe`, que sí acepta filtro por
+ruta y no hace falta abrir el explorador:
+
+```
+hgpaktool.exe -U --upper -A -O <salida> -f "TEXTURES/UI/FRONTEND/ICONS/QUICKMENU/EMOTES/*.DDS" <PCBANKS>
+```
+
+`HOLOSYSTEM.DDS` resultó ser **BC7_UNORM 256×256 con 2 mips** (82 068 bytes), no 12 mips como
+las texturas de criatura. Los tres PNG de `asset/mapa/` (512×512) se convirtieron con
+`tools/Make-NMSTexture.py` usando esa cabecera: **82 068 bytes los tres, idéntico al vanilla**.
+
+**Hubo que arreglar el conversor.** Hacía `convert("RGB")` antes de escalar, que en una piel
+de criatura da igual —no tiene alfa— pero en un icono de UI aplastaba el fondo transparente a
+negro opaco. Ahora entra en `RGBA` de principio a fin. Comprobado decodificando con Pillow:
+esquina `(1,1,1,1)` (alfa ≈ 0) y centro `(255,247,143,255)` opaco.
+
+### Los archivos nuevos van por `ADD_FILES`
+
+No hace falta colocar el `.DDS` a mano en la carpeta desplegada: AMUMSS lo copia con la misma
+tabla que usa el mod 5 para la piel del Horror Biológico.
+
+```lua
+["ADD_FILES"] = { { ["EXTERNAL_FILE_SOURCE"] = ..., ["FILE_DESTINATION"] = [[TEXTURES\UI\...\MOD3_MAPA_01.DDS]] } }
+```
+
+Son **archivos nuevos, no reemplazos**: ningún icono vanilla se toca, así que ningún otro mod
+puede chocar por ellos.
+
+### Build y despliegue
+
+`3 files ADDed`, líneas 5–175 añadidas al MXML (171 = 3 × 57), **0 errores, 0 warnings**.
+Desplegado desde `ModBackups\` y verificado descompilando el MBIN de
+`GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA08\`: 36 emotes (33 vanilla + 3), los tres con
+`Scale 0.100000` y su `Filename` apuntando a `MOD3_MAPA_0X.DDS`.
+
+**La PRUEBA 07 se retiró.** Dos mods sobre `EMOTEMENU.MBIN` es la trampa de la PRUEBA 04, y
+07 y 08 lo son entre sí. `PSI_Terminus` sigue fuera, en
+`build\_desplegados_inertes_2026-08-08\`.
+
+### Qué mirar in-game
+
+| # | Qué hacer | Qué anotar |
+|---|---|---|
+| 1 | Menú rápido → emotes | ¿Salen las tres entradas `MOD3 Mapa Galactico 1/2/3`? Van las primeras |
+| 2 | Mirar los iconos | **La pregunta de esta prueba.** ¿Se ve el arte propio, o el holograma vanilla, o un cuadro negro/rosa? |
+| 3 | Si hay fondo negro alrededor del dibujo | El alfa no sobrevivió al BC7 y hay que revisar el conversor, no el mod |
+| 4 | Elegir cuál gusta | Es lo que se queda para el mod |
+| 5 | De paso, usar uno | Como la 07 pero solo a escala 0.10: ¿aparece la consola en la mano? ¿sale cartel de interacción? |
+
+Para revertir: borrar `GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA08\`. No toca el save.
+
+### Lo que se observó in-game con la PRUEBA 08
+
+Los tres iconos propios salen bien en la rueda: **arte propio, sin fondo negro ni cuadro
+rosa**. Elegido el **icono 1** (galaxia espiral). La pregunta de la prueba queda contestada:
+un mod puede meter texturas nuevas en `EMOTEMENU` por `ADD_FILES`, y el conversor con
+cabecera BC7 256×256 / 2 mips y alfa preservado da un `.DDS` que el juego lee.
+
+Y de paso, el dato que nadie esperaba de esta prueba: **el prop en la mano sí sirve
+interacciones a pie**. Al usar el emote aparecen opciones de carguero —personalizar el
+carguero y la de la flota— pero **no** el mapa galáctico.
+
+Eso no es un fallo del emote. Es que `BRIDGETERMINAL.SCENE` no tiene un terminal: tiene tres.
+
+---
+
+## [Reabierto de nuevo] — el nodo del mapa nace apagado, 2026-08-08
+
+### `BRIDGETERMINAL.SCENE` cuelga tres nodos interactivos
+
+Se descompiló la escena y se recorrieron sus `ATTACHMENT`. Tres locators con interacción,
+los tres a ~2 m del origen del modelo (o sea, a ~20 cm en la mano a escala 0.10):
+
+| Locator | Entidad | `InteractionType` | ¿Salió in-game? |
+|---|---|---|---|
+| `FleetTerminal` | `FLEETTERMINAL.ENTITY` | `ManageFleet` | **sí** |
+| `FreighterReserachTerminal` | `FREIGHTERRESERACHTERMINAL.ENTITY` | `CustomiseFreighter` | **sí** |
+| `GalaxyMapTerminal` | `GALAXYMAPTERMINAL.ENTITY` | `FreighterGalacticMap` | **no** |
+
+`MPMISSIONTERMINAL` e `INTERACT` existen en la carpeta de entidades pero **no están
+atadas** a esta escena.
+
+### El diff son dos campos, y el control es perfecto
+
+`FLEETTERMINAL` es el mejor control que ha tenido este mod: mismo prop, misma escena, misma
+distancia, y **coincide con el terminal del mapa en todo lo que suele ser sospechoso** —
+`InteractDistance 5.0`, `InteractAngle 360`, `RepeatInteraction false`,
+`UseIntermediateUI false`, `UseInteractCamera true`. Uno da cartel y el otro no. Lo único
+que los separa:
+
+| Campo | `GALAXYMAPTERMINAL` | los dos que sí salen |
+|---|---|---|
+| `TriggerAction` | **`INACTIVE`** | `INTERACT` |
+| `StoryUtilityOverrideData.Name` | **`""`** | `NPC_NAVIGATOR_OPT_A` / `UI_FRIG_TOKEN_TERM` |
+
+**`INACTIVE` no es casualidad.** Se descompilaron todas las entidades de
+`HANGARINTERIORPARTS` y ese valor aparece en dos interacciones: `FreighterGalacticMap` y
+`AbandonedFreighterEnd` — la del carguero abandonado, que también nace apagada y la
+enciende el guion de la misión. Los cuatro terminales que sí dan cartel llevan `INTERACT`.
+
+Y el `Name` vacío es el mismo `StoryUtilityOverrideData` que la **PRUEBA 03 ya demostró
+vivo a pie**, con las 1234 unidades.
+
+### No hay un terminal mejor escondido
+
+Se barrieron los 97 `.pak` buscando `FREIGHTERGALAXYMAP`. En todo el juego existen **dos**
+entidades con `InteractionType = FreighterGalacticMap`:
+
+| Entidad | `TriggerAction` | `Name` |
+|---|---|---|
+| `...HANGARINTERIORPARTS\BRIDGETERMINAL\ENTITIES\GALAXYMAPTERMINAL` | `INACTIVE` | `""` |
+| `...INDUSTRIAL\ACCESSORIES\HANGARPARTS\BRIDGE\BRIDGE\ENTITIES\FREIGHTERGALAXYMAP` | `INACTIVE` | `""` |
+
+Configuración **idéntica**. No hay una terminal buena que copiar: hay un interruptor apagado.
+
+### Esto reabre la PRUEBA 04
+
+Lo que se anotó en el cierre fue: «PRUEBA 04: ni sale el cartel. El juego descarta la
+interacción antes de dibujarla». La lectura era que `FreighterGalacticMap` está capada por
+contexto. Nunca se miró que **el nodo nace apagado en el propio vanilla**, así que el
+Módulo de Mensajes de la 04 heredó el `TriggerAction` de la pieza, no el del terminal — y el
+resultado es compatible con las dos explicaciones. Otra vez el error de método de siempre:
+una prueba cuyas salidas no distinguen.
+
+### PRUEBA 09 — construida, desplegada y verificada · **pendiente de probar in-game**
+
+Script: [`../work/scripts/mapa/MOD3_MapaGalactico_PRUEBA09.lua`](../work/scripts/mapa/MOD3_MapaGalactico_PRUEBA09.lua)
+
+```
+METADATA\UI\EMOTEMENU.MBIN
+    + MOD3_GALMAP    BRIDGETERMINAL.SCENE.MBIN    Scale 0.10    icono MOD3_MAPA_01.DDS
+
+MODELS\...\BRIDGETERMINAL\ENTITIES\GALAXYMAPTERMINAL.ENTITY.MBIN
+    TriggerAction                    INACTIVE -> INTERACT
+    StoryUtilityOverrideData.Name    ""       -> SHIP_GALACTICMAP
+```
+
+Un solo emote, con el icono elegido en la 08. **Los otros dos terminales no se tocan**: se
+quedan dentro del mismo prop haciendo de control, así que la prueba trae su propio testigo
+sin gastar una entrada extra.
+
+`SHIP_GALACTICMAP` es una clave real: se sacó escaneando los siete
+`LANGUAGE\NMS_LOC*_ENGLISH.MBIN` en crudo. De paso apareció `QUICK_MENU_NO_GALMAP` — el
+mensaje de «mapa galáctico no disponible» del menú rápido, que confirma que esa condición
+vive en el ejecutable y cierra otra vez la ruta A.
+
+**Anclajes, los dos ya probados en este mod.** `VALUE_MATCH = "INACTIVE"` como la PRUEBA 04,
+y `PRECEDING_KEY_WORDS = {"StoryUtilityOverrideData"}` como la PRUEBA 03. Los dos tokens
+aparecen **una sola vez** en el ENTITY (verificado), igual que `RepeatInteraction` y
+`"TriggerAction"`.
+
+Build: **1 ADD (líneas 5–61, las 57 del emote) + 2 CHANGE + 1 file ADDed, 0 errores,
+0 warnings, 0 notices.** El delta de `CreatedMODS` son 15 líneas y ni una de más:
+
+```xml
+<Property name="TriggerAction" value="INTERACT" /> !# CHANGED
+<Property name="StoryUtilityOverrideData" value="GcStoryUtilityOverride">
+  <Property name="Name" value="SHIP_GALACTICMAP" /> !# CHANGED
+```
+
+**Desplegado como MBIN desde `ModBackups\`** y verificado descompilando de vuelta desde
+`GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA09\`: `TriggerAction = INTERACT`,
+`Name = SHIP_GALACTICMAP`, y `InteractionType = FreighterGalacticMap` /
+`SecondaryInteractionType = None` / `InteractDistance = 5.0` **intactos**. `EMOTEMENU`:
+33 emotes (32 + 1), el nuestro con su `.SCENE`, escala y `.DDS`.
+
+### Conflictos
+
+- **`PSI_Terminus` había vuelto solo.** Vortex lo redesplegó desde staging, y manda
+  `METADATA\UI\EMOTEMENU.EXML` — 91 113 bytes, el archivo entero. Dos mods sobre
+  `EMOTEMENU` dejan el resultado ilegible. Se retiró **solo ese EXML** a
+  `build\_desplegados_inertes_2026-08-08\PSI_Terminus_vortex\`, dejando en pie el resto de
+  la carpeta de Vortex. Para devolverlo: purgar y redesplegar desde Vortex, no arrastrar el
+  archivo a mano.
+- La PRUEBA 08 se retiró entera al mismo sitio: escribía el mismo `EMOTEMENU.MBIN`.
+- Comprobado tras desplegar: en `GAMEDATA\MODS` hay **un solo** `EMOTEMENU` y **ningún**
+  otro mod toca `GALAXYMAPTERMINAL.ENTITY`.
+
+Save respaldado antes de la prueba: `NMS_saves_2026-08-08_2218_antes-prueba09-mapa`.
+
+### Tabla de salidas
+
+| Lo que se observa al usar el emote | Qué significa |
+|---|---|
+| Sale una **tercera** opción y **abre el mapa galáctico** | **Ruta F buena. El mod 3 existe.** El nodo solo estaba apagado |
+| Sale la tercera opción pero al pulsarla no pasa nada | El tipo se sirve a pie; lo que está capado es la UI del mapa. Diagnóstico bueno, mod muerto |
+| Siguen saliendo **solo las dos de siempre** | `FreighterGalacticMap` está capada por contexto de verdad. Ahí sí se cierra, y esta vez con el control dentro del mismo prop |
+
+### Checklist de la prueba in-game
+
+Save de pruebas, **a pie, en un planeta y sin carguero cerca**.
+
+| # | Qué hacer | Qué anotar |
+|---|---|---|
+| 1 | Cargar el save de pruebas | Que **no** sea la partida buena |
+| 2 | Menú rápido → emotes | ¿Sale `MOD3 Mapa Galactico`? Va el primero, con el icono 1 |
+| 3 | Usarlo y mirar la consola en la mano | **¿Cuántas opciones salen: dos o tres?** |
+| 4 | Si sale una tercera | El texto exacto del cartel. Debería leerse como "mapa galáctico" |
+| 5 | Pulsarla | ¿Galaxia o pantalla rota? ¿La cámara queda bien? |
+| 6 | Dentro del mapa | ¿Deja **marcar destino**? |
+| 7 | Dentro del mapa | **Si ofrece SALTAR, no pulsarlo.** Anotarlo y salir |
+| 8 | Salir | ¿Vuelve el control del personaje? |
+| 9 | Si el juego se cuelga | Cerrar, decirlo, y **no** volver a entrar hasta retirar el mod |
+
+Para revertir: borrar `GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA09\` y redesplegar
+`PSI_Terminus` desde Vortex. No toca el save.
+
+> **Ojo con el terminal del puente de verdad.** La PRUEBA 09 edita el ENTITY vanilla, no una
+> copia, así que el terminal del mapa del carguero también queda con `TriggerAction = INTERACT`
+> mientras esto esté puesto. Si el nodo se encendía por guion, ahora está siempre encendido.
+> Para el mod publicable habría que **clonar** el ENTITY con la sintaxis #3 de
+> `MBIN_FILE_SOURCE` y dejar el vanilla en paz.
+
+### Lo que se observó in-game con la PRUEBA 09: **siguen saliendo dos opciones**
+
+- El emote sale, **el primero de la rueda y con el icono 1**. `ADD_FILES` + `EMOTEMENU` quedan
+  confirmados por segunda vez.
+- Al usarlo siguen apareciendo **dos** carteles, no tres. Encender el `TriggerAction` del nodo
+  del mapa y darle etiqueta **no lo hace aparecer**.
+
+Es la fila 3 de la tabla de salidas, pero **no cierra nada todavía**, y conviene decir por qué
+en vez de dar la ruta por muerta como se hizo con la 01 y la 04. Sigue habiendo dos lecturas:
+
+- **A.** `FreighterGalacticMap` está capada por contexto y el juego la descarta antes de
+  dibujar el cartel.
+- **B.** El nodo `GalaxyMapTerminal` no llega a evaluarse por algo del prop —posición del
+  locator dentro del modelo, oclusión, orden de los `ATTACHMENT`— y el tipo de interacción no
+  tiene nada que ver.
+
+`TriggerAction` e `InteractDistance` ya no separan A de B: los tres nodos los tienen idénticos
+y aun así uno no sale.
+
+> **Cabo suelto en el reporte, ya resuelto.** Los dos carteles se anotaron como «sensor
+> planetario» y «busca», que no cuadraba con «personalizar el carguero» y «la de la flota» de
+> la PRUEBA 08. Se resolvió al descompilar los `LANGUAGE` (ver la PRUEBA 10): ninguno de esos
+> textos pertenece al prop, y el que se estaba leyendo es `UI_SCAN_ROOM_LABEL`, de una sala de
+> sondeo cercana.
+
+### Los textos reales de las tres etiquetas
+
+Sacados descompilando los `LANGUAGE\NMS_LOC*_SPANISH.MBIN` con MBINCompiler. **El grep en
+crudo sobre el `.MBIN` no vale**: el archivo guarda la clave y un puntero al texto, no el texto
+al lado. Hay que descompilar a `.MXML`, donde cada entrada es un bloque con `Id` y un campo por
+idioma.
+
+| Clave | Dónde vive | Texto español |
+|---|---|---|
+| `SHIP_GALACTICMAP` | `GALAXYMAPTERMINAL` | **Mapa galáctico** |
+| `NPC_NAVIGATOR_OPT_A` | `FLEETTERMINAL` | **Ver expediciones potenciales** |
+| `UI_FRIG_TOKEN_TERM` | `FREIGHTERRESERACHTERMINAL` | **Terminal de investigación de carguero** |
+
+Guardar esto: es la tabla que hacía falta para leer cualquier prueba futura de este mod sin
+adivinar a qué nodo corresponde cada cartel.
+
+---
+
+## PRUEBA 10 — las tres terminales son mapa galáctico, 2026-08-08
+
+Script: [`../work/scripts/mapa/MOD3_MapaGalactico_PRUEBA10.lua`](../work/scripts/mapa/MOD3_MapaGalactico_PRUEBA10.lua)
+
+### Por qué esta y no «voltear el modelo»
+
+La idea de girar el prop para alcanzar el tercer nodo **no tiene dónde escribirse**:
+`GcPlayerEmotePropData` solo lleva `Model`, `Scale`, `Hand`, `IsHologram`,
+`ScanEffectNodeName`, `ScanEffect` y `DelayTime`. No hay rotación ni desplazamiento. Lo único
+parecido sería escala negativa —que espeja el modelo y probablemente rompe las normales— o
+cambiar `Hand` de `Left` a `Right`. Ninguna de las dos es una prueba limpia: mueven la
+geometría *y* el aspecto a la vez.
+
+La otra idea sí lo es, y además **hace innecesaria la primera**. Si el problema pudiera ser la
+posición del nodo, la forma de quitarlo de en medio no es mover el prop: es **poner la
+interacción del mapa en los nodos que ya está demostrado que dibujan cartel**.
+
+```
+MODELS\...\BRIDGETERMINAL\ENTITIES\FLEETTERMINAL.ENTITY.MBIN
+    InteractionType    ManageFleet        -> FreighterGalacticMap
+
+MODELS\...\BRIDGETERMINAL\ENTITIES\FREIGHTERRESERACHTERMINAL.ENTITY.MBIN
+    InteractionType    CustomiseFreighter -> FreighterGalacticMap
+
+MODELS\...\BRIDGETERMINAL\ENTITIES\GALAXYMAPTERMINAL.ENTITY.MBIN
+    TriggerAction                  INACTIVE -> INTERACT      (se mantiene de la 09)
+    StoryUtilityOverrideData.Name  ""       -> SHIP_GALACTICMAP
+
+METADATA\UI\EMOTEMENU.MBIN
+    + MOD3_GALMAP    BRIDGETERMINAL.SCENE.MBIN    Scale 0.10    icono MOD3_MAPA_01.DDS
+```
+
+**Las etiquetas de los dos nodos buenos no se tocan a propósito.** `NPC_NAVIGATOR_OPT_A` y
+`UI_FRIG_TOKEN_TERM` se quedan como están para poder reconocer in-game qué cartel es cuál — y
+de paso resuelven el cabo suelto de la 09.
+
+### La prueba sí separa A de B
+
+Es lo que la 09 no hacía:
+
+| Lo que se observa al usar el emote | Qué significa |
+|---|---|
+| Los dos carteles de siempre siguen saliendo y **abren el mapa galáctico** | **Ruta F viva. El mod 3 existe.** El tipo se sirve a pie; lo que fallaba era el nodo `GalaxyMapTerminal`, no la interacción. El mod se construye sobre el nodo de flota, no sobre el del mapa |
+| Los dos carteles siguen saliendo pero **no pasa nada** al pulsarlos | El juego acepta y dibuja `FreighterGalacticMap` a pie; lo que está capado es la UI del mapa. Diagnóstico bueno, mod muerto por datos |
+| **Los dos carteles desaparecen** | `FreighterGalacticMap` se descarta antes de dibujar el cartel. Lectura **A** confirmada, y explica de paso la 09, la 04 y la 01 de una vez. Mod muerto, sin cabos |
+| Sale un tercer cartel | El nodo del mapa sí se evalúa; lo que pasa es que solo se dibuja cuando el tipo se acepta. Dato nuevo |
+
+Las tres primeras filas son excluyentes y ninguna se puede confundir con «no pasa nada», que es
+el fallo de método que costó las PRUEBAS 02, 05 y 09.
+
+### Build y despliegue
+
+Anclajes: `VALUE_MATCH = "ManageFleet"` y `VALUE_MATCH = "CustomiseFreighter"`, el mismo idioma
+que la PRUEBA 01 usó con `MessageModule` — esquiva el envoltorio `GcInteractionType` y la
+pareja `SecondaryInteractionType`.
+
+Build: **1 ADD (líneas 5–61, las 57 del emote) + 2 CHANGE (mapa) + 1 CHANGE (flota) +
+1 CHANGE (investigación) + 1 file ADDed. 0 errores, 0 warnings, 0 notices.** El delta de
+`CreatedMODS` deja el envoltorio sin marca en los dos ENTITY nuevos:
+
+```xml
+<Property name="InteractionType" value="GcInteractionType">
+  <Property name="InteractionType" value="FreighterGalacticMap" /> !# CHANGED
+</Property>
+```
+
+> **Incidencia de tooling, otra vez el requisito 2.** La primera build murió con
+> `LoadAndExecuteModScript.lua:14200: attempt to compare nil with number` — el síntoma que el
+> docstring de `Build-Tiers.ps1` atribuye a `NoDefaultCurrentDirectoryInExePath`. La variable
+> se había quitado en una llamada anterior de PowerShell, pero **el estado del shell no
+> persiste entre llamadas**: hay que quitarla y llamar a `BUILDMOD.bat` en la misma. No se
+> construyó con `Build-Tiers.ps1` porque construiría los diez `.lua` de la carpeta.
+
+**Desplegado como MBIN desde `ModBackups\`** y verificado descompilando de vuelta desde
+`GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA10\`:
+
+| ENTITY | `InteractionType` | `TriggerAction` | etiqueta |
+|---|---|---|---|
+| `GALAXYMAPTERMINAL` | `FreighterGalacticMap` | `INTERACT` | `SHIP_GALACTICMAP` |
+| `FLEETTERMINAL` | `FreighterGalacticMap` | `INTERACT` | `NPC_NAVIGATOR_OPT_A` |
+| `FREIGHTERRESERACHTERMINAL` | `FreighterGalacticMap` | `INTERACT` | `UI_FRIG_TOKEN_TERM` |
+
+`SecondaryInteractionType = None` e `InteractDistance = 5.0` intactos en los tres.
+`EMOTEMENU`: 33 emotes (32 + 1), el nuestro con su `.SCENE`, escala e icono.
+
+### Conflictos
+
+- **La PRUEBA 09 se retiró entera** a `build\_desplegados_inertes_2026-08-08\`: escribía el
+  mismo `EMOTEMENU.MBIN` y el mismo `GALAXYMAPTERMINAL.ENTITY`.
+- `PSI_Terminus` sigue sin su `EMOTEMENU.EXML`, en el mismo sitio. Comprobado tras desplegar:
+  en `GAMEDATA\MODS` hay **un solo** `EMOTEMENU` y **ningún** otro mod toca los tres ENTITY.
+
+Save respaldado antes de la prueba: `NMS_saves_2026-08-08_2309_antes-prueba10-mapa`.
+
+### Checklist de la prueba in-game
+
+Save de pruebas, **a pie, en un planeta y sin carguero cerca**.
+
+| # | Qué hacer | Qué anotar |
+|---|---|---|
+| 1 | Cargar el save de pruebas | Que **no** sea la partida buena |
+| 2 | Menú rápido → emotes | ¿Sale `MOD3 Mapa Galactico`? Va el primero, con el icono 1 |
+| 3 | Usarlo y contar los carteles | **¿Cuántos salen: cero, dos o tres?** Cero es un resultado, no un fallo |
+| 4 | Copiar el texto **exacto** de cada cartel | Resuelve el cabo suelto de la 09 |
+| 5 | Pulsar el primero | ¿Se abre el mapa galáctico? ¿Sigue abriendo la flota / el carguero? ¿No pasa nada? |
+| 6 | Pulsar el segundo | Lo mismo. Si uno abre el mapa y el otro no, es dato de nodo |
+| 7 | Si se abre el mapa | ¿Galaxia o pantalla rota? ¿La cámara queda bien? ¿Deja **marcar destino**? |
+| 8 | Dentro del mapa | **Si ofrece SALTAR, no pulsarlo.** Anotarlo y salir |
+| 9 | Salir | ¿Vuelve el control del personaje? |
+| 10 | Si el juego se cuelga | Cerrar, decirlo, y **no** volver a entrar hasta retirar el mod |
+
+Para revertir: borrar `GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA10\` y redesplegar `PSI_Terminus`
+desde Vortex. No toca el save.
+
+> **Esta prueba rompe más que las anteriores.** Edita los ENTITY vanilla de los tres
+> terminales, así que mientras esté puesta **el puente del carguero de verdad pierde la gestión
+> de flota y la personalización del carguero**: los tres botones intentan abrir el mapa. Es save
+> de pruebas y nada más. Para el mod publicable hay que clonar los ENTITY con la sintaxis #3 de
+> `MBIN_FILE_SOURCE`.
+
+### Resultado de la PRUEBA 10: **el prop se queda sin carteles**
+
+Probado con NMS reiniciado, así que es la 10 y no la 09.
+
+- Al usar el emote sale **un solo cartel**, contra los dos de la 09.
+- Al pulsarlo **no abre el mapa**: abre otra cosa.
+- El texto que se leyó es «activar sonda planetaria».
+
+Ese texto es la clave `UI_SCAN_ROOM_LABEL` (`NMS_LOC7`), y **no aparece en ninguno de los tres
+ENTITY del puente** — se comprobó grepeando los tres `.MXML` descompilados desde
+`GAMEDATA\MODS`. Es una **sala de sondeo** del entorno, no el prop de la mano.
+
+O sea que el prop no dibujó **ningún** cartel. Es la tercera fila de la tabla de salidas, la
+que dice «los dos carteles desaparecen».
+
+### La escena no esconde un cuarto nodo
+
+Se descompiló `BRIDGETERMINAL.SCENE` entera y se listaron sus referencias a `.ENTITY.MBIN`:
+
+| Entidad enganchada | ¿Interacción? |
+|---|---|
+| `FLEETTERMINAL` | sí |
+| `FREIGHTERRESERACHTERMINAL` | sí |
+| `GALAXYMAPTERMINAL` | sí |
+| `GALAXY`, `MIDDLEEFFECT`, `SPINNYTHINGY` ×2, `STATICPHYSICS`, `TKROTATEVERYSLOW` ×3 | no |
+
+`MPMISSIONTERMINAL` (que sí lleva `MPMissionGiver`) e `INTERACT` **no están enganchadas** a la
+escena, como ya se había anotado. Y cada uno de los tres ENTITY tiene **una sola**
+`GcInteractionComponentData` — se verificó listando todas las apariciones, no solo la primera.
+No hay un cuarto sitio de donde pudiera salir un cartel.
+
+### Ruta F cerrada, y esta vez con el control dentro
+
+Es el resultado que la PRUEBA 09 no podía dar. El experimento controlado es limpio:
+
+| Nodo | Interacción en la 09 | ¿Cartel? | Interacción en la 10 | ¿Cartel? |
+|---|---|---|---|---|
+| `FLEETTERMINAL` | `ManageFleet` | **sí** | `FreighterGalacticMap` | **no** |
+| `FREIGHTERRESERACHTERMINAL` | `CustomiseFreighter` | **sí** | `FreighterGalacticMap` | **no** |
+| `GALAXYMAPTERMINAL` | `FreighterGalacticMap` | no | `FreighterGalacticMap` | no |
+
+Mismo prop, misma escena, mismo locator, mismo `TriggerAction = INTERACT`, misma
+`InteractDistance = 5.0`. **Lo único que cambió es el valor de `InteractionType`, y el cartel
+desapareció.** No es la posición del nodo, no es el `TriggerAction`, no es la escala, no es la
+etiqueta: es el tipo de interacción.
+
+**`FreighterGalacticMap` se descarta antes de dibujar el cartel cuando no hay contexto de
+carguero.** Y explica de una vez las tres pruebas que habían quedado ambiguas:
+
+- **PRUEBA 01 y 04** (`MessageModule` → `FreighterGalacticMap`, sin botón): mismo mecanismo,
+  no era que el EXML rompiera el nodo ni que la pieza fuera la equivocada.
+- **PRUEBA 09** (encender el `TriggerAction` del nodo del mapa): no podía funcionar. El nodo
+  nace apagado *y además* su tipo está capado; encender uno solo no bastaba.
+
+### Inventario final: no queda nada en datos
+
+Con esto se agotan las tres vías del inventario que se cerró tras la PRUEBA 03:
+
+| Vía | Estado |
+|---|---|
+| `GcInteractionType = FreighterGalacticMap` | **Muerta a pie — PRUEBA 10** |
+| `GcRewardForceOpenGalaxyMap` | Muerta a pie — PRUEBA 03 |
+| `GcRewardOpenPage` con página de mapa | No existe esa página |
+
+Y las rutas A y E ya estaban cerradas porque la condición vive en el ejecutable — lo confirmó
+de paso la cadena `QUICK_MENU_NO_GALMAP` encontrada al preparar la 09.
+
+**El mod 3 no sale por datos.** Abrir el mapa galáctico a pie pide parchear el binario, que
+está fuera del alcance de este proyecto. Diez pruebas, y el cierre es con dato y con control,
+no con suposición.
+
+### Qué se queda como resultado aprovechable
+
+Aunque el mod no salga, tres cosas de aquí sirven para otros mods:
+
+- **Un mod puede meter emotes nuevos en `EMOTEMENU`** con `ADD_OPTION = "ADDbeforeSECTION"` y
+  `SPECIAL_KEY_WORDS {"EmoteID","EMOTE_WAVE"}`, y salen los primeros de la rueda.
+- **Un mod puede meter texturas propias de UI** por `ADD_FILES`: BC7 256×256 con 2 mips y alfa
+  preservado, generadas con `tools/Make-NMSTexture.py`.
+- **El prop de un emote sirve interacciones a pie** — las de flota y carguero salieron. Lo que
+  está capado es *esa* interacción, no el mecanismo. Cualquier `GcInteractionType` que no exija
+  contexto de carguero debería funcionar desde un emote.
+
+Ese último punto es la puerta que queda abierta, y no para el mapa galáctico.
+
+### Limpieza pendiente
+
+- Retirar `GAMEDATA\MODS\MOD3_MapaGalactico_PRUEBA10\` — mientras esté puesta, el puente del
+  carguero de verdad no gestiona flota ni personaliza el carguero.
+- Redesplegar `PSI_Terminus` desde Vortex (purgar y desplegar, no arrastrar el `EMOTEMENU.EXML`
+  de vuelta a mano).

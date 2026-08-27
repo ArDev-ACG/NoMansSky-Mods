@@ -7,29 +7,49 @@ y **sobre qué criatura actúa**.
 > de los `.lua`, esta tabla se actualiza en la misma sesión. Si la tabla y los `.lua` no
 > coinciden, manda el `.lua`.
 
-- Versión cubierta: **mod 2 Infestation 0.3.2** (incluye lo del mod 1 Predators 1.1.0).
 - Referencias: [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) · [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) · [`ASSETS.md`](ASSETS.md) · [`../work/scripts/infestacion/README.md`](../work/scripts/infestacion/README.md)
-- Última revisión: **2026-08-07**, descompilando los **MBIN** desplegados en `GAMEDATA\MODS`.
-- Los tres mods de prueba de aspecto (`NecroSkin`, `DerelictBugs`, `PredatorParts`) no
-  están en esta tabla: son experimentos 0.1.0 y viven en [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md).
+- Los mods de prueba de aspecto (`NecroSkin`, `DerelictBugs`, `PredatorParts`, `FiendMarkers`,
+  `EggMesh`) no están en esta tabla: son experimentos 0.1.0 y viven en sus `README` de
+  `work/scripts/`.
 
 ---
 
-## Qué está instalado ahora mismo
+## ⚠️ Estado de esta tabla — 2026-08-13
 
-| | |
+**Las filas cubren la 0.3.2 y el mod desplegado es la 0.6.3.** La última revisión campo por
+campo contra los MBIN de `GAMEDATA\MODS` fue el **2026-08-07**. Lo de abajo sigue siendo
+cierto salvo donde diga lo contrario, pero **falta la pasada completa**.
+
+| Instalado hoy | |
 |---|---|
-| Mod en `GAMEDATA\MODS` | `HorribleTerror_Infestation_4-Hardcore` + 3 mods de prueba |
-| Versión | **0.3.2** |
-| Formato | **14 MBIN** desde `ModBackups\`, con el `GLOBALS\` creado a mano (otra vez) |
-| Verificado | descompilando de vuelta desde `GAMEDATA\MODS`, campo por campo |
+| Mod | `HorribleTerror_Infestation_4-Hardcore` **0.6.3** — **11 MBIN** desde `ModBackups\`, con `GLOBALS\` movido a mano |
 | Mod 1 | **no instalado** (correcto: se instala uno o el otro) |
 | NMS | 170671, rama Public · MBINCompiler 6.45.0.1 |
 
-> **Lo que había antes eran 8 EXML con las marcas `!# CHANGED` dentro** — el delta de
-> `CreatedMODS`, que es el informe y no el archivo de juego. 0.3.1 es el primer despliegue
-> de Hardcore verificado como MBIN, así que **todo lo probado in-game antes del 05/08 hay
-> que tratarlo como no medido**. Ver `CHANGELOG-MOD2.md`, 0.3.1 § Fixed.
+### Lo que cambió desde la 0.3.2 y aún no está en las filas de abajo
+
+| Versión | Campo | Qué pasó |
+|---|---|---|
+| 0.3.3 | `BUGFIEND`: `MinFlurryHits` 3 / `MaxFlurryHits` 6, `DelayBetweenPounceAttacks` 1.2, `AnimSpeedModifier` 1.2 | añadidos — las crías pegan como el padre |
+| 0.3.3 | `BUGFIEND.AllowSpawnBrood` | **`false`**: la cría no pare. Es el techo de la oleada |
+| 0.6.1 | Huevos dentro de los edificios abandonados | **retirados**: borraban la planta del techo sin poner nada |
+| 0.6.2 | `FreighterSpawnDist` 30 · `FreighterDespawnDist` 50 · `FiendAggroDecreasePerSpawn` 0.1 | **devueltos a vanilla** |
+| 0.6.1 → 0.6.3 | `FIEND.NearDist` / `FarDist` | 6/10 → 1/3 → **6/10 otra vez**. Neto: **vanilla, el mod ya no toca este campo** |
+
+> ✅ **La 0.6.3 se jugó el 2026-08-13 y las dos filas que quedaban salieron bien:** los
+> Horrores vuelven a atacar de lejos (`F-BANDA`) y las crías también (`F-CRIAS`). La cría
+> nunca tuvo nada roto —el mod jamás le tocó la banda al `BUGFIEND`, siempre 6/10—: parecía
+> pasiva porque el padre no llegaba a entrar en combate. Detalle en
+> [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md), «Pruebas in-game — 2026-08-13».
+>
+> **Sigue faltando la pasada campo por campo** de la 0.3.2 a la 0.6.3 sobre las filas de
+> abajo. Que la conducta se haya medido no es lo mismo que que la tabla esté al día.
+
+> **Regla de despliegue:** el `.lua` que queda en `GAMEDATA\MODS` **no se sobrescribe** al
+> redesplegar y puede decir una versión vieja. Para saber qué corre de verdad hay que
+> descompilar el MBIN. Y todo lo probado in-game antes del 05/08 hay que tratarlo como no
+> medido: hasta la 0.3.1 se desplegaban EXML delta de `CreatedMODS`, que son un informe y no
+> un archivo de juego.
 
 ---
 
@@ -48,14 +68,33 @@ y **sobre qué criatura actúa**.
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 1 | `GroundGroupsPerKm.Sparse` | Grupos de fauna por km² en planetas pelados | **Toda la fauna terrestre** (no solo hostil) | ×1 | ×2 | ×5 | ×20 | ×20 |
-| 2 | `GroundGroupsPerKm.Normal` | Ídem, densidad media | Toda la fauna terrestre | ×1 | ×2 | ×5 | ×20 | ×20 |
-| 3 | `GroundGroupsPerKm.Dense` | Ídem, densidad alta | Toda la fauna terrestre | ×1 | ×2 | ×5 | ×20 | ×20 |
-| 4 | `GroundGroupsPerKm.VeryDense` | Ídem, densidad máxima | Toda la fauna terrestre | ×1 | ×2 | ×5 | ×20 | ×20 |
-| 5 | `Generic → Ground → DANGEROUS → "Weight "` | Peso del arquetipo de planeta hostil. Sube el % de planetas infestados de depredadores | **Depredadores** (`PLAYERPREDATOR`), vía selección de planeta | 1 | 3 | 10 | 1000 | 1000 |
+| 1 | `GroundGroupsPerKm.Sparse` | Grupos de fauna por km² en planetas pelados | **Toda la fauna terrestre** (no solo hostil) | ×1 | ×2 | ×3 | ×20 | ×20 |
+| 2 | `GroundGroupsPerKm.Normal` | Ídem, densidad media | Toda la fauna terrestre | ×1 | ×2 | ×3 | ×20 | ×20 |
+| 3 | `GroundGroupsPerKm.Dense` | Ídem, densidad alta | Toda la fauna terrestre | ×1 | ×2 | ×3 | ×20 | ×20 |
+| 4 | `GroundGroupsPerKm.VeryDense` | Ídem, densidad máxima | Toda la fauna terrestre | ×1 | ×2 | ×3 | ×20 | ×20 |
+| 5 | `Generic → Ground → DANGEROUS → "Weight "` | Peso del arquetipo de planeta hostil. Sube el % de planetas infestados de depredadores | **Depredadores** (`PLAYERPREDATOR`), vía selección de planeta | 1 | — | 4 | 1000 | 1000 |
 
 > `"Weight "` lleva **espacio al final**: typo de Hello Games. La regla va anclada con
 > `SPECIAL_KEY_WORDS` encadenado, nunca `WHERE_IN_SECTION` — eso puso a 1000 los 22 pesos.
+
+> ### ⚖️ 2026-08-18 — por qué Fácil y Normal bajaron
+>
+> **El peso de `DANGEROUS` es la palanca que decide si un planeta entero es hostil, no
+> cuántos bichos hostiles hay en él.** Un planeta que cae en ese arquetipo saca **toda** su
+> fauna terrestre de `GROUNDTABLEPLAYERPREDATORMED` y `...LARGE`: allí no hay especies
+> pacíficas que valga. Vanilla reparte 1 de una suma de 11 = **9,1 %** de los planetas.
+>
+> | Tier | Peso antes | % antes | Peso ahora | % ahora |
+> |---|---:|---:|---:|---:|
+> | Fácil | 3 | 23,1 % | **— (vanilla)** | **9,1 %** |
+> | Normal | 10 | 50,0 % | **4** | **26,7 %** |
+> | Difícil / Hardcore | 1000 | 99,0 % | 1000 | 99,0 % |
+>
+> Con Fácil en 23 % un jugador tenía **casi 1 de 4** de que el planeta donde tenía la partida
+> guardada se re-rodara a hostil de golpe, y esa es exactamente la queja que llegó por Nexus.
+> `PercentagePlayerPredators` es el segundo filtro —de esos depredadores, cuántos van a por ti
+> en vez de cazar fauna— y en Fácil también vuelve a vanilla. **Difícil y Hardcore no se
+> tocan: quien los elige quiere justo eso.**
 
 ---
 
@@ -63,8 +102,8 @@ y **sobre qué criatura actúa**.
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 6 | `MinGroupSize` | Tamaño mínimo de manada | **Depredadores medianos y grandes que cazan al jugador** | 1 | 1 | 2 | 3 | 5 |
-| 7 | `MaxGroupSize` | Tamaño máximo de manada | Ídem | 1 | 2 | 3 | 5 | 7 |
+| 6 | `MinGroupSize` | Tamaño mínimo de manada | **Depredadores medianos y grandes que cazan al jugador** | 1 | 1 | 1 | 3 | 5 |
+| 7 | `MaxGroupSize` | Tamaño máximo de manada | Ídem | 1 | 2 | 2 | 5 | 7 |
 
 Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 
@@ -81,8 +120,8 @@ Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
 | 8 | `PredatorPerceptionDistance` | A cuántos metros te detecta | **Depredadores** | 40 | 45 | 50 | 60 | 80 |
-| 9 | `PredatorRunAwayHealthPercent` | % de vida al que huye. 0 = pelea hasta morir | Depredadores | 40 | 30 | 15 | **0** | **0** |
-| 10 | `PercentagePlayerPredators` | Fracción de depredadores que atacan al jugador en vez de cazar fauna | Depredadores | 0.5 | 0.6 | 0.75 | **1.0** | **1.0** |
+| 9 | `PredatorRunAwayHealthPercent` | % de vida al que huye. 0 = pelea hasta morir | Depredadores | 40 | — | 25 | **0** | **0** |
+| 10 | `PercentagePlayerPredators` | Fracción de depredadores que atacan al jugador en vez de cazar fauna | Depredadores | 0.5 | — | 0.6 | **1.0** | **1.0** |
 | 11 | `MaxEcosystemCreaturesNormal` | Tope duro de criaturas vivas a la vez. Entero | **Todas las criaturas** | 40 | 45 | 50 | 60 | 70 |
 | 12 | `PlayerPredatorBoredomDistance` | A qué distancia se aburren y te sueltan | Depredadores | 80 | — | — | — | **150** |
 
@@ -212,10 +251,11 @@ archivo, así que `ONCE` refuerza el ancla.
 
 ---
 
-## 4 · `METADATA\SIMULATION\ECOSYSTEM\CREATUREDATATABLE.MBIN` — hasta 7 cambios
+## 4 · `METADATA\SIMULATION\ECOSYSTEM\CREATUREDATATABLE.MBIN` — hasta 11 cambios
 
-**Archivo nuevo en 0.2.0.** Todas las reglas van ancladas a `{"Id", "FIEND"}` con
-`REPLACE_TYPE = "ONCE"`. **Solo tocan al `FIEND`**, a ninguno de los otros nueve dueños.
+**Archivo nuevo en 0.2.0.** Cada regla va anclada a `{"Id", "<dueño>"}` con
+`REPLACE_TYPE = "ONCE"`. Toca **dos** dueños de los diez: `FIEND` y —desde 0.3.3—
+`BUGFIEND`. A los otros ocho, ninguno.
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
@@ -223,9 +263,31 @@ archivo, así que `ONCE` refuerza el ancla.
 | 24 | `MaxFlurryHits` | Golpes máximos por racha. Entero | Solo `FIEND` | 4 | — | — | 5 | 6 |
 | 25 | `DelayBetweenPounceAttacks` | Segundos entre saltos sobre ti | Solo `FIEND` | 2.0 | — | 1.8 | 1.5 | 1.2 |
 | 26 | `AnimSpeedModifier` | Velocidad de la animación de ataque. **No toca el daño** | Solo `FIEND` | 1.0 | — | — | 1.1 | 1.2 |
-| 27 | `AllowSpawnBrood` | Activa que el bicho **pare crías mientras luchas** | Solo `FIEND` | `false` | — | — | — | **`true`** `[SIN PROBAR]` |
-| 28 | `SpawnBroodID` | Qué grupo pare. Copiado de `BUGQUEEN` vanilla | Solo `FIEND` → pare **`BUGFIENDS`** | *(vacío)* | — | — | — | `BUGFIENDS` `[SIN PROBAR]` |
-| 29 | `SpawnBroodTimer` | Segundos entre partos. `BUGQUEEN` usa 30; bajado para que se vea | Solo `FIEND` | 0.0 | — | — | — | 10 `[SIN PROBAR]` |
+| 27 | `AllowSpawnBrood` | Activa que el bicho **pare crías mientras luchas** | Solo `FIEND` | `false` | — | — | — | **`true`** ✅ |
+| 28 | `SpawnBroodID` | Qué grupo pare. Copiado de `BUGQUEEN` vanilla | Solo `FIEND` → pare **`BUGFIENDS`** | *(vacío)* | — | — | — | `BUGFIENDS` ✅ |
+| 29 | `SpawnBroodTimer` | Segundos entre partos. `BUGQUEEN` usa 30; bajado para que se vea | Solo `FIEND` | 0.0 | — | — | — | 10 ✅ |
+
+### 4b · Las crías igualadas al padre — 0.3.3
+
+Las crías del brood (#27-29) **no son `FIEND`**: entran por la entrada `BUGFIEND` del
+mismo archivo. Hasta 0.3.2 salían con estadísticas de vanilla mientras sus padres iban
+subidos — pegaban bastante más flojo que quien las llamó.
+
+Se copian los mismos cuatro campos de ataque, con el valor del tier. **No se copia el
+brood**: si la cría pariese también, el crecimiento sería exponencial y sin techo conocido
+(`MaxFiendsToSpawn` limita la eclosión del huevo, no el brood).
+
+| # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| 66 | `MinFlurryHits` | Igual que #23, en la cría | **Solo `BUGFIEND`** | 2 | — | — | — | 3 `[SIN PROBAR]` |
+| 67 | `MaxFlurryHits` | Igual que #24 | Solo `BUGFIEND` | 4 | — | — | — | 6 `[SIN PROBAR]` |
+| 68 | `DelayBetweenPounceAttacks` | Igual que #25 | Solo `BUGFIEND` | 2.0 | — | — | — | 1.2 `[SIN PROBAR]` |
+| 69 | `AnimSpeedModifier` | Igual que #26 | Solo `BUGFIEND` | 1.0 | — | — | — | 1.2 `[SIN PROBAR]` |
+| — | `AllowSpawnBrood` | **Deliberadamente NO se toca en `BUGFIEND`** | — | `false` | — | — | — | `false` |
+
+> **Solo Hardcore, a propósito.** El brood es exclusivo de Hardcore, así que en Normal y
+> Difícil no hay crías que igualar: tocar allí su `BUGFIEND` cambiaría bichos salvajes que
+> nadie pidió y obligaría a re-verificar y re-publicar dos tiers congelados desde 0.2.0.
 
 ### ⚠️ Los diez bloques de ataque
 
@@ -312,10 +374,17 @@ Solo Hardcore. Son `ABANDONDEDSCIENTIFIC`, `ABANDONDEDTRADER` y `ABANDONDEDWARRI
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---|---:|---:|---:|---|
-| 59 | `Model` del locator `TENTACLE_` | Qué prop cuelga de ese hueco. Pasa de planta de tentáculos a **huevo de Horror** | **Huevos de Fiend**, dentro de edificios abandonados | `INTERIOR_TENTACLEPLANT` | — | — | — | **`FIENDEGG.SCENE`** `[SIN PROBAR]` |
-| 60 | `Probability` del locator `TENTACLE_` | Con qué frecuencia se llena ese hueco | Ídem | 30 | — | — | — | **100** `[SIN PROBAR]` |
+| 59 | `Model` del locator `TENTACLE_` | Qué prop cuelga de ese hueco. Pasa de planta de tentáculos a **huevo de Horror** | **Huevos de Fiend**, dentro de edificios abandonados | `INTERIOR_TENTACLEPLANT` | — | — | — | **`FIENDEGG.SCENE`** ❌ **falla** |
+| 60 | `Probability` del locator `TENTACLE_` | Con qué frecuencia se llena ese hueco | Ídem | 30 | — | — | — | **100** ❌ **falla con #59** |
 
 Son 5 locators `TENTACLE_` por edificio → **hasta 5 huevos por edificio, siempre**.
+
+> ❌ **Probado el 2026-08-11 y no funciona — pero el fallo está acotado.** Dentro del
+> edificio **la planta ya no está y el huevo tampoco**. Que la planta desaparezca demuestra
+> que el mod está activo y que el locator se resuelve: el `Model` se escribió. Lo que no
+> instancia es la escena. `FIENDEGG.SCENE` vive en `RARERESOURCE\GROUND\` y es un asset **de
+> superficie planetaria**; colgado del techo de un interior no aparece. Siguiente intento en
+> [`PENDIENTES.md`](PENDIENTES.md).
 
 > **Por qué basta con poner el huevo.** El huevo no invoca criaturas: su entidad solo
 > declara `IncreaseFiendCrime = EggDestroyed`, y cuántos Horrores salen lo decide
@@ -335,15 +404,24 @@ Son 5 locators `TENTACLE_` por edificio → **hasta 5 huevos por edificio, siemp
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 61 | `AgroTorch` | Aggro que suma **apuntarle con la linterna**. Cono de 25°, 10 m | **Nido del carguero** → MiniFiends | 0.0 | — | — | — | **12.0** `[SIN PROBAR]` |
-| 62 | `GunfireAgro` | Aggro que suma **disparar cerca**. Radio 20 m | Ídem | 0.0 | — | — | — | **8.0** `[SIN PROBAR]` |
+| 61 | `AgroTorch` | Aggro que suma **apuntarle con la linterna**. Cono de 25°, 10 m | **Nido del carguero** → MiniFiends | 0.0 | — | — | — | **12.0** ✅ |
+| 62 | `GunfireAgro` | Aggro que suma **disparar cerca**. Radio 20 m | Ídem | 0.0 | — | — | — | **8.0** ✅ |
 
 > Los dos estaban **a cero**: implementados y apagados por Hello Games, igual que
 > `AllowSpawnBrood`. `AgroMovement` (11), `AgroThreshold` (15) y `AgroRate` (−5) se dejan
-> quietos — **la escala de los valores nuevos es inferencia**, no está confirmada.
+> quietos.
+>
+> ✅ **Verificado en partida el 2026-08-09.** La escala ya no es inferencia: valores del
+> orden de `AgroThreshold` (15) despiertan el nido, y también salen MiniFiends y el Horror
+> grande. Los dos interruptores apagados por Hello Games funcionan.
 >
 > ⚠️ **Ruta disputada:** `NoDerelictMiniHorrors` escribe estos dos archivos y les quita el
 > componente entero. Hay que desactivarlo para medir nada.
+>
+> ⚠️ **Y desde el 2026-08-21 también la escribe `HT_CeilingPlague_PRUEBA03`**, que pone
+> `IncreaseFiendWanted` en `true` para que romper el nido llame Horrores. Para no perder estas
+> dos filas cuando gane ella, la `PRUEBA03` **repite `AgroTorch` 12 y `GunfireAgro` 8**: es un
+> superconjunto de la versión del Infestation, verificado por `diff` tras construir.
 
 ---
 

@@ -1,352 +1,202 @@
-# Mod 2 — Infestación (Horrores Biológicos)
+# Mod 2 — Horrible Terror · Infestación · 4 configuraciones
 
-Mod nuevo, versionado aparte, en **0.2.0**. No es una actualización del mod 1: es otro
-mod que reutiliza su calibración.
+**El mod completo: contiene al mod 1 y le añade el mundo infestado.** Es el que se instala y
+se juega.
 
-| | Mod 1 | Mod 2 |
+Versión **0.5.0**. Changelog propio:
+[`../../../docs/CHANGELOG-MOD2.md`](../../../docs/CHANGELOG-MOD2.md)
+
+## La relación entre los dos mods — decidida el 2026-08-09
+
+**El mod 2 contiene al mod 1.** Se instala uno **o** el otro, nunca los dos.
+
+| | Mod 1 · `HorribleTerror_Predators` | Mod 2 · `HorribleTerror_Infestation` |
 |---|---|---|
-| Nombre | `HorribleTerror_Predators` | `HorribleTerror_Infestation` |
-| Versión | 1.1.0 | 0.2.0 |
-| Qué hace | dificultad de depredadores | lo del mod 1 **+** los Fiends |
-| Página de Nexus | la suya | la suya |
+| Versión | 2.0.0 | **0.5.0** |
+| Qué es | la conducta sola, como producto aparte | **la conducta + el mundo + (pronto) los modelos** |
+| Instalado | **no** | **sí** |
+| Rutas | 7 | **12** |
 
-**El mod 2 contiene al mod 1.** Escriben los mismos archivos, así que instalar los
-dos hace que uno pise al otro en silencio. En Nexus hay que decirlo en la primera
-línea de las dos páginas.
+> ⚠️ **Hubo un intento de repartirlos por tipo de cambio (0.4.0, misma tarde) y se
+> descartó.** La idea era que mod 1 llevara la conducta y mod 2 solo la colocación, para
+> poder instalarlos juntos. Se construyó, se desplegó y se revirtió el mismo día: **lo que
+> tiene que diferenciar a los dos mods son los modelos de los monstruos, no el tipo de
+> campo.** Queda anotado para no volver a proponerlo.
 
-Changelog propio: [`../../../docs/CHANGELOG-MOD2.md`](../../../docs/CHANGELOG-MOD2.md)
+**Lo que va a diferenciar al mod 2 es el modelado.** Todo lo de conducta lo comparten por
+definición; lo propio del mod 2 será: monstruos con nuestras mallas, sus texturas, sus
+colores, y dónde aparecen.
 
----
+## Qué contiene
 
-## Las cuatro configuraciones
+| Qué | Viene de | Tiers | Estado |
+|---|---|---|---|
+| Conducta y agresividad de depredadores y Fiends | **mod 1** | los 4, escalado | ⬜ ver `PENDIENTES.md` |
+| Brood: llaman a las crías al rugir | **mod 1** | solo Hardcore | ✅ 2026-08-09 |
+| Densidad de huevos de Horror | propio | los 4, ×2 / ×5 / ×20 / ×20 | ✅ probado |
+| Densidad del gusano de arena | propio | los 4, mismo multiplicador | ✅ probado |
+| Huevos dentro de los edificios abandonados | propio | **solo Hardcore** | ❌ **sin medir** → prueba **P1** |
+| Modelos propios de monstruo | propio | — | ⬜ **es el trabajo que sigue** |
 
-Se instala **una sola**.
+## Qué va a entrar (el trabajo que sigue)
 
-| Parámetro | Vanilla | 1 Fácil | 2 Normal | 3 Difícil | 4 Hardcore |
-|---|---|---|---|---|---|
-| **Heredado del mod 1** ||||||
-| Densidad terrestre | ×1 | ×2 | ×5 | ×20 | ×20 |
-| Peso `DANGEROUS` | 1 | 3 | 10 | 1000 | 1000 |
-| Manada min/max | 1/1 | 1/2 | 2/3 | 3/5 | 5/7 |
-| Percepción depredador (m) | 40 | 45 | 50 | 60 | 80 |
-| Huye al % de vida | 40 | 30 | 15 | 0 | 0 |
-| % depredadores hostiles | 0.5 | 0.6 | 0.75 | 1.0 | 1.0 |
-| Tope criaturas a la vez | 40 | 45 | 50 | 60 | 70 |
-| Distancia de aburrimiento | 80 | 80 | 80 | 80 | 150 |
-| **Fiends: cantidad (0.1.0, retocado en 0.3.1)** ||||||
-| Densidad de huevos | ×1 | ×2 | ×5 | ×20 | ×20 |
-| `FiendMaxAttackers` | 2 | 2 | 3 | 4 | **8** |
-| `FiendMaxEngaged` | 6 | 6 | 8 | 10 | **16** |
-| `MaxFiendsToSpawn` | 6 | 6 | 8 | 10 | **16** |
-| `FiendAggroTime` (s) | 45 | 45 | 60 | 90 | **600** |
-| **Fiends: conducta (0.2.0)** ||||||
-| Marcador de UI del Fiend | sí | sí | sí | **NO** | **NO** |
-| `FiendPerceptionDistance` (m) | 60 | 60 | 65 | 70 | **120** |
-| Eclosión min/max (s) | 0.25/3.0 | 0.25/3.0 | 0.2/2.0 | 0.15/1.0 | 0.1/0.5 |
-| `AvoidCreaturesWeight` | 6 | 6 | 8 | 10 | 10 |
-| Radio activación gusano (m) | 100 | 100 | 50 | 20 | 10 |
-| Golpes por racha | 2/4 | 2/4 | 2/4 | 3/5 | 3/6 |
-| Cadencia del salto (s) | 2.0 | 2.0 | 1.8 | 1.5 | 1.2 |
-| Velocidad de ataque | 1.0 | 1.0 | 1.0 | 1.1 | 1.2 |
-| Se multiplican | no | no | no | no | **SÍ** |
-| **Movimiento: sin acechar (0.3.0)** ||||||
-| `PredatorNoticePauseTime` (s) | 1.5 | 1.5 | 0.8 | 0.3 | **0.0** |
-| `PredatorApproachTime` (s) | 4.0 | 4.0 | 2.0 | 0.5 | **0.0** |
-| `PredatorChargeDist` (m) | 7 | 7 | 12 | 25 | **40** |
-| `PredatorEnergyUseChasing` | -0.1 | -0.1 | -0.05 | **0.0** | **0.0** |
-| **Movimiento: derechos (0.3.0)** ||||||
-| `SteeringUpdateRate` (s) | 0.25 | 0.25 | 0.20 | 0.15 | **0.10** |
-| `MaxTurnRadius` (m) | 5.0 | 5.0 | 4.0 | 3.0 | **2.0** |
-| **Movimiento: horda (0.3.0)** ||||||
-| `FollowLeaderCohereWeight` | 0.1 | 0.1 | 0.4 | 0.8 | **1.2** |
-| `FollowLeaderAlignWeight` | 1.0 | 1.0 | 1.5 | 2.5 | **3.5** |
-| `SpherePusherWeight` S/M | 10 | 10 | 9 | 7 | **5** |
-| `SpherePusherWeight` L | 5 | 5 | 4.5 | 4 | **3** |
-| **Árbol `MELEE` (0.3.0)** ||||||
-| `BehaviourMoveSpeed` | Normal | Normal | Normal | **Fast** | **Fast** |
-| `DynamicMoveSlowdownDistMul` | 4.0 | 4.0 | 3.0 | 2.0 | **1.0** |
-| **Sin marcador y sin soltar presa (0.3.1)** ||||||
-| `ShowOnscreenPredatorMarkers` | sí | sí | sí | sí | **NO** |
-| `FiendAggroDecreasePerSpawn` | 0.1 | 0.1 | 0.1 | 0.1 | **0.0** |
-| `FiendAggroIncrease` Damage/DestroyEgg | 1.0 | 1.0 | 1.0 | 1.0 | **3.0** |
-| `FiendBeingShotMemoryTime` (s) | 10 | 10 | 10 | 10 | **60** |
-| `FiendDespawnDistance` (m) | 150 | 150 | 150 | 150 | **300** |
+Este es el mod donde aterriza todo lo de aspecto y modelado. Hoy siguen como mods de prueba
+aparte porque **ninguno ha pasado en partida**, y meter algo sin probar en el mod publicado
+haría imposible atribuir un crash:
 
-**0.3.1 es solo Hardcore.** Los otros tres tiers no cambian ni un campo: sus deltas
-salen idénticos a los de 0.3.0 (23 / 45 / 50, verificado en la build del 05/08).
-
-**Fácil no cambia en 0.2.0.** No coge ninguno de los ocho cambios de conducta: sus
-valores coincidirían con vanilla y escribirlos ensuciaría el EXML delta sin cambiar
-nada. Verificado tras la build: **sus 6 EXML son byte a byte idénticos a los de
-0.1.0.** Quien tenga Fácil instalado no necesita actualizar.
-
-**El zigzag ya no está en la tabla.** Estuvo en la primera build de 0.2.0 y se retiró
-sin llegar a probarlo — ver la sesión del 2026-08-04 más abajo. Se quita la regla entera
-en vez de escribir 0, porque escribir el propio valor vanilla ensucia el EXML delta sin
-cambiar nada, que es el mismo criterio de Fácil.
-
----
-
-## Conteo de cambios esperado por tier
-
-Si `REPORT` no da estos números, algo no encajó y **no se despliega**.
-
-| Tier | Total | Desglose (gen + med + large + globals + datatable + eggs + infest + árbol + **uiglobals**) |
+| Mod de prueba | Qué | Entra cuando |
 |---|---|---|
-| 1 Fácil | **23** | 5 + 2 + 2 + 4 + — + 4 + 6 + — + — |
-| 2 Normal | **45** | 5 + 2 + 2 + 24 + 1 + 4 + 6 + 1 + — |
-| 3 Difícil | **50** | 5 + 2 + 2 + 25 + 4 + 4 + 6 + 2 + — |
-| 4 Hardcore | **60** | 5 + 2 + 2 + 31 + 7 + 4 + 6 + 2 + **1** |
+| `HT_FiendMarkers_PRUEBA01` | un color por tipo de Horror | pase la prueba **P3** |
+| `HorribleTerror_NecroSkin` | textura `.DDS` propia | deje de salir blanca |
+| `HT_PredatorParts_PRUEBA01` | quitar piezas del `.DESCRIPTOR` | ya pasó (5.1, 5.3) — falta decidir el reparto de piezas |
+| `HorribleTerror_DerelictBugs` | salas de carguero infestadas | ya pasó (3.2) — se puede fusionar |
+| Sonda de `ReferencePaths` | ¿el juego resuelve una ruta a un `.SCENE` ajeno? | **sin escribir**, ver abajo |
 
-Hardcore lleva seis globals más que Difícil: `PlayerPredatorBoredomDistance` (único tier
-que lo toca) y los cinco de tenacidad de 0.3.1. Y tres cambios más de `datatable` por el
-brood. El de `uiglobals` es el marcador de depredador, también solo Hardcore. Normal lleva
-una regla menos del árbol: no escribe `BehaviourMoveSpeed`, que ya es `Normal`.
+### 🔓 2026-08-09 — la forma del XML resuelta, la inyección todavía no
 
-**Construidos y verificados el 2026-08-04** contra NMS 170671 / MBINCompiler 6.45.0.1:
-los cuatro dan **23 / 45 / 50 / 54** con **0 errores**, y los deltas se comprobaron
-propiedad por propiedad.
+**Resuelto:** una lista de strings se serializa **repitiendo el nombre en el hijo**, con
+`_index`. El molde salió de `ValidRoomIDs` en `FREIGHTERDUNGEONSTABLE`:
 
-**Desplegado el 2026-08-04:** `HorribleTerror_Infestation_4-Hardcore`, con los 54 cambios
-confirmados leyendo el EXML de `GAMEDATA\MODS`. Desglose de cada campo en
-[`../../../docs/MODIFICACIONES.md`](../../../docs/MODIFICACIONES.md).
+```xml
+<Property name="ReferencePaths">
+  <Property name="ReferencePaths" value="MODELS\PLANETS\CREATURES\ARTHROPOD\BUGFIEND.SCENE.MBIN" _index="0" />
+</Property>
+```
+
+**Verificado empíricamente, sin tocar el juego:** se metió a mano en el MXML del descriptor,
+MBINCompiler lo compiló (37040 → 37112 bytes) y al descompilar **la ruta volvió intacta**.
+La forma es válida y MBINCompiler la entiende; no la descarta.
+
+**Lo que falta:** la regla de AMUMSS que la inyecta **no aterriza**. Está escrita en el
+Hardcore con `SPECIAL_KEY_WORDS = {"Name", "_Head_TRex"}` (ancla **única** en el archivo),
+`LINE_OFFSET = "1"` y `ADD_OPTION = "REPLACEatLINE"`. El log dice
+`Lines 515 - 517 ADDED` y 41 acciones, pero **el MBIN resultante sale idéntico a vanilla
+(37040 bytes, sin la cadena `BUGFIEND`)**.
+
+La pista está en el número: `_Head_TRex` está en la línea **515** y `ReferencePaths` en la
+**516**. O sea que el `LINE_OFFSET` no se aplicó como se esperaba y el bloque reemplazó la
+línea del propio `Name`, dejando el nodo sin nombre — y de ahí que el resultado se descarte.
+
+**Siguiente intento:** anclar directamente sobre la línea de `ReferencePaths` en vez de
+desplazarse desde `Name`. `ADD` **no cuenta como CHANGE** en el `REPORT` (igual que
+`REMOVE`), así que el conteo de 40 no sirve de verificación: **hay que descompilar el MBIN y
+buscar la cadena.**
+
+⚠️ **Conflicto a tener en cuenta cuando aterrice:** `HT_PredatorParts_PRUEBA01` escribe el
+**mismo** `TREX.DESCRIPTOR.MBIN`, y los dos son MBIN completos: el que cargue después gana en
+silencio. Mientras se pruebe la sonda hay que sacar `HT_PredatorParts_PRUEBA01` de
+`GAMEDATA\MODS`, o no se sabrá cuál de los dos manda.
+
+### ⬜ Contexto: por qué esta sonda importa
+
+Es la prueba que decide si hace falta Blender: si el juego resuelve una ruta puesta en el
+campo `ReferencePaths` de un descriptor, se pueden mover mallas vanilla entre rigs sin
+exportar nada. Ver [`ASSETS.md`](../../../docs/ASSETS.md) §3 y §4.3.
+
+**Lo que falta para escribirla:** en `TREX.DESCRIPTOR` el campo está **vacío en los 172**
+descriptores, y en EXML se serializa como `<Property name="ReferencePaths" />` — una
+propiedad sin valor. `VALUE_CHANGE_TABLE` no puede escribir ahí: hace falta `ADD` con
+`ADD_OPTION = "REPLACEatLINE"` **inyectando XML**, y para eso hay que ver primero cómo
+serializa una lista `ReferencePaths` **no vacía**. No hay ejemplo vanilla en este archivo.
+
+Inventar el XML a ciegas y meterlo en el mod publicado es la forma de conseguir un crash que
+no se puede atribuir. **El paso previo es extraer un descriptor y buscar un ejemplo real.**
+
+## Conteo esperado por build
+
+Si `REPORT` no da estos números, **no se despliega**.
+
+| Config | Total | Desglose (gen + predtables + globals + nidos + uiglobals + árbol + datatable + lsystem ×3 + eggs + infest) |
+|---|---:|---|
+| 1 Fácil | **23** | 5 + 2+2 + 4 + — + — + — + — + — + 4 + 6 |
+| 2 Normal | **45** | 5 + 2+2 + 24 + — + — + 1 + 1 + — + 4 + 6 |
+| 3 Difícil | **50** | 5 + 2+2 + 25 + — + — + 2 + 4 + — + 4 + 6 |
+| 4 Hardcore | **101** | 5 + 2+2 + 34 + 2+2 + 1 + 2 + 11 + 10+10+10 + 4 + 6 |
+
+**Verificado el 2026-08-09** contra NMS 170671 / MBINCompiler 6.45.0.1: los cuatro dan
+23 / 45 / 50 / 101 con **0 errores**.
+
+**Estos totales son idénticos a los de 0.3.3**, y eso es la verificación: 0.5.0 no cambia ni
+un valor respecto a 0.3.3, solo reordena de dónde sale cada bloque. Si un tier no da su
+número, la composición perdió o duplicó algo.
+
+**Cómo se compone.** Los bloques de conducta son **los mismos** que los del mod 1: mod 2 se
+arma como *bloques del mod 1 + bloques de mundo*. Cuando se cambie un valor de conducta hay
+que tocarlo en el tier del mod 1 y volver a componer aquí, o los dos mods se separan sin que
+nadie se dé cuenta. **El conteo es lo que lo delata:** mod 2 tiene que dar siempre
+mod 1 + 10 (y + 40 en Hardcore, que además lleva los edificios).
+
+| Tier | Mod 1 | Mundo | Mod 2 |
+|---|---:|---:|---:|
+| Fácil | 13 | 10 | **23** |
+| Normal | 35 | 10 | **45** |
+| Difícil | 40 | 10 | **50** |
+| Hardcore | 61 | 40 | **101** |
 
 ### Histórico
 
 | Versión | Fácil | Normal | Difícil | Hardcore |
 |---|---:|---:|---:|---:|
 | 0.1.0 | 23 | 27 | 27 | 28 |
-| 0.2.0 (1ª build, con zigzag) | 23 | 33 | 39 | 43 |
-| 0.2.0 (final) | 23 | 33 | 37 | 41 |
+| 0.2.0 | 23 | 33 | 37 | 41 |
 | 0.3.0 | 23 | 45 | 50 | 54 |
-| **0.3.1** | **23** | **45** | **50** | **60** |
+| 0.3.1 | 23 | 45 | 50 | 60 |
+| 0.3.2 | 23 | 45 | 50 | 97 |
+| 0.3.3 | 23 | 45 | 50 | 101 |
+| ~~0.4.0~~ (reparto, revertido el mismo día) | ~~10~~ | ~~10~~ | ~~10~~ | ~~40~~ |
+| **0.5.0** | **23** | **45** | **50** | **101** |
 
----
+0.5.0 vuelve a los números de 0.3.3 porque vuelve a contener al mod 1. **0.4.0 no se
+considera una versión jugada:** se construyó, se desplegó y se retiró sin partida.
 
-## Rutas que toca — 9
+## Rutas que toca — 12
 
 ```
 METADATA\SIMULATION\ECOSYSTEM\CREATUREGENERATIONDATA.MBIN
-METADATA\SIMULATION\ECOSYSTEM\GROUND\GROUNDTABLEPLAYERPREDATORMED.MBIN
-METADATA\SIMULATION\ECOSYSTEM\GROUND\GROUNDTABLEPLAYERPREDATORLARGE.MBIN
-METADATA\SIMULATION\ECOSYSTEM\CREATUREDATATABLE.MBIN          <-- nuevo en 0.2.0
-METADATA\SIMULATION\ECOSYSTEM\CREATUREBEHAVIOURTREES.MBIN     <-- nuevo en 0.3.0
+METADATA\SIMULATION\ECOSYSTEM\GROUND\GROUNDTABLEPLAYERPREDATOR{MED,LARGE}.MBIN
+METADATA\SIMULATION\ECOSYSTEM\CREATUREDATATABLE.MBIN
+METADATA\SIMULATION\ECOSYSTEM\CREATUREBEHAVIOURTREES.MBIN
 GLOBALS\GCCREATUREGLOBALS.MBIN
-GLOBALS\GCUIGLOBALS.GLOBAL.MBIN                               <-- nuevo en 0.3.1
+GLOBALS\GCUIGLOBALS.GLOBAL.MBIN
+MODELS\...\INFESTATION\{LARGEPILLARSLIME,MEDIUMHANGSLIME}\ENTITIES\*.ENTITY.MBIN
 METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\FIENDEGGS.MBIN
 METADATA\SIMULATION\SOLARSYSTEM\BIOMES\OBJECTS\RARE\INFESTATION.MBIN
+MODELS\PLANETS\BIOMES\COMMON\BUILDINGS\ABANDONED\ABANDONDED{SCIENTIFIC,TRADER,WARRIOR}.LSYSTEM.MBIN
 ```
 
-Fácil solo toca 6: no necesita `CREATUREDATATABLE`, `CREATUREBEHAVIOURTREES` ni
-`GCUIGLOBALS`. La novena ruta es **solo de Hardcore**.
+Las siete primeras son las del mod 1 — **por eso no se instalan los dos**. Las tres
+`LSYSTEM` solo las toca Hardcore. Fácil toca 5.
 
-Escaneo del **2026-08-03**: las 8 primeras rutas están **libres** de mods de terceros
-(`CREATUREBEHAVIOURTREES` entró en esa misma pasada). La única disputada es
-`GCCREATUREGLOBALS`, y solo contra nuestro propio mod 1.
+⚠️ **`GCCREATUREGLOBALS.MBIN` y `GCUIGLOBALS.GLOBAL.MBIN` salen de `ModBackups` en la raíz de
+la carpeta, no en `GLOBALS\`.** Copiados tal cual, el juego no los lee y se pierden en
+silencio la mitad de los cambios. **Al desplegar hay que moverlos a `GLOBALS\`.**
 
-### ⚠️ `GCUIGLOBALS` sí está disputada — escaneo del 2026-08-05
+De los 87 mods de terceros, la única ruta disputada es `GCUIGLOBALS`, contra
+`Small Cursor 6.6`.
 
-De los 87 mods instalados hay **uno** que la toca: `Small Cursor 6.6`, y con un EXML de
-cuatro líneas:
+## Las trampas que hay que respetar al editar
 
-```xml
-<Data template="GcUIGlobals">
-  <Property name="FrontendCursorSize" value="14" />
-  <Property name="FrontendCursorWidth" value="7" />
-</Data>
-```
+**1 · Los dos bloques de densidad.** Cada objeto de `FIENDEGGS` / `INFESTATION` lleva
+`QualityVariants` (los valores reales) y `QualityVariantData` (`Coverage 0.2` /
+`FlatDensity 0.5`, **idéntico en los cinco objetos** — struct por defecto). Multiplicar
+`FlatDensity` a secas tocaría los dos: de ahí el `VALUE_MATCH` con el valor vanilla exacto.
 
-No hay solape de campos con `ShowOnscreenPredatorMarkers`, pero **sí de archivo**, y es la
-primera vez que enviamos un MBIN completo sobre un archivo que otro mod parchea por EXML.
-Según `README-How MBIN and EXML coexist.txt` de AMUMSS los dos conviven: nuestro MBIN
-reemplaza el archivo y su EXML parchea líneas encima, así que el cursor pequeño debería
-seguir funcionando. **Es lo que hay que mirar de refilón al probar** — si el cursor del
-menú vuelve al tamaño normal, la regla de convivencia no es como la leímos y habría que
-enviar el nuestro también como EXML.
+`Coverage` **no se toca**: los valores reales son 0.1, 1.0 y 2.0 y no se conoce el rango
+válido — ×20 sobre 2.0 podría salirse.
 
----
+**2 · La trampa de orden.** Las reglas de un mismo archivo se aplican **en secuencia**, así
+que un valor ya escrito puede encajar en el `VALUE_MATCH` de una regla posterior. En Normal
+(×5) pasó: la regla de huevos subía `0.005 → 0.025` y la del gusano (`VALUE_MATCH 0.025`)
+los volvía a multiplicar. `FlatDensity` acabó en ×25 y solo un conteo por tier lo delató.
 
-## ⚠️ La trampa del árbol de comportamiento (nueva en 0.3.0)
+**El arreglo, y sigue vigente: en `INFESTATION` el gusano va primero y los huevos últimos.**
 
-`CREATUREBEHAVIOURTREES` tiene 8 árboles y **tres comparten los campos que tocamos**:
+**3 · El locator del edificio.** La regla del modelo casa por `VALUE_MATCH` con la ruta de
+`INTERIOR_TENTACLEPLANT.SCENE.MBIN` — con **barras normales**, no invertidas, que es como
+está en el MXML. La de probabilidad va anclada por `{"LocatorType", "TENTACLE_"}`.
 
-| Campo | Está en | Vanilla |
-|---|---|---|
-| `DynamicMoveSlowdownDistMul` | `MELEE`, `RANGED_SPIT`, `RANGED_FIRE` | 4.0 |
-| `BehaviourMoveSpeed` | `MELEE`, `RANGED_SPIT` · `RANGED_FIRE` ya usa `Fast` | `Normal` |
-| `AvoidCreaturesStrength` | `MELEE`, `RANGED_SPIT`, `RANGED_FIRE` (0.0) · `FLYING`, `CRASHY` (1.0) | 0.0 |
-
-Y `0.000000` aparece por todo el archivo. Por eso las reglas van ancladas:
-
-```lua
-["SPECIAL_KEY_WORDS"] = {"Id", "MELEE"},
-["REPLACE_TYPE"]      = "ONCE",
-```
-
-`MELEE` es además el **primer** árbol del archivo, así que `ONCE` refuerza el ancla.
-
-**Verificado tras la build:** el delta contiene un solo `_id="MELEE"` y un solo nodo
-`GcBehaviourMoveToTargetData` con los dos campos. `RANGED_SPIT` y `RANGED_FIRE` intactos.
-
-**`AvoidCreaturesStrength` se deja en 0.0 a propósito.** `COMPORTAMIENTO.md` §7 lo
-proponía subir a 0.5 para separar la manada durante la carga; va justo en contra de que el
-movimiento sea **en horda**, que es el objetivo de 0.3.0.
-
----
-
-## ⚠️ La trampa de los diez bloques de ataque (nueva en 0.2.0)
-
-Lo más fácil de romper de esta versión.
-
-`CREATUREDATATABLE` no tiene **un** bloque `GcCreatureFiendAttackData`, tiene **diez**:
-
-| Dueño | Nota |
-|---|---|
-| `FIEND` | el que queremos |
-| `BUGFIEND` | |
-| `BUGQUEEN` | jefe, calibrado aparte |
-| `SCUTTLER` | |
-| **`SCUTTLER_PET`** | ⚠️ **la mascota del jugador** |
-| `SLUG` | |
-| `MINIFIEND` | |
-| `MINIDRONE` | |
-| `JELLYBOSS_BROOD`, `LAND_SQUID` | `GcCreatureSpookFiendAttackData`, otra estructura |
-
-Un `REPLACE_TYPE = "ALL"` sobre `MinFlurryHits` los tocaría los diez — incluida la
-mascota domesticada del jugador. Por eso **cada regla del archivo va anclada**:
-
-```lua
-["SPECIAL_KEY_WORDS"] = {"Id", "FIEND"},
-["REPLACE_TYPE"]      = "ONCE",
-```
-
-Es el mismo patrón que ya se usaba para el peso de `DANGEROUS`.
-
-**Verificado tras la build:** el delta de `CREATUREDATATABLE` de los tres tiers que lo
-tocan contiene una sola entrada, `_id="FIEND"`. Ni `SCUTTLER_PET` ni `BUGQUEEN`
-aparecen.
-
----
-
-## La trampa de los dos bloques de densidad
-
-Cada objeto de `FIENDEGGS` / `INFESTATION` lleva **dos** bloques de densidad:
-
-- `QualityVariants` → los valores reales, distintos por objeto.
-- `QualityVariantData` → `Coverage 0.2` / `FlatDensity 0.5`, **idéntico en los cinco
-  objetos de los dos archivos**. Tiene pinta de struct por defecto, no de dato real.
-
-Multiplicar `FlatDensity` a secas tocaría los dos. Por eso los scripts usan
-`VALUE_MATCH`: solo se multiplican las ocurrencias cuyo valor actual es el de vanilla
-del bloque bueno.
-
-`Coverage` **no se toca**. Los valores reales son 0.1, 1.0 y 2.0, y no sabemos el
-rango válido del campo — ×20 sobre 2.0 podría salirse.
-
----
-
-## La trampa de orden (0.1.0, sigue vigente)
-
-Las reglas de un mismo archivo se aplican **en secuencia** sobre el MXML, así que un
-valor ya escrito puede encajar en el `VALUE_MATCH` de una regla posterior.
-
-En Normal (`EGG_MULT = 5`) pasó exactamente eso: la regla de huevos subía
-`0.005 → 0.025`, y la del gusano (`VALUE_MATCH 0.025`) los volvía a multiplicar.
-`FlatDensity` acabó en **0.125 = ×25** en vez de ×5, y el `REPORT` dio **29** en vez
-de 27. Fácil (×2) y Difícil/Hardcore (×20) no colisionaban: **el bug solo aparecía en
-Normal**, y solo un conteo por tier lo delató.
-
-**El arreglo:** en `INFESTATION` el gusano va **primero** y los huevos **últimos**.
-
----
-
-## Tipos: enteros, floats y booleanos
-
-| Enteros (sin decimales) | Booleanos (minúsculas) |
-|---|---|
-| `FiendMaxAttackers`, `FiendMaxEngaged`, `MaxFiendsToSpawn`, `MaxEcosystemCreaturesNormal`, `MinFlurryHits`, `MaxFlurryHits` | `FiendOnscreenMarkers`, `AllowSpawnBrood` |
-
-Todo lo demás es float con 6 decimales. `SpawnBroodID` es una cadena (`BUGFIENDS`).
-
----
-
-## Sesión del 2026-08-04 — la prueba midió 0.1.0, no 0.2.0
-
-⚠️ **0.2.0 se construyó el 04/08 y nunca se copió a `GAMEDATA\MODS`.** La prueba in-game
-de esa tarde se jugó contra **0.1.0**. Comprobado leyendo el EXML desplegado:
-
-```
-GAMEDATA\MODS\HorribleTerror_Infestation_4-Hardcore\
-  GLOBALS\GCCREATUREGLOBALS.EXML     <- 9 cambios: los de 0.1.0
-  (falta CREATUREDATATABLE.EXML)     <- el archivo nuevo de 0.2.0
-```
-
-Los 9 son `MaxEcosystemCreaturesNormal`, `PredatorPerceptionDistance`,
-`PercentagePlayerPredators`, `PlayerPredatorBoredomDistance`,
-`PredatorRunAwayHealthPercent`, `FiendAggroTime`, `FiendMaxEngaged`,
-`FiendMaxAttackers` y `MaxFiendsToSpawn`. **Ni `FiendOnscreenMarkers`, ni `FiendZigZag*`,
-ni ninguno de los ocho cambios de conducta.**
-
-> **Regla nueva: construir no es desplegar.** Antes de cualquier prueba in-game, leer el
-> EXML de `GAMEDATA\MODS` y confirmar que contiene los campos de la versión que se cree
-> estar probando. Un `REPORT` con el conteo correcto dice que la build salió; **no** dice
-> que esté en el juego.
-
-### Qué queda en pie de esa prueba
-
-| Observación | Veredicto |
-|---|---|
-| Los Fiend se acercan zigzagueando | **Válida** — y con `FiendZigZagSpeed = 0`. Ver abajo |
-| No se multiplicaban | **Nula.** `CREATUREDATATABLE` no estaba en el juego |
-| El marcador de UI | **Nula.** `FiendOnscreenMarkers` no estaba desplegado |
-
-### ❌ Zigzag — retirado sin llegar a probarlo
-
-El dato útil es justo el contrario del esperado: **los Fiend zigzaguean con el campo a
-0.** Luego `FiendZigZagSpeed`/`Strength` **no es la palanca** que causa lo que se ve en
-pantalla, y subirlo a 1.0/1.5 solo habría empujado en la dirección que molesta — el
-objetivo es que vengan **derechos**.
-
-Retirado de los dos tiers que lo tenían. **Nunca llegó a estar en el juego.**
-
-### La causa real del zigzag — sin identificar
-
-Sospechosos, por orden de probabilidad:
-
-| Candidato | Vanilla | Por qué encaja |
-|---|---:|---|
-| `MaxTurnRadius` | 5.0 | Con 5 m de radio de giro no pueden virar cerrado hacia ti: sobrepasan y corrigen, que se ve como zigzag |
-| `SpherePusher*` + manadas 5/7 | — | Las manadas que introdujo el mod 1 se empujan entre sí y se salen de su línea. **Esto lo causa nuestro propio mod** |
-| `AvoidCreaturesStrength` en `MELEE` | 0.0 | Ver la sección §5 de `COMPORTAMIENTO.md` |
-
-Ninguno probado. `AvoidCreaturesWeight` 6 → 8/10 ya está en 0.2.0 y ataca el segundo
-candidato de refilón: la primera prueba real de 0.2.0 ya dirá algo.
-
-### ⚠️ Que se multipliquen — sigue sin probar
-
-`SpawnBroodTimer` baja de 30 a **10** para que llegue a saltar dentro de un combate y se
-pueda ver. `SpawnBroodAnim` se queda en `ROAR` — un cambio por intento.
-
-La prueba estará **confundida por el propio mod** si se hace en cualquier sitio: con
-`FiendMaxEngaged = 12` y los huevos ×20, una cría de brood es indistinguible de un Fiend
-salido de un huevo. **Hace falta un sitio con Fiends pero sin huevos cerca.**
-
-Orden si falla: `BIRTHING` → y si tampoco, revertir el brood entero.
-
----
-
-## Valores sin referencia vanilla — `[Sin probar]`
-
-- **`AllowSpawnBrood` en Hardcore.** `BUGQUEEN` lo usa en vanilla con
-  `SpawnBroodID = BUGFIENDS`, timer 30 y anim `BIRTHING`. Aquí se copia el ID y se baja
-  el timer a 10, pero se deja `SpawnBroodAnim` en `ROAR`, que es lo que el `FIEND` ya
-  trae: no sabemos si el `FIEND` tiene animación `BIRTHING`.
-  **Sigue siendo el primer cambio a revertir si algo falla.**
-- **`FiendOnscreenMarkers = false`.** Sin probar: nunca llegó a desplegarse. La duda
-  original sigue abierta — ¿quita solo el marcador, o también la detección del escáner y
-  las misiones que usan `FIENDCORE` como `ValidMissionSurveyId` del huevo?
-
----
+⚠️ **`EGG_PROB = 100` es la primera palanca a bajar** si el interior resulta injugable: 30-50
+antes de tocar nada más.
 
 ## Valores vanilla verificados
 
@@ -367,42 +217,25 @@ NMS 170671, MBINCompiler 6.45.0.1.
 | `FIENDEGGS` | `FIENDEGG` | `FLORACLUMP` | 0.005 | 0.005 | 0.1 |
 | (sin nombre) | `FIENDEGG` | `RAREX` | 0.005 | 0.005 | 2.0 |
 
-**`CREATUREDATATABLE.MBIN`, entrada `FIEND`:**
-
-| Campo | Vanilla |
-|---|---:|
-| `MinFlurryHits` / `MaxFlurryHits` | 2 / 4 |
-| `DelayBetweenPounceAttacks` | 2.0 |
-| `AnimSpeedModifier` | 1.0 |
-| `AllowSpawnBrood` | `false` |
-| `SpawnBroodID` / `SpawnBroodTimer` | *(vacío)* / 0.0 |
-
----
-
 ## Cómo construir
 
 ```
 tools\Build-Tiers.ps1 -Carpeta infestacion
 ```
 
-Construye los 4 de una pasada, uno a la vez, y archiva cada salida en
-`build\infestacion_<fecha>\` con su log y su `REPORT`. Comprobar los totales contra la
-tabla de arriba **en las cuatro configuraciones**: el bug de cascada de 0.1.0 solo
+Construye los 4 de una pasada y archiva cada salida en `build\infestacion_<fecha>\` con su
+log y su `REPORT`. Comprobar los totales **en las cuatro**: el bug de cascada de 0.1.0 solo
 aparecía en una.
 
-Para cambiar de configuración en el juego: borrar la carpeta del tier actual de
-`GAMEDATA\MODS\` y copiar la nueva. NMS solo carga mods **al arrancar**.
-
----
+Desplegar copiando los `.MBIN` de `tools\AMUMSS\ModBackups\<nombre>\` a
+`GAMEDATA\MODS\<nombre>\`. **El EXML de `CreatedMODS` es un informe, no despliega nada.**
+NMS solo carga mods **al arrancar**.
 
 ## Aplazado
 
-- **`GcAntagonistComponentData` en el huevo salvaje** — para que los Fiend salgan sin
-  romper el huevo, a ~5 m. Hay molde vanilla (el huevo construible, percepción
-  `HIVE_MIND` de `Range 6.0`), pero exige **añadir un componente** a un `.ENTITY.MBIN`,
-  no cambiar un valor. Sesión propia. Ver [`COMPORTAMIENTO.md`](../../../docs/COMPORTAMIENTO.md) §8.
-- **`BehaviourMoveSpeed` `Normal` → `Fast`** en el árbol `MELEE`, y
-  **`AvoidCreaturesStrength` 0.0 → 0.5** en su nodo `MOVE_CLOSE`. Los dos en
-  `CREATUREBEHAVIOURTREES`: sería la primera vez que editamos estructura anidada.
-- **`MaxFiendsToSpawnCarnage = 10`** — hay un modo "carnage" y no sabemos qué lo
-  dispara.
+- **`GcAntagonistComponentData` en el huevo salvaje** — para que los Fiend salgan sin romper
+  el huevo, a ~5 m. Hay molde vanilla (el huevo construible, percepción `HIVE_MIND` de
+  `Range 6.0`), pero exige **añadir un componente** a un `.ENTITY.MBIN`, no cambiar un valor.
+  Ver [`COMPORTAMIENTO.md`](../../../docs/COMPORTAMIENTO.md) §8.
+- **`Chance > 0` en un descriptor** — los 172 valen 0.0 en vanilla; no hay ejemplo del que
+  copiar la escala.
