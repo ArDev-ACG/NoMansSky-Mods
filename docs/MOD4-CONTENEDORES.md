@@ -134,11 +134,18 @@ puede hacer esta misma noche junto a las tres pruebas de malla.
 
 ## 4 · Lo que queda, en orden
 
-| # | Qué | Coste |
+| # | Qué | Estado |
 |---|---|---|
-| 1 | **Probar `<IMG>PADLOCK<> Municion` como nombre de contenedor.** Sin tocar archivos | 30 s en partida |
-| 2 | Subir `ChestNLayout.Slots` de 50 a *N* en `defaultsavedata.mbin` y **abrir un contenedor viejo** | Un `.lua` de diez líneas |
-| 3 | Si el paso 1 sale bien: añadir iconos propios a `specialstylesimagesdata` | Una fila + un `.DDS` |
+| 1 | **Probar `<IMG>PADLOCK<> Municion` como nombre de contenedor.** Sin tocar archivos | ⬜ 30 s en partida |
+| 2 | **`MOD4_Contenedores_PRUEBA01` — cofre 1 de 50 a 100 casillas** | 🆕 **construido y desplegado el 27/08, sin medir**. Verificado descompilando el `.MBIN` de `GAMEDATA\MODS`: `Chest1` 100 y los otros nueve en 50. Ningún otro mod de la carpeta escribe `DEFAULTSAVEDATA.MBIN` |
+| 3 | Si el paso 1 sale bien: añadir iconos propios a `specialstylesimagesdata` | ⬜ una fila + un `.DDS` |
+
+> ⚠️ **Y una cosa que hay que decir clara sobre el selector de iconos.** Lo que pides —un
+> teclado de emojis al escribir el nombre— **no se puede**, y no por falta de datos: ese
+> selector sería una **pantalla nueva del interfaz**, y los mods de NMS cambian valores dentro
+> de archivos, no dibujan pantallas ni ejecutan código. Lo que sí queda, si la prueba 1 sale
+> bien, es **escribir el código a mano** (`<IMG>PADLOCK<> Municion`) y tener la chuleta de los
+> 161 nombres a mano en §3.
 
 **Lo de sumar inventarios por adyacencia y lo de bloquear el borrado no entran**: no hay campo
 donde escribirlos, y no es cuestión de buscar más — es que los mods de NMS no ejecutan código.
