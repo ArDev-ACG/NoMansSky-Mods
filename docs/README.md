@@ -11,6 +11,7 @@ Destino: Nexus Mods, categoría Creatures.
 |---|---|
 | ⭐ [`PENDIENTES.md`](PENDIENTES.md) | **Siempre, primero.** Lo que está en el juego sin medir, la cola, y las preguntas sin responder. Nada más |
 - [`ACUERDOS.md`](ACUERDOS.md) — **lo ya aprobado en partida y que no se toca**, con quién lo comprueba. Se lee antes de cambiar cualquier constante
+- [`MOD4-CONTENEDORES.md`](MOD4-CONTENEDORES.md) — investigacion del mod 4: los diez cofres globales, que se puede tocar y que no, y los iconos en texto
 | [`MODIFICACIONES.md`](MODIFICACIONES.md) | «¿Qué campo toca el mod y sobre qué bicho?» — tabla viva |
 | [`ASSETS.md`](ASSETS.md) | «¿Cómo cambio el aspecto?» — texturas, colores, partes, y **Blender + NMSDK** en §4 |
 | [`../BLENDER/README.md`](../BLENDER/README.md) | «¿Qué carpeta abro para ver el modelo que hay en el juego?» — banco de Blender, la vuelta completa y el prefijo que hay que quitar |
