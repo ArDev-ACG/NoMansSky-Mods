@@ -7,13 +7,15 @@ en el juego. Lo que falta es **pegar nuestra malla a esos huesos**.
 Esta receta salió de hacerlo entero con el **SkrullCrawler** el 2026-08-15. Está escrita para
 repetirla con los otros tres modelos sin volver a investigar nada.
 
-Actualizado: **2026-08-27**.
+Actualizado: **2026-09-02**, con la segunda hornada —el **warrior bug** y el **cry wolf**— que
+sustituye a los dos bípedos y que **enseñó cuál era la causa de fondo de las dieciocho pruebas
+anteriores**. Está en §3, «la altura: la malla no puede subir por encima del esqueleto».
 
 ---
 
 ## 0 · Qué cambia por modelo y qué no
 
-Casi todo está automatizado. Lo que hay que decidir en cada modelo nuevo son **siete cosas**:
+Casi todo está automatizado. Lo que hay que decidir en cada modelo nuevo son **ocho cosas**:
 
 | Qué | Dónde se pone | Cómo se decide |
 |---|---|---|
@@ -24,6 +26,7 @@ Casi todo está automatizado. Lo que hay que decidir en cada modelo nuevo son **
 | **`escala_piel`** | Igual | `"altura"` **sólo** si nuestra malla mide lo mismo que el bicho vanilla. Si no, **`1.0`**. Ver §3, «la escala del pesado» |
 | **`tope_reparto`** | Igual | `None` si nuestro bicho es del mismo tipo de animal que el vanilla; un número absoluto —**0.85**— si es un bípedo montado en una araña. Ver §3 |
 | **`regiones`** | Igual | **El mapa a mano región → hueso.** Sin él se copia del vecino más cercano, que sólo vale entre dos bichos del mismo tipo de animal. Sale del volcado, no de suponer. Ver §3, «el mapa a mano» |
+| **`sin_claves`** | Igual | Los huesos de la paleta **sin ni una clave en ningún `.ANIM`**. Se leen del `.ANIM` del bicho, no se suponen. Es lo que impide colgar un miembro de un hueso que no gira: la `PRUEBA05`. Ver §3, «estar en el `SkinMatrixLayout` no quiere decir que el hueso se mueva» |
 
 Todo lo demás —el stride, los offsets, la paleta, el casado, la comprobación— no lo toca nadie.
 
@@ -46,14 +49,15 @@ O sea: abrir 12 bytes por vértice y llenarlos.
 
 ---
 
-## 2 · Los cinco pasos
+## 2 · Los seis pasos
 
 ```
 1. Extraer el vanilla del .pak                          una vez por bicho
 2. tools/Weight-NMSMesh.py       -> pesos.json          Blender, sin interfaz
 3. tools/Skin-NMSGeometry.py     -> carpeta _anim       sin Blender
 4. tools/Check-NMSGraft.py       -> pasa o no pasa      ANTES de construir
-5. _F02_SKINNED en el .MATERIAL  -> va en el .lua       el ultimo, siempre
+5. _F02_SKINNED en el .MATERIAL  -> Flag-NMSMaterial      el ultimo, siempre
+6. tools/Check-NMSGraft.py       -> OTRA VEZ              el paso 3 borro el flag
 ```
 
 > **Antes de la piel hay que meter la malla, y eso son otros cinco pasos.** Con el
@@ -124,6 +128,7 @@ vertices con peso: N de N                    <- N de N o hay fallo de alineacion
 la piel del vanilla se pega a K huesos       <- 19 en el SPIDERRIG, 40 en el
                                                 FIEND, 29 en el ARTHROPOD
 asignaciones: ~2 por vertice                 <- si sale ~1, el suavizado no corrio
+                                                de 4 ranuras; ver §3, las ranuras
 el vanilla con su propia piel: mayor X%, asimetria A
 nuestra asimetria B contra A del vanilla     <- LA QUE CORTA. Ver §3
 ```
@@ -152,10 +157,23 @@ python tools/Check-NMSGraft.py work/models/<malla>_anim
 
 **Nada de construir ni desplegar hasta que esto pase.** Ver §4.
 
-### Paso 5 — el flag
+### Paso 5 — el flag, y volver a correr el paso 4
 
-`_F02_SKINNED` de vuelta en el `.MATERIAL`, y eso va en el `.lua`, no aquí. **El último
-siempre**, porque es el que convierte un error de datos en un cierre del juego.
+```
+python tools/Flag-NMSMaterial.py work/models/<malla>_anim/<X>.MATERIAL.MBIN --poner _F02_SKINNED
+python tools/Set-NMSSampler.py   work/models/<malla>_anim/<X>.MATERIAL.MBIN --ver
+python tools/Check-NMSGraft.py   work/models/<malla>_anim        <- OTRA VEZ, y ahora sí
+```
+
+`_F02_SKINNED` de vuelta en el `.MATERIAL`. **El último siempre**, porque es el que convierte un
+error de datos en un cierre del juego.
+
+> 🔴 **Y NO SE SALTA NUNCA, ni «si ya estaba puesto».** El paso 3 **copia la carpeta de origen
+> entera**, y la de origen **no** lleva el flag: cada re-cosido lo borra en silencio, junto con
+> cualquier sampler reapuntado. Saltárselo costó la `PRUEBA05` de los dos bípedos. Ver §3.
+>
+> Por eso el paso 4 se corre **dos veces**: antes de poner el flag, para los índices, y después,
+> para el material. La segunda es la que autoriza a construir.
 
 ---
 
@@ -298,11 +316,11 @@ fronteras salen duras y las deshace el suavizado de 2b, que es exactamente para 
 
 ```
 ("NewHeadJNT",     lambda u, v, w: v > 0.86),                    # cabeza
-("LFirstLeg3JNT",  lambda u, v, w: v > 0.45 and u > 0.70),       # brazo -> pata delantera
-("RFirstLeg3JNT",  lambda u, v, w: v > 0.45 and u < 0.30),
+("LFirstLeg1JNT",  lambda u, v, w: v > 0.45 and u > 0.70),       # brazo -> pata delantera
+("RFirstLeg1JNT",  lambda u, v, w: v > 0.45 and u < 0.30),
 ("NewBack1JNT",    lambda u, v, w: v > 0.55),                    # torso
-("LFourthLeg3JNT", lambda u, v, w: v <= 0.40 and u >= 0.50),     # pierna -> pata trasera
-("RFourthLeg3JNT", lambda u, v, w: v <= 0.40 and u < 0.50),
+("LFourthLeg1JNT", lambda u, v, w: v <= 0.40 and u >= 0.50),     # pierna -> pata trasera
+("RFourthLeg1JNT", lambda u, v, w: v <= 0.40 and u < 0.50),
 ("RootJNT",        lambda u, v, w: True),                        # lo que quede
 ```
 
@@ -317,6 +335,272 @@ punta no aplica**: mide una anatomía —«el cuerpo no cuelga de la punta de un
 dice al revés a propósito, porque nuestras piernas **sí** cuelgan de las patas traseras. Se
 sustituye por una más fuerte: **que el reparto que sale no se separe más de 5 puntos del que
 pedía el mapa**. El fallo del 15/08 eran 40 puntos.
+
+### El eslabón de la pata: el mapa nombra el **primero**, no el tercero
+
+**Esto costó la `PRUEBA04` de los dos bípedos.** Con el mapa a mano puesto y la textura ya
+sana, el necromorfo y el zombie entraron al juego con el cuerpo bien plantado y **los brazos y
+las piernas estirados en cuchillas de varios metros**. No era el mapa: eran las **filas**.
+
+El número sale del `.SCENE` del vanilla, midiendo el desplazamiento de cada hueso respecto a
+su padre:
+
+```
+SPIDERRIG   RootJNT -> LFirstLeg1JNT 0,34 -> Leg2 +0,29 -> Leg3 +0,61 -> Leg4END +0,59
+ARTHROPOD   spine   -> legbase_L0_0  0,69 -> leg_0 +0,35 -> leg_1 +0,48 -> leg_2 +0,49
+```
+
+Los dos mapas colgaban los miembros del **tercer** eslabón —`*Leg3JNT` y `leg_*_1_jnt`—, que
+está a **0,85 m pata afuera** y además **acumula el giro de sus dos padres**. Y nuestros brazos
+están **por encima de todo el bicho vanilla**: su piel cabe en la mitad de abajo de nuestra caja
+(§«el mapa a mano»), así que el brazo de palanca hasta la mano son **metros**.
+
+> **Giro acumulado × palanca larga = el estirón.** Y explica la firma exacta: el cuerpo sale
+> bien, porque cuelga del tronco, y sólo se van las puntas.
+
+**La regla, corregida el 29/08: el eslabón que nombra el mapa es el PRIMERO QUE TENGA CLAVES
+DE ANIMACIÓN.** No el primero de la cadena — eso fue la `PRUEBA05` y salió peor. Lleva un solo
+giro propio y su origen apenas se mueve, así que el miembro entero va **rígido con la pata** en
+vez de estirarse detrás de ella.
+
+| | El primero **con claves** |
+|---|---|
+| `SPIDERRIG` (necromorfo) | **`*Leg1JNT`** — que es a la vez el primero de la cadena |
+| `ARTHROPOD` (zombie) | **`leg_*_0_jnt`** — el primero de la cadena, `legbase_*`, **está quieto** |
+
+Comprobar siempre que el eslabón elegido esté en el `SkinMatrixLayout`; el `assert` de regiones
+lo corta si no.
+
+### 🔴 Recoser la piel BORRA el `_F02_SKINNED`, y con él los samplers
+
+**Esto costó la `PRUEBA05` entera, en los dos bípedos a la vez, y es el fallo más caro de toda
+la receta porque IMITA UN ÉXITO.** Los dos bichos entraron al juego **sin estirarse** —que era
+justo lo que la `PRUEBA05` iba a arreglar— **y sin moverse**, y el zombie además peor de textura
+que en la `PRUEBA04`.
+
+**Las tres cosas salen de un solo archivo.** Comparando md5 contra la `PRUEBA04` desplegada, el
+`.MATERIAL` de la `PRUEBA05` **no declaraba `_F02_SKINNED`**, y en el zombie el `gMasksMap`
+había vuelto además a `ARTHROPODTHORAX01.BASE.MASKS.DDS`.
+
+| Lo que se ve en partida | Por qué |
+|---|---|
+| No se mueve | Sin `_F02_SKINNED` el juego **no aplica el esqueleto**. La malla se dibuja sin pesar |
+| **No se estira** | Porque **no se deforma nada**. Parece que el pesado ha mejorado; lo que pasa es que ya no se pesa |
+| Textura peor (zombie) | El `gMasksMap` compartido con toda la fauna artrópodo: `M-BABA` otra vez |
+
+> ⚠️ **Un pesado roto y un pesado desconectado se ven distinto, y hay que saber distinguirlos:**
+> **estirado = el flag está y los pesos están mal**; **rígido = el flag no está**. Si una prueba
+> «arregla el estirón» y de paso pierde el movimiento, **sospechar del flag antes que del mapa**.
+
+**El porqué, que es lo que hay que recordar:** `Skin-NMSGeometry.py` **copia la carpeta de origen
+entera**, y en la de origen el `.MATERIAL` no lleva ni el flag ni el sampler reapuntado — porque
+los dos son el **paso 5**, y el paso 5 se aplica al final, **sobre la copia**. Así que **cada vez
+que se rehace la piel los dos se pierden en silencio**. Y el `COMMENT` del `.lua` seguía diciendo
+«`CON _F02_SKINNED`», porque el comentario no se rehace con el archivo.
+
+```
+python tools/Flag-NMSMaterial.py <material> --poner _F02_SKINNED
+python tools/Set-NMSSampler.py  <material> gMasksMap TEXTURES/.../ZOMBIE.BASE.MASKS.DDS
+python tools/Check-NMSGraft.py  work/models/<malla>_anim      <- ahora lo verifica
+```
+
+> 🛡️ **`Check-NMSGraft.py` lo caza desde el 29/08** y da **salida 1** si falta el flag o si un
+> sampler ha vuelto a una textura compartida del vanilla. Comprobado contra la `PRUEBA05`
+> desplegada: la caza. **El paso 4 vuelve a correrse después del paso 5**, y ése es el orden bueno.
+
+### Estar en el `SkinMatrixLayout` NO quiere decir que el hueso se mueva
+
+**Esto no fue lo que se vio en la `PRUEBA05` —eso era el flag— pero es un fallo real que estaba
+debajo, y se encontró midiendo.** Con el flag puesto, el mapa de la `PRUEBA05` habría dado los
+miembros rígidos igual, porque colgaban de huesos que no giran. Se arregla en la misma vuelta.
+
+La causa se mide en los **`.ANIM`**, no en el `.SCENE`:
+
+```
+tools/AMUMSS/MODBUILDER/hgpaktool.exe -U -f "*creatures/arthropod/anims/*" ^
+    -O ./anims "…\PCBANKS\NMSARC.AnimMBIN.pak"
+MBINCompiler.exe anims\...\arthropodwalk.anim.mbin          (uno por clip)
+python tools/Sway-NMSJoint.py <.SCENE.MXML> anims\...\*.MXML
+```
+
+**`Sway-NMSJoint.py` es el que da la respuesta**, y de paso escribe la tupla `sin_claves` lista
+para pegar. Marca cada hueso `SI` / `QUIETO` / `a veces` y le pone al lado su **giro de mundo**
+en cada clip. La firma del fallo se lee de un vistazo, porque el hueso quieto da **exactamente**
+el mismo número que su padre:
+
+```
+hueso                      claves arthropodwa arthropodru arthropodid arthropodat
+spine_C0_0_jnt                 SI         5.8         2.2         0.8        38.1
+legbase_L0_0_jnt           QUIETO         5.8         2.2         0.8        38.1   <- ni uno propio
+leg_L0_0_jnt                   SI        18.1        52.1         3.1        62.9   <- este si
+leg_L0_1_jnt                   SI        31.3        40.0         2.2        34.9
+```
+
+Un `.ANIM` trae `NodeData` con un `RotIndex` por hueso y dos bloques de fotogramas. **Si el
+`RotIndex` cae por encima del número de rotaciones de `AnimFrameData`, el hueso no tiene clave:
+se lee de `StillFrameData` y no se mueve nunca.** Medido sobre los cuatro clips del `ARTHROPOD`
+—`WALK`, `RUN`, `IDLE` y `ATTACK01`—:
+
+| | |
+|---|---|
+| Huesos de la paleta del `ARTHROPOD` | 29 |
+| **Quietos en los cuatro clips** | **6, y son los seis `legbase_*`** |
+| Los que la `PRUEBA05` puso bajo brazos y piernas | **4 de esos 6 — el 52,2 % de la malla** |
+| Huesos de la paleta del `SPIDERRIG` | 7 |
+| Quietos | **1, `NewBack1JNT`** — y es el **torso**, así que ahí está bien |
+
+Un hueso quieto **no está congelado en el mundo**: hereda a su padre. `legbase_*` cuelga de
+`spine_C0_0_jnt` y gira exactamente los mismos **4,0°** de mundo que el torso. Por eso el bicho
+no se rompía —se movía entero, de una pieza— y por eso tampoco se movía.
+
+**El giro de MUNDO es el número que decide**, no el local, porque es el que multiplica la
+palanca. Promediado sobre `WALK` y `RUN`:
+
+| Cadena del `ARTHROPOD` | `spine` | `legbase` | **`leg_*_0`** | `leg_*_1` |
+|---|---:|---:|---:|---:|
+| Giro de mundo | 4,0° | **4,0°** | **18–35°** | 28–36° |
+| Desplazamiento en nuestra pierna | — | 0,04 / 0,06 m | **0,27 / 0,52 m** | 0,12 / 0,62 m |
+| Desplazamiento en nuestro brazo | — | 0,10 / 0,10 m | **0,90 / 0,86 m** | 0,85 / 1,03 m |
+
+`leg_*_0_jnt` es el primero que se mueve por su cuenta y arrastra **un solo** giro; `leg_*_1_jnt`
+—la `PRUEBA04`— arrastra **dos**, y eso por la palanca de metros hasta nuestras manos es el
+estirón.
+
+Y en el `SPIDERRIG` la misma medida **confirma** el mapa que ya había, así que el necromorfo no
+se toca:
+
+| Desplazamiento, `WALK` + `RUN` | `Leg1` | `Leg2` | `Leg3` |
+|---|---:|---:|---:|
+| Brazo (L / R) | **1,12 / 0,86** | 1,03 / 0,99 | 1,11 / 1,11 m |
+| Pierna (L / R) | **0,84 / 0,35** | 1,25 / 0,39 | 1,43 / 0,29 m |
+
+> **Y queda un `assert` que lo corta antes de entrar al juego.** En `Weight-NMSMesh.py`, justo
+> detrás del que comprueba la paleta: si el mapa cuelga un **miembro** de un hueso de
+> `sin_claves`, revienta. El **tronco** sí puede colgar de uno quieto —hereda al padre y no
+> necesita giro propio—, y por eso la excepción se decide con los fragmentos de `tronco` del
+> propio modelo.
+
+### Las cuatro ranuras del buffer, y no dos
+
+El canal 5 son **4 bytes** de índice y el 6 son **4 half** de peso: el contrato del vanilla da
+**cuatro** huesos por vértice, y `nmsskin.canales()` siempre escribió los cuatro. Lo que
+truncaba a **dos** —y renormalizaba— era `Weight-NMSMesh.py`.
+
+**Renormalizar a dos deshace el suavizado justo donde hacía falta:** la frontera entre dos
+regiones es el único sitio donde se juntan tres o más huesos, y es exactamente donde se tensa
+la lámina. Un vértice que salía del suavizado con 0,4 / 0,3 / 0,2 / 0,1 se guardaba como
+0,57 / 0,43. Arreglado el 28/08: se guardan las `nmsskin.RANURAS` mayores.
+
+| | PRUEBA04 | PRUEBA05 |
+|---|---:|---:|
+| Influencias por vértice, necromorfo | 1,71 | **2,10** |
+| Influencias por vértice, zombie | 1,81 | **2,04** |
+
+> ⚠️ **Y las ranuras quedan DESCARTADAS como causa de nada, con número.** Cuando la `PRUEBA05`
+> salió rígida y con la textura peor, las cuatro ranuras eran el otro cambio de esa entrega y
+> había que descartarlas. Se recalculó el reparto truncando el **mismo** `pesos.json` a 2 y a 4:
+>
+> | | top-2 | top-4 |
+> |---|---:|---:|
+> | Peso en los miembros, necromorfo | 60,4 % | 60,5 % |
+> | Peso en los miembros, zombie | 52,1 % | 52,1 % |
+>
+> **0,1 puntos.** Las ranuras sólo tocan los vértices de la frontera, que es exactamente para lo
+> que están. No eran ellas: era el eslabón. Y el `VertexLayout` del vanilla declara `Size = 4`
+> en los canales 5 **y** 6, así que cuatro es el contrato, no una decisión nuestra.
+
+### 🔴 La altura: **la malla no puede subir por encima del esqueleto**
+
+**Esto es la causa de fondo de las dieciocho pruebas del zombie y el necromorfo, y se leyó mal
+todo ese tiempo como «es que son bípedos».** Se encontró el 02/09 al montar dos bichos que **sí**
+son del mismo tipo de animal que su vanilla — un insecto de cuatro patas sobre el `ARTHROPOD` y
+un cuadrúpedo sobre el `FIEND` — y ver que **fallaban igual**.
+
+Los acuerdos `B1` y `B2` subieron el necromorfo a **3,62 m** y el zombie a **2,43 m** porque a
+la altura del vanilla «se veían enanos». Lo que no se midió entonces es dónde deja eso al
+esqueleto:
+
+| | Mide el esqueleto | Nuestra malla | Malla **sin un solo hueso encima** |
+|---|---:|---:|---:|
+| `FIEND` / necromorfo y cry wolf | **1,34 m** | 3,62 m | **59,5 %** |
+| `ARTHROPOD` / zombie y warrior bug | **1,05 m** | 2,43 m | **60,7 %** |
+
+**Más de la mitad de la malla flota por encima del último hueso**, y ahí el vecino más cercano
+no encuentra otra cosa que tronco. De ahí salen los dos números que cortan:
+
+```
+cry wolf a 3,62 m     RootJNT          62,8 %   (tope 25,5)
+warrior bug a 2,43 m  spine_C0_0_jnt   43,0 %   (tope 39,3)
+```
+
+**La regla: el bicho se escala a 1,4-1,7× su vanilla, no a 2-3×.** Con 1,90 m y 1,80 m el
+esqueleto cubre el 70-75 % de la malla, los dos siguen siendo claramente mayores que el bicho
+del juego —que es lo que `B1` y `B2` querían— y los dos pesados pasan.
+
+> **El bipedismo lo agravaba, pero no era la causa.** Un bípedo estira la malla hacia arriba y
+> por eso llegaba antes al problema; el fallo lo produce la escala, y le pasa igual a un
+> cuadrúpedo. Ver `B10` en [`ACUERDOS.md`](ACUERDOS.md).
+
+### El giro: el assert mide la ALTURA y **no ve un bicho montado del revés**
+
+**Los dos entraron mirando hacia atrás y nada lo cazó.** El assert de orientación compara
+`RootJNT` contra las puntas de las patas, o sea mide **arriba/abajo**; delante/detrás no lo
+mira nadie.
+
+Se ve poniendo lado a lado el volcado del vanilla y el histograma de nuestra malla, en las
+mismas coordenadas:
+
+| | Nuestra parte alta | La cabeza del vanilla |
+|---|---:|---:|
+| cry wolf | `w` **0,05** | `NewHeadJNT` en `w` **1,51** |
+| warrior bug | `w` **0,38** | `head_C0_0_jnt` en `w` **0,84** |
+
+Se arregla con `giro=(-90, 0)` en vez de `(-90, 180)` en `Export-NMSMesh.py`. **Y ojo con
+tantear el `GIRO_Z` de `Weight-NMSMesh.py` para esto: ése gira el ESQUELETO, no nuestra malla,
+y el `Rz(180)` es el que lo pone de pie** — con 0 el esqueleto queda boca abajo, aunque el
+reparto parezca mejorar.
+
+### La proporción: dos cuadrúpedos pueden no casar, y entonces hace falta el mapa igual
+
+**El cry wolf y el `FIEND` son los dos cuadrúpedos y aun así hizo falta mapa a mano.** El
+motivo no es la anatomía sino la forma: medido en el volcado, el `FIEND` ocupa **dentro de
+nuestra caja** de `w` −0,47 a **1,64**, o sea **4,4 m de largo por 1,2 de alto —3,5 a 1—**
+contra el **1,1 a 1** del lobo. Sus patas delanteras (`w` 1,08) y su cabeza (`w` 1,51) caen
+**por delante de nuestra malla**, así que ahí no hay nada que copiar.
+
+> **La condición para el vecino más cercano no es «mismo tipo de animal»: es que el esqueleto
+> del vanilla quepa dentro de nuestra malla.** El SkrullCrawler cumplía las dos —araña sobre
+> araña **y** misma altura, escala 1,0005— y por eso salió a la primera.
+
+### Los cortes del mapa salen del HISTOGRAMA de nuestra malla, no del ojo
+
+Con `regiones` ya no hay que adivinar dónde está cada parte: se mira la nube de nuestros
+propios vértices en `u, v, w` normalizados y las jorobas son los miembros.
+
+```
+warrior bug, mitad de abajo (v < 0,45, el 23% de la malla)
+    w 0,2-0,4   1353 vertices   patas traseras
+    w 0,5-0,7   2107 vertices   patas delanteras
+cry wolf, eje w entero
+    w 0,2-0,5   4650 vertices   cuerpo, con las cuatro patas
+    w 0,9-1,0   3174 vertices   cuello y cabeza, el 34% del bicho
+```
+
+### El agarre hace falta **aunque la anatomía case**, y se mide antes de construir
+
+Se entregaron los dos primero con el mapa duro —`alfa` 1,0, sin agarre— y `Pose-NMSMesh.py` lo
+tumbó sin entrar al juego, que es exactamente para lo que está:
+
+| | Mapa duro | Con agarre y tope 120 | Zombie `PRUEBA10`, ya aceptado |
+|---|---:|---:|---:|
+| warrior bug, `walk` / `run` / `attack` | 55,1 / 81,9 / 117,4 | **25,9 / 38,7 / 55,3** | 11,5 / 17,0 / 13,0 |
+| cry wolf, `walk` / `run` / `attack` | 71,8 / 55,6 / 64,9 | **16,2 / 12,6 / 15,0** | — |
+
+**Y el tope por vaivén no lo arregla todo solo.** En el warrior bug, con el agarre puesto, el
+hueso que pasaba a mandar era `tail_C0_0_jnt` —el abdomen, 28,5 % de la malla— con **vaivén 8**,
+o sea muy por debajo del tope, que ni lo veía. Lo que abría no era su giro sino el **salto**
+contra `spine_C0_0_jnt` en la frontera del mapa. Se arregla con `alfas_fijos`, igual que las
+piernas del zombie en la `PRUEBA10`.
 
 ### La escala del pesado: **1.0**, aunque nuestra malla mida otra cosa
 
@@ -415,7 +699,37 @@ alguien metió el `JOINTINDEX` en vez de la posición, el juego se cierra.
 
 ---
 
-## 5 · Lo que salió en los tres, para comparar
+## 5 · Lo que salió en los cinco, para comparar
+
+### 5a · La segunda hornada, que es la que hay en el juego
+
+| | Warrior bug | Cry wolf |
+|---|---:|---:|
+| Vanilla al que sustituye | `BUGFIEND` (`ARTHROPOD`) | `FIEND` (`SPIDERRIG`) |
+| Sustituye a su vez a | el zombie | el necromorfo |
+| Tipo de animal | insecto de 4 patas | cuadrúpedo de cuello largo |
+| Triángulos, del FBX → decimados | 133 108 → 36 000 | 18 920 → **sin decimar** |
+| Vértices en Blender / exportados | 18 063 / 20 257 | 9 672 / 11 100 |
+| Aristas de UV por encima de 0,10 | 4 de 108 000 (0,0037 %) | **0** de 56 760 |
+| Texturas del asset → atlas | **12** → 2048, 12 de 16 celdas | 2 → 2048, 8 de 16 celdas |
+| Normal | inventado de la luminancia | **del asset** |
+| Máscaras | planas a 87 | **rugosidad del asset, invertida** |
+| `.DDS` | 2048 (el zombie iba a 1024) | 2048 |
+| **Altura** | **1,80 m** (1,7× el vanilla) | **1,90 m** (1,4× el vanilla) |
+| Giro | `(-90, 0)` | `(-90, 0)` |
+| Método de pesado | mapa a mano + agarre | mapa a mano + agarre |
+| Grupos que reciben peso | 7 | 7 |
+| Influencias por vértice | **2,17** | **2,22** |
+| Asimetría, nuestra / del vanilla | **0,000 / 0,018** | **0,000 / 0,005** |
+| Vértice medio a su hueso / diagonal | 0,60 / 3,49 | 1,51 / 2,95 |
+| Tensión `walk` / `run` / `attack` | 25,9 / 38,7 / 55,3 | **16,2 / 12,6 / 15,0** |
+| La costura abre | 11 / 17 / 28 cm | **10 / 12 / 13 cm** |
+
+> **El cry wolf entra mejor que la `HT_ZombieMesh_PRUEBA10`**, que era la mejor de las
+> dieciocho pruebas anteriores: 11,5 / 17,0 / 13,0 de tensión y 7 / 13 / 21 cm de apertura.
+> Y lo hace en su **`PRUEBA01`**, sin una sola medida en partida.
+
+### 5b · La primera hornada
 
 | | SkrullCrawler | Necromorfo | Zombie |
 |---|---:|---:|---:|
@@ -427,17 +741,24 @@ alguien metió el `JOINTINDEX` en vez de la posición, el juego se cierra.
 | Vértices en Blender | 4 820 | 16 048 | 17 983 |
 | Vértices exportados | 7 627 | 42 742 | 22 982 |
 | Método de pesado | vecino más cercano | **mapa a mano** | **mapa a mano** |
+| Eslabón del que cuelgan los miembros | — | **`*Leg1JNT`** | **`leg_*_0_jnt`** |
+| Huesos de la paleta **sin claves** | — | 1 (`NewBack1JNT`, y es torso) | **6 (`legbase_*`)** |
 | Grupos que reciben peso | 14 | 7 | 7 |
 | Mayor reparto, nuestro / del vanilla | 43,5 % / 45,9 % | 21,0 % / 20,4 % | 23,7 % / 31,4 % |
 | Asimetría, nuestra / del vanilla | 0,026 / 0,000 | 0,014 / 0,005 | 0,052 / 0,018 |
-| Influencias por vértice | 1,96 | 1,71 | 1,81 |
+| Influencias por vértice | 1,96 | **2,10** | **2,04** |
 | Vértice medio a su hueso / diagonal | 0,90 / 4,22 | 1,74 / 4,97 | 0,86 / 3,05 |
 | `FIRSTSKINMAT` → `LASTSKINMAT` | 0 → 14 | 0 → 7 | 0 → 7 |
 
 > **Los dos 80 % de la primera entrega eran el bloque, y el mapa a mano los deshizo:** el hueso
 > más cargado baja de 79,5 % a 21,0 % en el necromorfo y de 80,1 % a 23,7 % en el zombie, con
-> siete huesos repartiendo en vez de uno. Lo que queda por ver en partida es si los miembros se
-> mueven por su cuenta y si los lados están cruzados.
+> siete huesos repartiendo en vez de uno.
+>
+> **Y el reparto no volvió a moverse desde entonces**, ni al cambiar de eslabón ni al pasar de
+> dos ranuras a cuatro: las tres entregas del zombie —`04`, `05` y `06`— dan los mismos
+> porcentajes con un punto de diferencia, porque el mapa por regiones es el mismo. **Lo único
+> que cambia entre ellas es de qué hueso cuelga cada región**, y eso no se ve en el reparto: se
+> ve en el giro de mundo y en partida.
 
 ---
 

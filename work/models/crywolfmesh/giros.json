@@ -1,0 +1,310 @@
+{
+ "GlobalCTRLJNT": {
+  "fiendattack.anim": 0.0,
+  "fiendidle.anim": 0.0,
+  "fiendrun.anim": 0.0,
+  "fiendtrot.anim": 0.0,
+  "fiendwalk.anim": 0.0
+ },
+ "LFirstLeg1JNT": {
+  "fiendattack.anim": 54.31,
+  "fiendidle.anim": 6.83,
+  "fiendrun.anim": 3.24,
+  "fiendtrot.anim": 21.16,
+  "fiendwalk.anim": 51.05
+ },
+ "LFirstLeg2JNT": {
+  "fiendattack.anim": 91.07,
+  "fiendidle.anim": 6.41,
+  "fiendrun.anim": 5.41,
+  "fiendtrot.anim": 21.53,
+  "fiendwalk.anim": 42.69
+ },
+ "LFirstLeg3JNT": {
+  "fiendattack.anim": 48.96,
+  "fiendidle.anim": 6.92,
+  "fiendrun.anim": 4.12,
+  "fiendtrot.anim": 22.17,
+  "fiendwalk.anim": 60.34
+ },
+ "LFirstLeg4END": {
+  "fiendattack.anim": 0.01,
+  "fiendidle.anim": 0.01,
+  "fiendrun.anim": 0.01,
+  "fiendtrot.anim": 0.01,
+  "fiendwalk.anim": 54.0
+ },
+ "LFourthLeg1JNT": {
+  "fiendattack.anim": 60.38,
+  "fiendidle.anim": 5.0,
+  "fiendrun.anim": 67.28,
+  "fiendtrot.anim": 29.01,
+  "fiendwalk.anim": 69.54
+ },
+ "LFourthLeg2JNT": {
+  "fiendattack.anim": 69.34,
+  "fiendidle.anim": 5.44,
+  "fiendrun.anim": 88.41,
+  "fiendtrot.anim": 43.77,
+  "fiendwalk.anim": 78.63
+ },
+ "LFourthLeg3JNT": {
+  "fiendattack.anim": 61.41,
+  "fiendidle.anim": 5.27,
+  "fiendrun.anim": 67.63,
+  "fiendtrot.anim": 34.22,
+  "fiendwalk.anim": 69.75
+ },
+ "LFourthLeg4END": {
+  "fiendattack.anim": 0.01,
+  "fiendidle.anim": 0.01,
+  "fiendrun.anim": 27.45,
+  "fiendtrot.anim": 0.01,
+  "fiendwalk.anim": 26.83
+ },
+ "LPincer1JNT": {
+  "fiendattack.anim": 66.61,
+  "fiendidle.anim": 7.68,
+  "fiendrun.anim": 5.3,
+  "fiendtrot.anim": 17.6,
+  "fiendwalk.anim": 34.24
+ },
+ "LPincer2JNT": {
+  "fiendattack.anim": 37.06,
+  "fiendidle.anim": 7.61,
+  "fiendrun.anim": 4.85,
+  "fiendtrot.anim": 8.44,
+  "fiendwalk.anim": 8.03
+ },
+ "LPincer3JNT": {
+  "fiendattack.anim": 26.38,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 5.5,
+  "fiendtrot.anim": 7.02,
+  "fiendwalk.anim": 10.01
+ },
+ "LPincer4JNT": {
+  "fiendattack.anim": 26.38,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 5.5,
+  "fiendtrot.anim": 7.02,
+  "fiendwalk.anim": 10.01
+ },
+ "LPincer5JNT": {
+  "fiendattack.anim": 26.38,
+  "fiendidle.anim": 26.53,
+  "fiendrun.anim": 17.03,
+  "fiendtrot.anim": 14.28,
+  "fiendwalk.anim": 17.91
+ },
+ "LPincer6END": {
+  "fiendattack.anim": 26.38,
+  "fiendidle.anim": 26.53,
+  "fiendrun.anim": 17.03,
+  "fiendtrot.anim": 14.28,
+  "fiendwalk.anim": 17.91
+ },
+ "NewBack1JNT": {
+  "fiendattack.anim": 18.91,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 3.29,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 6.34
+ },
+ "NewBack2JNT": {
+  "fiendattack.anim": 18.91,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 3.29,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 6.34
+ },
+ "NewBack3JNT": {
+  "fiendattack.anim": 18.91,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 3.29,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 6.34
+ },
+ "NewBack6JNT": {
+  "fiendattack.anim": 85.85,
+  "fiendidle.anim": 13.41,
+  "fiendrun.anim": 14.33,
+  "fiendtrot.anim": 48.3,
+  "fiendwalk.anim": 15.52
+ },
+ "NewBack7JNT": {
+  "fiendattack.anim": 148.1,
+  "fiendidle.anim": 13.41,
+  "fiendrun.anim": 14.33,
+  "fiendtrot.anim": 48.3,
+  "fiendwalk.anim": 15.52
+ },
+ "NewHeadJNT": {
+  "fiendattack.anim": 31.52,
+  "fiendidle.anim": 35.16,
+  "fiendrun.anim": 2.56,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 2.91
+ },
+ "NewJawEND": {
+  "fiendattack.anim": 45.31,
+  "fiendidle.anim": 35.59,
+  "fiendrun.anim": 2.56,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 2.91
+ },
+ "NewJawJNT": {
+  "fiendattack.anim": 45.31,
+  "fiendidle.anim": 35.59,
+  "fiendrun.anim": 2.56,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 2.91
+ },
+ "NewTail1JNT": {
+  "fiendattack.anim": 23.91,
+  "fiendidle.anim": 2.96,
+  "fiendrun.anim": 3.81,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 5.38
+ },
+ "NewTail2JNT": {
+  "fiendattack.anim": 28.92,
+  "fiendidle.anim": 4.36,
+  "fiendrun.anim": 4.78,
+  "fiendtrot.anim": 14.03,
+  "fiendwalk.anim": 6.23
+ },
+ "NewTail3JNT": {
+  "fiendattack.anim": 33.93,
+  "fiendidle.anim": 6.05,
+  "fiendrun.anim": 6.81,
+  "fiendtrot.anim": 23.8,
+  "fiendwalk.anim": 7.85
+ },
+ "NewTail4JNT": {
+  "fiendattack.anim": 38.94,
+  "fiendidle.anim": 7.86,
+  "fiendrun.anim": 8.66,
+  "fiendtrot.anim": 32.23,
+  "fiendwalk.anim": 9.54
+ },
+ "NewTail4JNT_2": {
+  "fiendattack.anim": 43.96,
+  "fiendidle.anim": 9.68,
+  "fiendrun.anim": 10.37,
+  "fiendtrot.anim": 39.25,
+  "fiendwalk.anim": 11.25
+ },
+ "NewTail5JNT": {
+  "fiendattack.anim": 45.42,
+  "fiendidle.anim": 11.53,
+  "fiendrun.anim": 13.28,
+  "fiendtrot.anim": 44.66,
+  "fiendwalk.anim": 23.28
+ },
+ "RFirstLeg1JNT": {
+  "fiendattack.anim": 55.28,
+  "fiendidle.anim": 5.96,
+  "fiendrun.anim": 4.01,
+  "fiendtrot.anim": 30.23,
+  "fiendwalk.anim": 38.48
+ },
+ "RFirstLeg2JNT": {
+  "fiendattack.anim": 45.64,
+  "fiendidle.anim": 5.77,
+  "fiendrun.anim": 7.09,
+  "fiendtrot.anim": 29.47,
+  "fiendwalk.anim": 39.44
+ },
+ "RFirstLeg3JNT": {
+  "fiendattack.anim": 57.14,
+  "fiendidle.anim": 6.19,
+  "fiendrun.anim": 3.15,
+  "fiendtrot.anim": 33.32,
+  "fiendwalk.anim": 41.79
+ },
+ "RFirstLeg4END": {
+  "fiendattack.anim": 0.01,
+  "fiendidle.anim": 0.01,
+  "fiendrun.anim": 0.01,
+  "fiendtrot.anim": 0.01,
+  "fiendwalk.anim": 30.59
+ },
+ "RFourthLeg1JNT": {
+  "fiendattack.anim": 67.35,
+  "fiendidle.anim": 4.96,
+  "fiendrun.anim": 29.42,
+  "fiendtrot.anim": 11.48,
+  "fiendwalk.anim": 26.17
+ },
+ "RFourthLeg2JNT": {
+  "fiendattack.anim": 67.64,
+  "fiendidle.anim": 5.14,
+  "fiendrun.anim": 37.45,
+  "fiendtrot.anim": 16.56,
+  "fiendwalk.anim": 28.1
+ },
+ "RFourthLeg3JNT": {
+  "fiendattack.anim": 67.95,
+  "fiendidle.anim": 5.2,
+  "fiendrun.anim": 30.7,
+  "fiendtrot.anim": 11.65,
+  "fiendwalk.anim": 26.41
+ },
+ "RFourthLeg4END": {
+  "fiendattack.anim": 0.01,
+  "fiendidle.anim": 0.01,
+  "fiendrun.anim": 25.81,
+  "fiendtrot.anim": 0.01,
+  "fiendwalk.anim": 25.15
+ },
+ "RPincer1JNT": {
+  "fiendattack.anim": 43.12,
+  "fiendidle.anim": 7.05,
+  "fiendrun.anim": 3.39,
+  "fiendtrot.anim": 13.66,
+  "fiendwalk.anim": 24.56
+ },
+ "RPincer2JNT": {
+  "fiendattack.anim": 45.1,
+  "fiendidle.anim": 6.74,
+  "fiendrun.anim": 3.39,
+  "fiendtrot.anim": 13.96,
+  "fiendwalk.anim": 21.37
+ },
+ "RPincer3JNT": {
+  "fiendattack.anim": 41.37,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 3.64,
+  "fiendtrot.anim": 11.03,
+  "fiendwalk.anim": 11.6
+ },
+ "RPincer4JNT": {
+  "fiendattack.anim": 41.37,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 3.64,
+  "fiendtrot.anim": 11.03,
+  "fiendwalk.anim": 11.6
+ },
+ "RPincer5JNT": {
+  "fiendattack.anim": 27.05,
+  "fiendidle.anim": 23.51,
+  "fiendrun.anim": 9.1,
+  "fiendtrot.anim": 14.98,
+  "fiendwalk.anim": 13.17
+ },
+ "RPincer6END": {
+  "fiendattack.anim": 27.05,
+  "fiendidle.anim": 23.51,
+  "fiendrun.anim": 9.1,
+  "fiendtrot.anim": 14.98,
+  "fiendwalk.anim": 13.17
+ },
+ "RootJNT": {
+  "fiendattack.anim": 18.91,
+  "fiendidle.anim": 2.43,
+  "fiendrun.anim": 3.29,
+  "fiendtrot.anim": 4.08,
+  "fiendwalk.anim": 6.34
+ }
+}

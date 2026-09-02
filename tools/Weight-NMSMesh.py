@@ -110,6 +110,206 @@ MODELOS = {
         escala_piel="altura",
         tope_reparto=None,
     ),
+    # LOS DOS DE LA SEGUNDA HORNADA, Y LO QUE LOS DEFINE ES LO QUE NO LLEVAN.
+    #
+    # Ni `regiones`, ni `agarre`, ni `giros`, ni `objetivo`, ni `alfas_fijos`.
+    # Toda esa maquinaria -ocho pruebas del necromorfo y diez del zombie- se
+    # monto para UNA sola cosa: sostener un BIPEDO sobre un esqueleto de
+    # arana. La piel del vanilla cabia entera en la mitad de abajo de la
+    # malla, asi que nuestros brazos y nuestra cabeza no tenian cerca mas que
+    # cuerpo, y por eso el vecino mas cercano daba un solo hueso con el 79,5%.
+    #
+    # Estos dos son del MISMO TIPO DE ANIMAL que su vanilla -un insecto de
+    # cuatro patas sobre un artropodo de seis, y un cuadrupedo de cuello
+    # largo sobre un cuadrupedo bajo-, que es la condicion exacta que la
+    # receta pone para que copiar del vecino mas cercano valga. Es lo mismo
+    # que hizo el SkrullCrawler, que es una arana puesta sobre una arana y
+    # salio a la primera.
+    #
+    # `sin_claves` SI se queda: es una propiedad del esqueleto vanilla, no
+    # del bicho que le pongas encima, y ya esta medida en los `.ANIM`.
+    "warriorbug": dict(
+        blend=RAIZ / "BLENDER" / "proyectos" / "warriorbug_nms.blend",
+        vanilla=(RAIZ / "work" / "models" / "vanilla_bugfiend" / "models"
+                 / "planets" / "creatures" / "arthropod"
+                 / "bugfiend.scene.mbin"),
+        salida=RAIZ / "work" / "models" / "warriorbugmesh" / "pesos.json",
+        objeto="ArthropodThorax",
+        giro_z=180,
+        puntas=("_end_jnt",),
+        cabeza=("head_",),
+        pies=("_end_jnt",),
+        tronco=("root_", "spine_", "tail_"),
+        espejo=("_L", "_R"),
+        # 1.0 y no "altura", por el acuerdo B3: los JointBindings se copian
+        # del vanilla TAL CUAL en Patch-NMSGraft.py, asi que en partida el
+        # juego lee nuestros vertices en el espacio del vanilla sin reescalar
+        # nada. Casar contra un rig hinchado es casar contra huesos que en
+        # partida estan en otro sitio. Y aqui hinchar seria x2,9: nuestra
+        # malla mide 2,430 y el ArthropodThorax vanilla 0,84.
+        escala_piel=1.0,
+        # Absoluto, como el zombie y el necromorfo, y por una razon distinta
+        # de la suya: no es que sea un bipedo, es que el ARTHROPOD reparte su
+        # masa entre SEIS patas y una cabeza -su maximo es head_C0_0_jnt con
+        # el 31,4%- y el warrior bug tiene CUATRO patas y un torax gordo. El
+        # relativo mide una anatomia que este bicho no tiene.
+        tope_reparto=0.85,
+        # EL MAPA A MANO, y hace falta aunque los dos sean artropodos.
+        #
+        # Se probo primero sin el, que era la apuesta: mismo tipo de animal,
+        # luego vale el vecino mas cercano. No valio, y la causa esta medida:
+        # el ARTHROPOD ocupa DENTRO DE NUESTRA CAJA de w -0,05 a 0,84 y de
+        # v 0,08 a 0,70, o sea que su cabeza cae por delante de la nuestra y
+        # el torax se come el resto. Sin mapa, `spine_C0_0_jnt` se llevaba el
+        # 43,0% con la altura vieja y el 53,1% con la nueva.
+        #
+        # Los cortes salen del histograma de NUESTRA malla, no de suponer.
+        # Con v < 0,45 -la parte baja, 23% de los vertices- el eje w tiene
+        # DOS jorobas, que son los dos pares de patas:
+        #     w 0,2-0,4  1353 vertices   patas traseras
+        #     w 0,5-0,7  2107 vertices   patas delanteras
+        # y la parte alta -v > 0,75, 13%- cae en w 0,62, que son las
+        # mandibulas y las antenas.
+        #
+        # El ARTHROPOD tiene TRES pares de patas y el bug DOS: se usan el par
+        # 0 -delantero, w 0,74- y el par 2 -trasero, w 0,43-, y el par 1 se
+        # queda sin usar. El eslabon es `leg_*_0_jnt`, el primero CON CLAVES;
+        # `legbase_*` esta en la paleta y no tiene ni una, que fue la
+        # PRUEBA05 del zombie.
+        #
+        # Gana la PRIMERA fila que case, asi que van de arriba abajo.
+        regiones=(
+            ("head_C0_0_jnt",  lambda u, v, w: v > 0.70 and w > 0.55),
+            ("leg_L0_0_jnt",   lambda u, v, w: v < 0.45 and w > 0.45 and u > 0.55),
+            ("leg_R0_0_jnt",   lambda u, v, w: v < 0.45 and w > 0.45 and u < 0.45),
+            ("leg_L2_0_jnt",   lambda u, v, w: v < 0.45 and u > 0.55),
+            ("leg_R2_0_jnt",   lambda u, v, w: v < 0.45 and u < 0.45),
+            ("spine_C0_0_jnt", lambda u, v, w: w > 0.45),
+            ("tail_C0_0_jnt",  lambda u, v, w: True),
+        ),
+        # EL AGARRE, Y HACE FALTA AUNQUE LA ANATOMIA CASE.
+        #
+        # Se entrego primero sin el -mapa duro, alfa 1,0- y `Pose-NMSMesh.py`
+        # lo midio antes de construir, que es justo para lo que esta:
+        #     walk    tension 55,1   abre 25 cm
+        #     run     tension 81,9   abre 39 cm
+        #     attack  tension 117,4  abre 62 cm
+        # contra los 11,5 / 17,0 / 13,0 del zombie ya aceptado. El mapa duro
+        # es la PRUEBA06, la de las cuchillas, y lo sigue siendo aqui.
+        #
+        # Las patas se agarran al abdomen y a el torax segun de cual cuelgan,
+        # y la cabeza al torax.
+        agarre={
+            "leg_L0_0_jnt":   "spine_C0_0_jnt",
+            "leg_R0_0_jnt":   "spine_C0_0_jnt",
+            "head_C0_0_jnt":  "spine_C0_0_jnt",
+            "leg_L2_0_jnt":   "tail_C0_0_jnt",
+            "leg_R2_0_jnt":   "tail_C0_0_jnt",
+            "tail_C0_0_jnt":  "spine_C0_0_jnt",
+        },
+        giros=RAIZ / "work" / "models" / "warriorbugmesh" / "giros.json",
+        clips=("arthropodwalk.anim", "arthropodrun.anim"),
+        clips_tope=("arthropodwalk.anim", "arthropodrun.anim",
+                    "arthropodidle.anim", "arthropodattack01.anim"),
+        # El ARTHROPOD es simetrico -al andar sus dos patas giran 17,9 y
+        # 17,8- y nuestro reparto tambien lo es -asimetria 0,000-, asi que
+        # aqui no hay diferencia entre lados que igualar. Lo que sobra es el
+        # vaiven ABSOLUTO, y eso lo corta el tope.
+        espejo_vaiven=False,
+        objetivo=120.0,
+        # EL TOPE NO LLEGA AL ABDOMEN, Y ES QUIEN MANDA LA COSTURA.
+        #
+        # Con solo el agarre y el tope de 120, `Pose-NMSMesh.py` bajo el bug
+        # de 55,1/81,9/117,4 a 47,6/54,4/74,7, pero el hueso que manda paso a
+        # ser `tail_C0_0_jnt`: 5154 vertices, el 28,5% de la malla, con
+        # vaiven 8 -o sea MUY por debajo del tope, que no lo ve-. Lo que abre
+        # no es su giro sino el SALTO contra `spine_C0_0_jnt` en la frontera
+        # w 0,45, que parte el cuerpo del bicho en dos.
+        #
+        # Es el mismo caso que las piernas del zombie en la PRUEBA10: el tope
+        # por vaiven no las trataba, y se arreglo con alfa fijo. Aqui el
+        # abdomen y las patas traseras van al mismo 0,4.
+        alfas_fijos={
+            "tail_C0_0_jnt": 0.4,
+            "leg_L2_0_jnt": 0.4,
+            "leg_R2_0_jnt": 0.4,
+        },
+        sin_claves=("legbase_L0_0_jnt", "legbase_L1_0_jnt", "legbase_L2_0_jnt",
+                    "legbase_R0_0_jnt", "legbase_R1_0_jnt", "legbase_R2_0_jnt"),
+    ),
+    "crywolf": dict(
+        blend=RAIZ / "BLENDER" / "proyectos" / "crywolf_nms.blend",
+        vanilla=(RAIZ / "work" / "models" / "vanilla_fiend" / "models"
+                 / "planets" / "creatures" / "spiderrig" / "fiend.scene.mbin"),
+        salida=RAIZ / "work" / "models" / "crywolfmesh" / "pesos.json",
+        objeto="_Fiend_Body",
+        giro_z=180,
+        puntas=("Leg3", "Leg4", "END"),
+        cabeza=("Head", "Jaw", "Skull"),
+        pies=("Leg4END", "Leg3END"),
+        tronco=("Root", "Back"),
+        espejo=("L", "R"),
+        escala_piel=1.0,
+        tope_reparto=0.85,
+        # EL MAPA A MANO, y la razon aqui es la PROPORCION, no la anatomia.
+        #
+        # El FIEND y el cry wolf son los dos cuadrupedos, que era la apuesta.
+        # Lo que no casa es la forma: medido en el volcado, el FIEND ocupa
+        # DENTRO DE NUESTRA CAJA de w -0,47 a 1,64, o sea 4,4 m de largo por
+        # 1,2 de alto -3,5 a 1-, y el cry wolf es 1,1 a 1. Sus patas
+        # delanteras -w 1,08- y su cabeza -w 1,51- caen POR DELANTE de
+        # nuestra malla, asi que el vecino mas cercano solo alcanza el
+        # tronco: `RootJNT` se llevaba el 62,8%.
+        #
+        # Los cortes salen del histograma de NUESTRA malla. El eje w es
+        # bimodal y las dos jorobas son el cuerpo y el cuello:
+        #     w 0,2-0,5   4650 vertices   cuerpo, con las cuatro patas
+        #     w 0,9-1,0   3174 vertices   cuello y cabeza, el 34% de la malla
+        # y en la parte baja -v < 0,45, 29%- las patas delanteras salen en
+        # w 0,3-0,5 y las traseras en w 0,0-0,25.
+        #
+        # El eslabon es `*Leg1JNT`, el primero de la cadena Y el primero con
+        # claves: los cuatro `*Leg1JNT` del SPIDERRIG tienen claves en todos
+        # los `.ANIM`, medido el 29/08.
+        regiones=(
+            ("NewHeadJNT",     lambda u, v, w: v > 0.72 and w > 0.55),
+            ("NewBack1JNT",    lambda u, v, w: w > 0.55),
+            ("LFirstLeg1JNT",  lambda u, v, w: v < 0.45 and w > 0.25 and u > 0.55),
+            ("RFirstLeg1JNT",  lambda u, v, w: v < 0.45 and w > 0.25 and u < 0.45),
+            ("LFourthLeg1JNT", lambda u, v, w: v < 0.45 and u > 0.55),
+            ("RFourthLeg1JNT", lambda u, v, w: v < 0.45 and u < 0.45),
+            ("RootJNT",        lambda u, v, w: True),
+        ),
+        # EL AGARRE. Medido igual que en el bug, con el mapa duro puesto:
+        #     walk    tension 71,8   abre 61 cm
+        #     run     tension 55,6   abre 67 cm
+        #     attack  tension 64,9   abre 57 cm
+        # y las tres las manda `*FirstLeg1JNT`, o sea las patas delanteras,
+        # que es de donde cuelga el pecho justo debajo del cuello largo.
+        #
+        # Las delanteras y la cabeza se agarran al pecho; las traseras, a la
+        # cadera.
+        agarre={
+            "LFirstLeg1JNT":  "NewBack1JNT",
+            "RFirstLeg1JNT":  "NewBack1JNT",
+            "NewHeadJNT":     "NewBack1JNT",
+            "LFourthLeg1JNT": "RootJNT",
+            "RFourthLeg1JNT": "RootJNT",
+        },
+        giros=RAIZ / "work" / "models" / "crywolfmesh" / "giros.json",
+        clips=("fiendwalk.anim", "fiendrun.anim"),
+        clips_tope=("fiendwalk.anim", "fiendrun.anim",
+                    "fiendidle.anim", "fiendattack.anim"),
+        # El FIEND NO es simetrico -sus patas traseras giran 69,5 contra 26,2
+        # al andar- y eso no lo arregla ningun tope, porque es una diferencia
+        # ENTRE regiones. El espejo se queda puesto, como en el necromorfo.
+        espejo_vaiven=True,
+        objetivo=120.0,
+        # El unico hueso sin claves de esta paleta, y es el TORSO: hereda a
+        # RootJNT y un torso no necesita giro propio, asi que el assert lo
+        # deja pasar por caer en `tronco`.
+        sin_claves=("NewBack1JNT",),
+    ),
     "necromorph": dict(
         blend=RAIZ / "BLENDER" / "proyectos" / "necromorph_nms.blend",
         vanilla=(RAIZ / "work" / "models" / "vanilla_fiend" / "models"
@@ -131,15 +331,81 @@ MODELOS = {
         # 0,37 sobre 3,62 m- y se sale por delante y por detras -z de 0,00 a
         # 1,56 sobre 2,22 m-. Los L* caen en x > 0,5 y los R* en x < 0,5.
         # Gana la PRIMERA fila que case, asi que van de arriba abajo.
+        #
+        # EL ESLABON ES EL PRIMERO DE LA PATA, NO EL TERCERO. Desde el
+        # 28/08: hasta la PRUEBA04 los brazos colgaban de *FirstLeg3JNT y
+        # las piernas de *FourthLeg3JNT, y en partida salian cuchillas de
+        # varios metros. La cadena mide
+        #     RootJNT -> Leg1 0,34 -> Leg2 +0,29 -> Leg3 +0,61 -> Leg4END
+        # asi que Leg3 esta a 0,90 m pata afuera Y acumula el giro de sus
+        # dos padres. Y nuestros brazos estan POR ENCIMA de todo el bicho
+        # vanilla -su piel cabe en y 0,05..0,37 de nuestros 3,62 m-, o sea
+        # que el brazo de palanca son metros. Giro acumulado por palanca
+        # larga es exactamente el estiron. Leg1 lleva solo su propio giro
+        # y su origen apenas se mueve.
+        #
+        # MEDIDO EL 29/08 y CONFIRMADO: aqui Leg1 SI vale, al reves que en
+        # el ARTHROPOD. Los cuatro `*Leg1JNT` tienen claves en todos los
+        # `.ANIM`, y de los siete huesos de esta paleta el UNICO quieto es
+        # `NewBack1JNT`, que es el TORSO y esta bien quieto -hereda a
+        # RootJNT y un torso no necesita giro propio-. Desplazamiento
+        # -giro de mundo x palanca, promediado sobre walk y run-:
+        #     brazo   Leg1 1,12/0,86   Leg2 1,03/0,99   Leg3 1,11/1,11 m
+        #     pierna  Leg1 0,84/0,35   Leg2 1,25/0,39   Leg3 1,43/0,29 m
+        # Leg1 gana claro en las piernas y empata en los brazos, asi que el
+        # mapa de la PRUEBA05 se queda como esta.
         regiones=(
             ("NewHeadJNT",     lambda u, v, w: v > 0.86),
-            ("LFirstLeg3JNT",  lambda u, v, w: v > 0.45 and u > 0.70),
-            ("RFirstLeg3JNT",  lambda u, v, w: v > 0.45 and u < 0.30),
+            ("LFirstLeg1JNT",  lambda u, v, w: v > 0.45 and u > 0.70),
+            ("RFirstLeg1JNT",  lambda u, v, w: v > 0.45 and u < 0.30),
             ("NewBack1JNT",    lambda u, v, w: v > 0.55),
-            ("LFourthLeg3JNT", lambda u, v, w: v <= 0.40 and u >= 0.50),
-            ("RFourthLeg3JNT", lambda u, v, w: v <= 0.40 and u < 0.50),
+            ("LFourthLeg1JNT", lambda u, v, w: v <= 0.40 and u >= 0.50),
+            ("RFourthLeg1JNT", lambda u, v, w: v <= 0.40 and u < 0.50),
             ("RootJNT",        lambda u, v, w: True),
         ),
+        # EL AGARRE: region -> la region VECINA que la sujeta. Ver
+        # `mapa_a_mano`. Cada miembro se queda `alfa` de su propio giro y el
+        # resto lo sigue al cuerpo, que es lo unico que baja la palanca de
+        # 18,4x de los brazos. Los brazos y la cabeza se agarran al torso;
+        # las piernas, a la cadera.
+        agarre={
+            "LFirstLeg1JNT":  "NewBack1JNT",
+            "RFirstLeg1JNT":  "NewBack1JNT",
+            "NewHeadJNT":     "NewBack1JNT",
+            "LFourthLeg1JNT": "RootJNT",
+            "RFourthLeg1JNT": "RootJNT",
+        },
+        # EL GIRO DE CADA HUESO, que es la mitad que le faltaba a la
+        # palanca. Lo escribe `Sway-NMSJoint.py --json`. Ver `vaiven_de`.
+        giros=RAIZ / "work" / "models" / "fiendmesh" / "giros.json",
+        # SOLO LOCOMOCION, y a proposito. La asimetria de las patas
+        # traseras -2,7 veces entre izquierda y derecha- vive en `walk` y
+        # `run`; en `attack` las dos giran parecido -60,4 y 67,4- y en
+        # partida el ataque se ve BIEN. Meter `attack` aqui taparia la
+        # asimetria justo en los dos clips donde se ve.
+        clips=("fiendwalk.anim", "fiendrun.anim"),
+        # El espejo se queda puesto: la asimetria de las patas traseras
+        # del FIEND -69,5 grados contra 26,2 al andar- es real y no la
+        # arregla ningun tope, porque es una diferencia ENTRE regiones.
+        espejo_vaiven=True,
+        # LA UNICA COSA QUE CAMBIA EN LA PRUEBA09, y es el tope global.
+        # 113 no es un numero redondo: es el vaiven en el que el espejo
+        # dejo las piernas en la PRUEBA08, y las piernas son lo unico que
+        # en partida se ve bien. Medido el 31/08 en las tres capturas del
+        # necromorfo: los brazos, CONGELADOS en el alfa de la 07, siguen
+        # sacando cuchillas -se quedaban en vaiven 207 y 154, casi el
+        # doble de las piernas-. Descongelarlos hasta 113 es peticion
+        # expresa del 31/08, sabiendo que van a salir MAS tiesos.
+        objetivo=113.0,
+        # Solo la cabeza sigue congelada, y por lo de siempre: en
+        # locomocion mide 18 -el tope ni la veria- pero en `idle` gira
+        # 35,2 grados, asi que soltarla seria un estreno sin medir.
+        alfas_fijos={
+            "NewHeadJNT": 0.65,
+        },
+        # El unico hueso sin claves de esta paleta. Cae en `tronco`, asi que
+        # el assert lo deja pasar: un torso quieto hereda a RootJNT y basta.
+        sin_claves=("NewBack1JNT",),
     ),
     "zombie": dict(
         blend=RAIZ / "BLENDER" / "proyectos" / "zombie_nms.blend",
@@ -164,15 +430,106 @@ MODELOS = {
         # de cuerpo mas alto, y las tres parejas de patas se ordenan por z:
         # `leg_*0_*` delante (z 1,07-1,33), `leg_*1_*` en medio (0,69) y
         # `leg_*2_*` detras (0,00-0,33). Los L* caen en x > 0,5.
+        #
+        # Y EL ESLABON ES `leg_*_0_jnt`: EL PRIMERO CON CLAVES, NO EL
+        # PRIMERO DE LA CADENA. La PRUEBA05 colgo los miembros de
+        # `legbase_*`, que es el primero de la cadena, y el zombie entro al
+        # juego RIGIDO. La causa, medida en los cuatro `.ANIM` del ARTHROPOD
+        # -walk, run, idle y attack01-: `legbase_*` NO TIENE NI UNA CLAVE en
+        # ninguno de los cuatro. De los 29 huesos a los que el vanilla pega
+        # piel, los SEIS `legbase_*` son los UNICOS quietos, y la PRUEBA05
+        # metio cuatro de ellos bajo los brazos y las piernas, o sea bajo el
+        # 52,2% de la malla. Un `legbase_*` solo hereda a `spine_C0_0_jnt`:
+        # gira los mismos 4,0 grados de mundo que el torso, nada propio.
+        #
+        # La cadena y su giro de MUNDO, promediado sobre walk y run:
+        #   spine 4,0deg -> legbase 4,0deg -> leg_0 18-35deg -> leg_1 28-36deg
+        # `leg_*_0_jnt` es el primero que se mueve por su cuenta y lleva un
+        # solo giro propio. `leg_*_1_jnt` -la PRUEBA04- arrastra dos, y eso
+        # con la palanca de metros hasta nuestras manos es el estiron.
         regiones=(
             ("head_C0_0_jnt", lambda u, v, w: v > 0.86),
-            ("leg_L0_1_jnt",  lambda u, v, w: v > 0.55 and u > 0.74),
-            ("leg_R0_1_jnt",  lambda u, v, w: v > 0.55 and u < 0.26),
+            ("leg_L0_0_jnt", lambda u, v, w: v > 0.55 and u > 0.74),
+            ("leg_R0_0_jnt", lambda u, v, w: v > 0.55 and u < 0.26),
             ("spine_C0_0_jnt", lambda u, v, w: v > 0.55),
-            ("leg_L2_1_jnt",  lambda u, v, w: v <= 0.40 and u >= 0.50),
-            ("leg_R2_1_jnt",  lambda u, v, w: v <= 0.40 and u < 0.50),
+            ("leg_L2_0_jnt", lambda u, v, w: v <= 0.40 and u >= 0.50),
+            ("leg_R2_0_jnt", lambda u, v, w: v <= 0.40 and u < 0.50),
             ("tail_C0_0_jnt", lambda u, v, w: True),
         ),
+        # Lo mismo aqui. Los brazos van a 6,8x y 7,7x y la cabeza a 4,1x,
+        # contra las piernas a 3,6x y 2,1x, que son las que se ven bien.
+        agarre={
+            "leg_L0_0_jnt":  "spine_C0_0_jnt",
+            "leg_R0_0_jnt":  "spine_C0_0_jnt",
+            "head_C0_0_jnt": "spine_C0_0_jnt",
+            "leg_L2_0_jnt":  "tail_C0_0_jnt",
+            "leg_R2_0_jnt":  "tail_C0_0_jnt",
+            # EL ANCLA TAMBIEN NECESITA AGARRE, desde la PRUEBA09. De
+            # `tail_C0_0_jnt` cuelga la cintura -la franja que no casa con
+            # ninguna otra region- y gira 119 grados en `attack01`, pero
+            # sin `agarre` no habia forma de toparlo: `alfas_de` solo
+            # recorre las regiones que lo tienen. Se agarra al torso, que
+            # en el mismo clip gira 38.
+            "tail_C0_0_jnt": "spine_C0_0_jnt",
+        },
+        giros=RAIZ / "work" / "models" / "zombiemesh" / "giros.json",
+        clips=("arthropodwalk.anim", "arthropodrun.anim"),
+        # EL TOPE LEE LOS CUATRO CLIPS desde la PRUEBA09, y el espejo se
+        # queda en locomocion. Con el tope leyendo solo `walk` y `run` la
+        # cabeza mide 21 y se queda en alfa 1,0; en `attack01` mide 299.
+        # Eso es la cuchilla de cuello medida el 31/08 en partida.
+        clips_tope=("arthropodwalk.anim", "arthropodrun.anim",
+                    "arthropodidle.anim", "arthropodattack01.anim"),
+        # AQUI EL ESPEJO NO VALE, y por una vez el ARTHROPOD es simetrico:
+        # los dos huesos de brazo giran 52,1 y 53,2 en `run`, asi que
+        # igualarlos no baja nada. Lo que sobra aqui es el vaiven ABSOLUTO
+        # de los brazos, no la diferencia entre lados, y eso lo corta el
+        # tope. Medido el 31/08 en partida: cuello, hombros y brazos
+        # estiran; las piernas no se mueven.
+        espejo_vaiven=False,
+        # Tope de VAIVEN, no de palanca. La 07 puso 4,0 de palanca y con
+        # eso los brazos se quedaron en vaiven 202 y 209 -y siguen sacando
+        # cuchillas-, mientras las piernas se quedaban en 59 y 65, que es
+        # el -las piernas no parecen moverse-. Se lee de la tabla que
+        # imprime este script.
+        objetivo=120.0,
+        # LAS DOS PIERNAS AL MISMO NUMERO, Y ESO ES LA PRUEBA10.
+        #
+        # El tope por `objetivo` NO LAS TRATA IGUAL, y ahi estaba la
+        # asimetria. Medido el 01/09 con Pose-NMSMesh.py sobre los cuatro
+        # .ANIM: en `attack01` los dos huesos giran casi lo mismo -46,8 y
+        # 41,6 grados- pero nuestras palancas son 3,6x y 2,1x, asi que el
+        # vaiven sale 168 y 87. Con el tope en 120 eso AGARRA LA IZQUIERDA
+        # -alfa 0,71- Y DEJA SUELTA LA DERECHA -alfa 1,0-. La asimetria no
+        # la pone el ARTHROPOD, que es simetrico: la fabrica el tope al
+        # leer una palanca que sale de nuestro propio reparto.
+        #
+        # Y en locomocion el tope NO LLEGA A NINGUNA DE LAS DOS: valen 65 y
+        # 59, muy por debajo de 120. Ahi la costura de la cadera abre 22 cm
+        # -`tail_C0_0_jnt` gira 3,2 grados y `leg_R2_0_jnt` 28,3, y entre
+        # los dos hay saltos de peso de 0,42 sobre aristas de 2,8 cm-.
+        #
+        # 0,4 fijo en las dos, medido ANTES de construir:
+        #     walk   tension 27,7 -> 11,5   abre 16 -> 7 cm
+        #     run    tension 41,2 -> 17,0   abre 22 -> 13 cm
+        #     attack tension 33,9 -> 13,0   abre 21 -> 21 cm  (es el hombro)
+        #     idle   sin cambio                              (es el hombro)
+        # `flex` -la deformacion normal, p99- se queda entre 1,84 y 2,36, o
+        # sea que la piel sigue deformando y esto NO es una estatua.
+        #
+        # LOS BRAZOS NO SE TOCAN, y se probo: agarrarlos a 0,75 lleva
+        # `attack` de 21 a 74 cm. El ancla es `spine_C0_0_jnt` y el torso
+        # tiene MAS alcance hasta los vertices del brazo que el propio
+        # hueso del brazo, asi que el agarre alarga la palanca en vez de
+        # acortarla.
+        alfas_fijos={
+            "leg_L2_0_jnt": 0.4,
+            "leg_R2_0_jnt": 0.4,
+        },
+        # Los huesos de la paleta del ARTHROPOD sin ni una clave en ningun
+        # `.ANIM`. Colgar un miembro de uno de ellos es la PRUEBA05.
+        sin_claves=("legbase_L0_0_jnt", "legbase_L1_0_jnt", "legbase_L2_0_jnt",
+                    "legbase_R0_0_jnt", "legbase_R1_0_jnt", "legbase_R2_0_jnt"),
     ),
 }
 
@@ -183,16 +540,32 @@ print(f"modelo: {CUAL}")
 BLEND = M["blend"]
 VANILLA = M["vanilla"]
 SALIDA = M["salida"]
+# `--salida <ruta>` escribe el pesado en otro sitio Y NO GUARDA EL .blend.
+# Es para probar un agarre y puntuarlo con Pose-NMSMesh.py sin pisar ni el
+# pesos.json que esta en el juego ni los grupos del .blend.
+PRUEBA = "--salida" in sys.argv
+if PRUEBA:
+    SALIDA = Path(sys.argv[sys.argv.index("--salida") + 1])
 NUESTRA = M["objeto"]
-GIRO_Z = M["giro_z"]
+# `--giro-z N` prueba otro giro sin tocar la tabla. Existe porque el giro NO
+# se adivina y el unico assert que habia lo mide en ALTURA -RootJNT por encima
+# de las puntas-, o sea que no dice nada de si el bicho mira adelante o atras.
+# Con el cry wolf eso importo: nuestra parte alta cae en w 0,05 y la cabeza
+# del FIEND en w 1,51, y si van enfrentadas todo se va a RootJNT.
+GIRO_Z = (int(sys.argv[sys.argv.index("--giro-z") + 1])
+          if "--giro-z" in sys.argv else M["giro_z"])
 ESCALA_PIEL = M.get("escala_piel", "altura")
 TOPE_REPARTO = M.get("tope_reparto")
 
 # Cuantos vertices de la piel vanilla promedia cada vertice nuestro.
 # Con 1 estariamos en el metodo que fallo -un ganador unico y una costura
 # donde cambia-. Con 8 la frontera es un degradado de varios centimetros,
-# que es lo que hace falta para que no se tense. Se queda en 2 influencias
-# por vertice, que es lo que cabe comodo en el buffer.
+# que es lo que hace falta para que no se tense. Se guardan las
+# nmsskin.RANURAS = 4 mayores, que son las que el buffer trae: el canal 5
+# son 4 bytes de indice y el 6 son 4 half de peso, y nmsskin.canales() ya
+# escribia los cuatro. Hasta el 28/08 esto truncaba a DOS y renormalizaba,
+# o sea que deshacia el suavizado justo donde hacia falta -en la frontera,
+# que es el unico sitio donde se juntan 3 o mas huesos-.
 VECINOS = 8
 BLOQUE_VECINOS = 256  # 256 x 7635 x 3 float64 son 47 MB; de una vez, 880
 
@@ -201,6 +574,11 @@ BLOQUE_VECINOS = 256  # 256 x 7635 x 3 float64 son 47 MB; de una vez, 880
 # vanilla se llevan, porque ahi no hay nada del vanilla que copiar salvo
 # pata. El numero se sube hasta que el assert de punta deja de saltar.
 SUAVIZADOS = 12
+
+# Las paradas de `--barrer`: mide la costura con cada numero de pasadas sin
+# escribir nada, para elegir SUAVIZADOS sin entrar a la partida. El ancho de
+# la transicion crece como la RAIZ de las pasadas, asi que van al doble.
+BARRIDO = (12, 24, 48, 96)
 
 # Lo que NO puede pasar. Los topes NO son numeros a ojo: los tres primeros
 # se comparan contra lo que hace el VANILLA con su propia piel, medido en
@@ -238,6 +616,125 @@ MINIMO_TRONCO = 0.30
 TOPE_PUNTA = 0.50  # una punta, como mucho, la mitad de lo que lleve el tronco
 
 
+def suaviza(crudo, vecinas):
+    """Una pasada de promedio por las aristas de NUESTRA malla."""
+    siguiente = []
+    for i, propio in enumerate(crudo):
+        mezcla = dict(propio)
+        for j in vecinas[i]:
+            for n, w in crudo[j].items():
+                mezcla[n] = mezcla.get(n, 0.0) + w
+        total = sum(mezcla.values())
+        siguiente.append({n: w / total for n, w in mezcla.items()})
+    return siguiente
+
+
+def costura(crudo, vecinas):
+    """Cuanto salta el peso entre dos vertices UNIDOS POR UNA ARISTA.
+
+    Una lamina tensada ES ese salto: dos vertices pegados que cuelgan de
+    huesos que giran distinto se van a sitios distintos, y en partida eso
+    son las cuchillas de varios metros. Se mide sobre NUESTRAS aristas, que
+    es donde se ve, y sobre los pesos YA RECORTADOS a las cuatro ranuras,
+    que es lo que de verdad viaja en el buffer.
+
+    Devuelve el salto en 0..1 -0 es el mismo peso a los dos lados, 1 es
+    hueso puro contra hueso puro- mas la fraccion de vertices que cuelgan
+    de UN solo hueso, que es la materia prima de la costura.
+    """
+    corto = []
+    for p in crudo:
+        pares = sorted(p.items(), key=lambda t: -t[1])[:nmsskin.RANURAS]
+        total = sum(w for _, w in pares)
+        corto.append({n: w / total for n, w in pares})
+    saltos = []
+    for i, propio in enumerate(corto):
+        for j in vecinas[i]:
+            if j <= i:
+                continue
+            otro = corto[j]
+            saltos.append(sum(abs(propio.get(n, 0.0) - otro.get(n, 0.0))
+                              for n in set(propio) | set(otro)) / 2)
+    s = np.array(saltos)
+    puros = float(np.mean([max(p.values()) > 0.99 for p in corto]))
+    infl = float(np.mean([len(p) for p in corto]))
+    return s.mean(), float(np.percentile(s, 99)), s.max(), puros, infl
+
+
+def costura_vanilla(vanillas, paleta):
+    """El mismo medidor, sobre la piel del VANILLA y sus propias aristas.
+
+    Es la referencia, como en el resto del guion: no hay un numero bueno de
+    salto en abstracto, hay el que el juego ya se traga con esa animacion y
+    ese esqueleto. Solo cuentan los vertices con peso de la paleta y las
+    aristas cuyos DOS extremos lo tienen; los demas son ojos y brillos, que
+    no son piel.
+    """
+    crudo, vecinas, mapa, n = [], [], {}, 0
+    for o in vanillas:
+        nombre = {g.index: g.name for g in o.vertex_groups}
+        vivos = {}
+        for v in o.data.vertices:
+            pares = [(nombre[e.group], e.weight) for e in v.groups
+                     if nombre[e.group] in paleta and e.weight > 0]
+            if not pares:
+                continue
+            total = sum(w for _, w in pares)
+            vivos[v.index] = n
+            crudo.append({g: w / total for g, w in pares})
+            vecinas.append([])
+            n += 1
+        for a in o.data.edges:
+            i, j = a.vertices
+            if i in vivos and j in vivos:
+                vecinas[vivos[i]].append(vivos[j])
+                vecinas[vivos[j]].append(vivos[i])
+        mapa[o.name] = len(vivos)
+    return costura(crudo, vecinas)
+
+
+def mide_palanca(dominantes, puntos, vv_nuestro, pesos_vanilla):
+    """Cuanto AMPLIFICA cada hueso, contra la piel a la que iba destinado.
+
+    Un grado de giro se convierte en metros segun lo lejos que este el
+    vertice del hueso que lo mueve. El sitio del hueso se toma de la PIEL
+    del vanilla -el centroide de los vertices que domina-, NO del armature:
+    NMSDK no deja alineadas las dos matrices y por ahi ya se colo un
+    diagnostico falso una vez.
+
+    Devuelve hueso -> (nuestra distancia, la del vanilla, las veces). Ese
+    ultimo numero es todo: con 18,4x el mismo giro que mueve su piel 5 cm
+    nos mueve el brazo casi un metro, y eso es la cuchilla.
+    """
+    centro = {}
+    for punto, pares in zip(vv_nuestro, pesos_vanilla):
+        centro.setdefault(max(pares, key=lambda t: t[1])[0], []).append(punto)
+    dom = np.array(dominantes)
+    salida = {}
+    for hueso, suyos in centro.items():
+        c = np.mean(suyos, axis=0)
+        mios = puntos[dom == hueso]
+        if not len(mios):
+            continue
+        nd = float(np.linalg.norm(mios - c, axis=1).mean())
+        sd = float(np.linalg.norm(np.array(suyos) - c, axis=1).mean())
+        salida[hueso] = (nd, sd, nd / sd)
+    return salida
+
+
+def deriva_del_mapa(crudo, cuenta, n):
+    """Lo que mas se separa el reparto del MAPA A MANO, en fraccion.
+
+    Es el assert DERIVA de abajo, adelantado: suavizar de mas se come una
+    region entera, y esto dice cuanto antes de que corte.
+    """
+    dom = {}
+    for p in crudo:
+        g = max(p, key=p.get)
+        dom[g] = dom.get(g, 0) + 1
+    return max(abs(dom.get(h, 0) / n - c / n) for h, c in cuenta.items())
+
+
 def caja_mundo(ob):
     co = [ob.matrix_world @ v.co for v in ob.data.vertices]
     lo = np.array([min(c[i] for c in co) for i in range(3)])
@@ -273,7 +770,7 @@ def paleta_vanilla():
             for v in re.findall(r'value="(-?\d+)"', bloque.group(0))}
 
 
-def asimetria(frac, espejo, paleta):
+def asimetria(frac, espejo, paleta, alfas=None):
     """Cuanto se desparejan los huesos izquierdo y derecho, en fraccion.
 
     Solo cuenta los que TIENEN pareja EN LA PALETA. Sin esa condicion,
@@ -281,8 +778,19 @@ def asimetria(frac, espejo, paleta):
     -que esta pareado al vertice, RFirstLeg3JNT 260 y LFirstLeg3JNT 260-
     salia con 0,459 de asimetria, o sea con la suya propia entera.
     NewBack1JNT ni siquiera lleva L ni R, y tambien se salta.
+
+    Y SE DESCUENTA EL ALFA, desde la PRUEBA08. El agarre desparea el peso
+    A PROPOSITO: si la pata izquierda del FIEND gira 2,7 veces mas que la
+    derecha, `espeja` le quita peso a la nuestra para que las dos se
+    MUEVAN igual, y el reparto sale con 0,208 de asimetria siendo justo lo
+    que se queria. Deshacer el alfa devuelve el reparto que pidio el mapa
+    -que si es simetrico, porque son dos mitades de un plano en u 0,50- y
+    deja este guard cazando lo que se escribio para cazar: que el vecino
+    mas cercano o el suavizado se hayan comido un lado, que es la PRUEBA12
+    y la PRUEBA14.
     """
     izq, der = espejo
+    alfas = alfas or {}
     total = 0.0
     for g in frac:
         if der not in g:
@@ -290,7 +798,9 @@ def asimetria(frac, espejo, paleta):
         pareja = g.replace(der, izq, 1)
         if pareja == g or pareja not in paleta:
             continue
-        total += abs(frac.get(pareja, 0.0) - frac[g])
+        a = max(alfas.get(g, 1.0), 1e-3)
+        b = max(alfas.get(pareja, 1.0), 1e-3)
+        total += abs(frac.get(pareja, 0.0) / b - frac[g] / a)
     return total
 
 
@@ -529,18 +1039,180 @@ if M.get("regiones"):
         f"el mapa de regiones nombra huesos a los que el vanilla NO pega "
         f"piel: {fuera}. Tienen que estar en el SkinMatrixLayout, o son "
         f"astillas: es el fallo de la PRUEBA14")
-    cuenta = {}
-    for p in puntos:
-        u, v, w = (p - lo_p) / tam_p
-        for hueso, dentro in M["regiones"]:
-            if dentro(u, v, w):
-                crudo.append({hueso: 1.0})
-                cuenta[hueso] = cuenta.get(hueso, 0) + 1
-                break
-    print("\nmapa a mano region -> hueso:")
+
+    # Y QUE EL HUESO SE MUEVA. Estar en la paleta dice que el vanilla le
+    # pega piel; NO dice que tenga una sola clave de animacion. El ARTHROPOD
+    # tiene seis `legbase_*` en la paleta y quietos en los cuatro `.ANIM`, y
+    # la PRUEBA05 colgo de ellos el 52,2% del zombie: entro al juego rigido.
+    # Un miembro cuelga de un hueso que gire; el tronco puede colgar de uno
+    # quieto, porque hereda al padre y no necesita giro propio.
+    quietos = [h for h, _ in M["regiones"]
+               if h in M.get("sin_claves", ())
+               and not any(t in h for t in M["tronco"])]
+    assert not quietos, (
+        f"el mapa cuelga un MIEMBRO de huesos sin ni una clave de "
+        f"animacion: {quietos}. En partida sale rigido, que es la PRUEBA05. "
+        f"Coge el primer eslabon de la cadena que SI tenga claves")
+    AGARRE = M.get("agarre", {})
+
+    def mapa_a_mano(alfa):
+        """Los pesos que pide el mapa, con el AGARRE ya aplicado.
+
+        EL AGARRE ES LA PALANCA, y es lo unico que quedaba por tocar.
+        Medido el 30/08 con `--barrer`: el mismo hueso que mueve su propia
+        piel vanilla 0,15 m mueve nuestro brazo 2,77 m, o sea 18,4 VECES,
+        porque el pivote le queda a metros. Por eso salian cuchillas en las
+        extremidades, y por eso cambiar de eslabon no las quitaba: Leg1,
+        Leg2 y Leg3 tienen todos la misma palanca y solo cambia el giro.
+
+        `alfa` es cuanto del giro PROPIO del hueso se queda la region; el
+        resto se lo lleva su ancla, que es la region vecina y va con el
+        cuerpo. El desplazamiento es lineal en el peso, asi que alfa
+        multiplica la palanca: con 0,20 el brazo se mueve una quinta parte.
+        Y la mezcla es la MISMA en toda la region, asi que no abre costura
+        por dentro; solo baja la que ya habia en el hombro.
+
+        alfa 1,0 es el mapa duro de siempre -la PRUEBA06, con cuchillas- y
+        alfa 0,0 es colgar el miembro del tronco, o sea rigido, que es la
+        PRUEBA05. El numero se elige con `--barrer --alfa`.
+
+        Devuelve DOS repartos: el que pide el mapa por region y el
+        DOMINANTE, que con mezcla ya no es el nombre de la region.
+        """
+        crudo, region, manda = [], {}, {}
+        for p in puntos:
+            u, v, w = (p - lo_p) / tam_p
+            for hueso, dentro in M["regiones"]:
+                if dentro(u, v, w):
+                    ancla = AGARRE.get(hueso)
+                    a = alfa.get(hueso, 1.0)
+                    pesos = ({hueso: a, ancla: 1.0 - a}
+                             if ancla and a < 1.0 else {hueso: 1.0})
+                    crudo.append(pesos)
+                    region[hueso] = region.get(hueso, 0) + 1
+                    g = max(pesos, key=pesos.get)
+                    manda[g] = manda.get(g, 0) + 1
+                    break
+        return crudo, region, manda
+
+    def vaiven_de(palanca, clips):
+        """Cuanto mueve cada hueso NUESTRA piel: palanca POR giro de mundo.
+
+        LA PALANCA SOLA NO BASTA, y eso lo ensena la PRUEBA07 en partida.
+        La palanca dice lo lejos que le queda el pivote a nuestra region,
+        o sea cuantas VECES amplifica; no dice si el hueso se mueve. La 07
+        eligio los alfas con la palanca sola y le salio del reves: apreto
+        la CABEZA del necromorfo al 61% -palanca 6,2x pero 2,9 grados al
+        andar, o sea inofensiva- y dejo enteras las dos patas traseras
+        -palanca 3,9x, pero 69,5 y 26,2 grados, las que mas giran de toda
+        la paleta, y el 41,7% de la malla-. En partida se vio exactamente
+        eso el 31/08: brazos y ataque limpios, y al andar se estira la
+        mitad de abajo.
+
+        El vaiven se mide sobre los clips de LOCOMOCION, que es donde se
+        ve, y se coge el PEOR. Sale en grados-por-veces y solo sirve para
+        comparar regiones entre si, nunca como medida absoluta.
+        """
+        if not clips:
+            return {h: x[2] for h, x in palanca.items()}
+        giros = json.loads(Path(M["giros"]).read_text(encoding="utf-8"))
+        return {h: x[2] * max(giros[h][c] for c in clips)
+                for h, x in palanca.items() if h in giros}
+
+    def espeja(vaiven):
+        """Iguala cada region con su espejo, por el lado MAS QUIETO.
+
+        Un bipedo anda con las dos piernas igual. El FIEND no: es una
+        arana, su animador nunca necesito simetria, y `LFourthLeg1JNT`
+        gira 69,5 grados al andar contra los 26,2 de `RFourthLeg1JNT`,
+        2,7 VECES mas. Nuestro mapa parte la mitad de abajo por un plano
+        duro en u 0,50 y cuelga cada mitad de una de las dos, asi que las
+        dos mitades cizallan por la linea media. Eso es el -al andar se
+        estira la mitad del cuerpo- de la PRUEBA07, y NO lo arregla ningun
+        tope global: es una diferencia ENTRE regiones, no un exceso de
+        una sola.
+
+        Se iguala por abajo porque el lado quieto es el que en partida se
+        ve bien.
+        """
+        izq, der = M["espejo"]
+        salida = dict(vaiven)
+        for h in vaiven:
+            for a, b in ((izq, der), (der, izq)):
+                if a not in h:
+                    continue
+                pareja = (b + h[len(a):] if h.startswith(a)
+                          else h.replace(a, b, 1))
+                if pareja != h and pareja in vaiven:
+                    salida[h] = min(vaiven[h], vaiven[pareja])
+                    break
+        return salida
+
+    def alfas_de(objetivo):
+        """Cuanto giro propio se le deja a cada region.
+
+        Dos reglas, y CADA UNA LEE SUS PROPIOS CLIPS. El ESPEJO iguala
+        cada miembro con el del otro lado y se mide sobre LOCOMOCION, que
+        es donde vive la asimetria de la arana: meter `attack` ahi la
+        taparia, porque atacando las dos patas giran parecido. El TOPE no
+        deja a nadie pasar del objetivo y se mide sobre `clips_tope`, que
+        por defecto son los mismos pero puede ser la lista entera.
+
+        LA PRUEBA08 ENSENA POR QUE HACEN FALTA DOS LISTAS. Con el tope
+        leyendo solo `walk` y `run`, la cabeza del zombie mide 21 -alfa
+        1,0, el tope ni la ve- y en `attack01` mide 299. En partida el
+        31/08 salio exactamente eso: brazos limpios y la cabeza en
+        cuchilla.
+
+        El desplazamiento es lineal en el peso, asi que el alfa es la
+        razon directa entre el vaiven que se quiere y el que hay, y de las
+        dos reglas manda la mas apretada.
+
+        `alfas_fijos` gana sobre las dos. Es para congelar una region que
+        ya se ha medido EN PARTIDA y que no se quiere volver a mover.
+        """
+        espejo = espeja(VAIVEN) if M.get("espejo_vaiven") else VAIVEN
+        alfas = {}
+        for h in AGARRE:
+            if not VAIVEN.get(h):
+                continue
+            a = espejo[h] / VAIVEN[h]
+            if objetivo and VAIVEN_TOPE.get(h):
+                a = min(a, objetivo / VAIVEN_TOPE[h])
+            alfas[h] = min(1.0, a)
+        alfas.update(M.get("alfas_fijos") or {})
+        # `--alfa hueso=valor,hueso=valor` para probar un agarre sin tocar
+        # este archivo. Existe desde el 01/09, y por una medida concreta:
+        # `Pose-NMSMesh.py` dice que la costura de la cadera abre 22 cm
+        # porque el muslo cuelga de un hueso que gira 28 grados y la
+        # cintura de uno que gira 3, y el tope por `objetivo` NO LLEGA AHI
+        # -pide 120 y las piernas miden 28-. Lo que hay que topar ahi no es
+        # el giro absoluto: es la DIFERENCIA a un lado y otro de la costura.
+        if "--alfa" in sys.argv:
+            for par in sys.argv[sys.argv.index("--alfa") + 1].split(","):
+                hueso, valor = par.split("=")
+                alfas[hueso] = float(valor)
+        return alfas
+
+    palanca = mide_palanca([max(p, key=p.get) for p in mapa_a_mano({})[0]],
+                           puntos, vv_nuestro, pesos_vanilla)
+    VAIVEN = vaiven_de(palanca, M.get("clips") or ())
+    VAIVEN_TOPE = vaiven_de(palanca, M.get("clips_tope") or M.get("clips") or ())
+    ALFAS = alfas_de(M.get("objetivo"))
+    crudo, cuenta, cuenta_manda = mapa_a_mano(ALFAS)
+    print()
+    print(f"mapa a mano region -> hueso (objetivo {M.get('objetivo') or '-'}):")
     for hueso, _ in M["regiones"]:
         n = cuenta.get(hueso, 0)
-        print(f"  {hueso:<20} {n:6d}  {n / len(puntos) * 100:5.1f}%")
+        x = palanca.get(hueso, (0, 0, 0))[2]
+        vai = VAIVEN.get(hueso, 0.0)
+        top = VAIVEN_TOPE.get(hueso, vai)
+        a = ALFAS.get(hueso, 1.0)
+        peor = f"  vaiven {vai:6.0f}" + (f" (todos {top:6.0f})" if top > vai else "")
+        cola = (f"{peor} -> {max(vai, top) * a:6.0f}, agarre "
+                f"{1 - a:.0%} a {AGARRE[hueso]}" if a < 1.0 else peor)
+        print(f"  {hueso:<20} {n:6d}  {n / len(puntos) * 100:5.1f}%"
+              f"   {x:4.1f}x{cola}")
 else:
     for i in range(0, len(puntos), BLOQUE_VECINOS):
         trozo = puntos[i:i + BLOQUE_VECINOS]
@@ -577,29 +1249,106 @@ for a in nuestra.data.edges:
     vecinas[i].append(j)
     vecinas[j].append(i)
 
-for _ in range(SUAVIZADOS):
-    siguiente = []
-    for i, propio in enumerate(crudo):
-        mezcla = dict(propio)
-        for j in vecinas[i]:
-            for n, w in crudo[j].items():
-                mezcla[n] = mezcla.get(n, 0.0) + w
-        total = sum(mezcla.values())
-        siguiente.append({n: w / total for n, w in mezcla.items()})
-    crudo = siguiente
+def a_salida(crudo):
+    """Los pesos crudos en el formato de pesos.json.
 
-salida = []
-for i, pesos in enumerate(crudo):
-    pares = sorted(pesos.items(), key=lambda t: -t[1])[:2]
-    total = sum(w for _, w in pares)
-    pares = [(n, round(float(w / total), 6)) for n, w in pares]
-    # Redondear a seis decimales puede dejar la suma en 0.999999, y el
-    # assert de mas abajo pide 1 con 1e-4. Se cuadra en el mayor.
-    pares[0] = (pares[0][0],
-                round(pares[0][1] + 1.0 - sum(w for _, w in pares), 6))
-    co = nuestra.data.vertices[i].co
-    salida.append([round(co.x, 6), round(co.y, 6), round(co.z, 6),
-                   [list(t) for t in pares]])
+    Se saco a funcion el 01/09 porque el barrido de `--objetivo` tiene que
+    DEJAR EN DISCO cada candidato para que `Pose-NMSMesh.py` lo puntue
+    contra las animaciones de verdad. Escribirlo dos veces era el camino
+    corto a que el barrido midiera un formato y la entrega otro.
+    """
+    salida = []
+    for i, pesos in enumerate(crudo):
+        pares = sorted(pesos.items(), key=lambda t: -t[1])[:nmsskin.RANURAS]
+        total = sum(w for _, w in pares)
+        pares = [(n, round(float(w / total), 6)) for n, w in pares]
+        # Redondear a seis decimales puede dejar la suma en 0.999999, y el
+        # assert de mas abajo pide 1 con 1e-4. Se cuadra en el mayor.
+        pares[0] = (pares[0][0],
+                    round(pares[0][1] + 1.0 - sum(w for _, w in pares), 6))
+        co = nuestra.data.vertices[i].co
+        salida.append([round(co.x, 6), round(co.y, 6), round(co.z, 6),
+                       [list(t) for t in pares]])
+    return salida
+
+
+if "--barrer" in sys.argv:
+    # Decidir SIN ENTRAR A LA PARTIDA. Dos barridos, y no miden lo mismo:
+    #
+    #   --barrer              pasadas de SUAVIZADOS. Medido el 30/08 y
+    #                         DESCARTADO: con 12 pasadas nuestra piel ya es
+    #                         MAS SUAVE que la del propio vanilla -p99 0,180
+    #                         contra 0,500- y el vanilla no saca cuchillas.
+    #                         La costura no era el fallo.
+    #   --barrer --objetivo   el AGARRE, que si lo es. Ver `mapa_a_mano`.
+    #
+    # El objetivo se lee contra la partida, no contra un numero redondo: las
+    # PIERNAS ya salen bien y estan a 3,9x en el necro y a 3,6x en el
+    # zombie. Bajar los brazos y la cabeza a eso es toda la medida.
+    if M.get("regiones"):
+        print()
+        print(f"{'hueso':<22} {'palanca':>8} {'vanilla':>8} {'x':>6}")
+        for _h, _ in M["regiones"]:
+            if _h in palanca:
+                nd, sd, x = palanca[_h]
+                print(f"{_h:<22} {nd:8.2f} {sd:8.2f} {x:5.1f}x")
+
+    v_med, v_p99, v_mx, v_puros, v_infl = costura_vanilla(vanillas, paleta)
+
+    if "--objetivo" in sys.argv:
+        metas = [float(x) for x in
+                 sys.argv[sys.argv.index("--objetivo") + 1].split(",")]
+        print()
+        print("x EFECTIVA por region:")
+        print(f"{'hueso':<22} {'hoy':>7}"
+              + "".join(f"{'obj ' + f'{m:g}':>9}" for m in metas))
+        for _h, _ in M["regiones"]:
+            if _h not in palanca:
+                continue
+            x = palanca[_h][2]
+            print(f"{_h:<22} {x:6.1f}x"
+                  + "".join(f"{x * alfas_de(m).get(_h, 1.0):8.1f}x"
+                            for m in metas))
+        print()
+        print(f"{'objetivo':>8} {'medio':>7} {'p99':>7} {'max':>7} "
+              f"{'1 hueso':>8} {'infl':>6} {'deriva':>7}")
+        for m in metas:
+            c_m, _, manda_m = mapa_a_mano(alfas_de(m))
+            for _ in range(SUAVIZADOS):
+                c_m = suaviza(c_m, vecinas)
+            med, p99, mx, puros, infl = costura(c_m, vecinas)
+            # Cada candidato se deja en disco. La costura es un PROXY -mide
+            # saltos de peso entre vecinos, sin animacion ninguna-; quien
+            # dice si sale cuchilla es Pose-NMSMesh.py, que lo mueve con los
+            # .ANIM del juego.
+            ruta = SALIDA.parent / f"pesos_obj{m:g}.json"
+            ruta.write_text(json.dumps(a_salida(c_m)), encoding="utf-8")
+            print(f"{m:8.1f} {med:7.3f} {p99:7.3f} {mx:7.3f} "
+                  f"{puros * 100:7.1f}% {infl:6.2f} "
+                  f"{deriva_del_mapa(c_m, manda_m, len(puntos)) * 100:6.1f}p")
+    else:
+        print()
+        print(f"{'pasadas':>7} {'medio':>7} {'p99':>7} {'max':>7} "
+              f"{'1 hueso':>8} {'infl':>6} {'deriva':>7}")
+        hecho = 0
+        for meta in (0,) + BARRIDO:
+            while hecho < meta:
+                crudo = suaviza(crudo, vecinas)
+                hecho += 1
+            med, p99, mx, puros, infl = costura(crudo, vecinas)
+            d = (f"{deriva_del_mapa(crudo, cuenta_manda, len(puntos)) * 100:6.1f}p"
+                 if M.get("regiones") else "     --")
+            print(f"{hecho:7d} {med:7.3f} {p99:7.3f} {mx:7.3f} "
+                  f"{puros * 100:7.1f}% {infl:6.2f} {d}")
+    print(f"{'VANILLA':>8} {v_med:7.3f} {v_p99:7.3f} {v_mx:7.3f} "
+          f"{v_puros * 100:7.1f}% {v_infl:6.2f}       - "
+          f" <- la piel del vanilla con sus propias aristas")
+    sys.exit(0)
+
+for _ in range(SUAVIZADOS):
+    crudo = suaviza(crudo, vecinas)
+
+salida = a_salida(crudo)
 
 # 3. Dejar los grupos puestos en el .blend, para poder mirarlo a mano.
 for g in list(nuestra.vertex_groups):
@@ -624,6 +1373,9 @@ print(f"asignaciones: {asignaciones}  "
       f"({asignaciones / len(salida):.2f} por vertice)")
 print(f"huesos con peso: {len(set(g for e in salida for g, _ in e[3]))}")
 print(f"la malla mide {tam[0]:.2f} / {tam[1]:.2f} / {tam[2]:.2f}\n")
+_med, _p99, _mx, _puros, _ = costura(crudo, vecinas)
+print(f"costura por arista: salto medio {_med:.3f}, p99 {_p99:.3f}, "
+      f"maximo {_mx:.3f}; {_puros * 100:.1f}% de vertices a UN solo hueso")
 print(f"{'hueso':22} {'vert':>5} {'%':>6}   caja")
 for g, n in sorted(reparto.items(), key=lambda t: -t[1])[:12]:
     c = puntos[np.array(dominante) == g]
@@ -644,7 +1396,8 @@ print(f"\ndistancia de cada vertice a SU hueso: media {lejos.mean():.3f}, "
 assert len(salida) == len(nuestra.data.vertices), (
     f"{len(salida)} pesos para {len(nuestra.data.vertices)} vertices")
 assert all(e[3] for e in salida), "hay vertices sin peso"
-assert max(len(e[3]) for e in salida) <= 2, "algun vertice cuelga de 3+"
+assert max(len(e[3]) for e in salida) <= nmsskin.RANURAS, (
+    f"algun vertice cuelga de mas de {nmsskin.RANURAS} huesos")
 for i, e in enumerate(salida):
     total = sum(p for _, p in e[3])
     assert abs(total - 1.0) < 1e-4, f"vertice {i} suma {total}"
@@ -678,7 +1431,21 @@ assert fraccion < limite, (
     f"{limite * 100:.1f}% (el vanilla no pasa del {ref_peor * 100:.1f}%). "
     f"Es el fallo del 15/08: un hueso dueño de medio bicho")
 
-asim = asimetria(nuestro, M["espejo"], paleta)
+# CON MAPA A MANO LA ASIMETRIA SE MIDE EN MASA, NO EN DOMINANTES.
+# `reparto_de` cuenta el hueso que MANDA en cada vertice, y eso deja de
+# querer decir nada en cuanto el agarre baja de 0,5: con alfa 0,42 la pierna
+# izquierda no manda en NINGUNO de sus vertices -manda RootJNT- y el guard
+# leia 0,208 de desparejo cuando el mapa habia repartido las dos mitades
+# igual. La masa de peso si es continua en el alfa, y descontandolo vuelve a
+# salir el reparto que pidio el mapa.
+masa = {}
+for _fila in salida:
+    for _g, _w in _fila[3]:
+        masa[_g] = masa.get(_g, 0.0) + _w
+masa = {_g: _m / len(salida) for _g, _m in masa.items()}
+
+asim = asimetria(masa if M.get("regiones") else nuestro, M["espejo"], paleta,
+                 ALFAS if M.get("regiones") else None)
 print(f"nuestra asimetria {asim:.3f} contra {ref_asim:.3f} del vanilla")
 assert asim - ref_asim < TOPE_ASIMETRIA, (
     f"el reparto sale desparejado: asimetria {asim:.3f} contra {ref_asim:.3f} "
@@ -705,8 +1472,8 @@ if M.get("regiones"):
     # tronco al 0,4%; una desviacion asi contra el mapa son 40 puntos y esto
     # corta en 5.
     DERIVA = 0.05
-    for hueso, _ in M["regiones"]:
-        pedido = cuenta.get(hueso, 0) / len(puntos)
+    for hueso in cuenta_manda:
+        pedido = cuenta_manda.get(hueso, 0) / len(puntos)
         salido = reparto.get(hueso, 0) / len(salida)
         assert abs(salido - pedido) < DERIVA, (
             f"{hueso}: el mapa le daba {pedido * 100:.1f}% y sale con "
@@ -764,5 +1531,8 @@ print(f"escrito {SALIDA}")
 for o in vanillas:
     bpy.data.objects.remove(o, do_unlink=True)
 bpy.data.objects.remove(armature, do_unlink=True)
-bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))
-print(f"guardado {BLEND}")
+if PRUEBA:
+    print(f"prueba: NO se guarda {BLEND}")
+else:
+    bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))
+    print(f"guardado {BLEND}")

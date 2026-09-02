@@ -51,6 +51,19 @@ PRESUPUESTOS = {
     # zombie no le aplica. Se deja escrito para que nadie vuelva a proponer
     # subirle el presupuesto: no hay de donde.
     "skrullcrawler": 30000,
+    # Los dos de la segunda hornada, que sustituyen al zombie y al
+    # necromorfo. Cada uno hereda el presupuesto del bicho vanilla al que
+    # va, porque el techo lo pone el formato -Indices16Bit=1, 65536
+    # vertices- y no el modelo.
+    #
+    # El warrior bug trae 133108 triangulos, o sea 3,7:1. Lejos del 46:1
+    # que puso al necromorfo a confeti, y ademas sus texturas NO vienen
+    # horneadas por triangulo: son de artista, con islas de UV grandes -el
+    # volcado por material da rangos 0..1 limpios en los doce slots-.
+    "warriorbug": 36000,
+    # El cry wolf trae 18920 entre sus dos mallas, o sea que este numero NO
+    # DECIMA NADA y esta puesto de tope, igual que en el skrullcrawler.
+    "crywolf": 30000,
 }
 
 MODELOS = {
@@ -64,6 +77,10 @@ MODELOS = {
         RAIZ + r"\ScrullCrawler_max_hd"
              + r"\Meshy_AI_Skullcrawler_0813180805_texture_fbx"
              + r"\Meshy_AI_Skullcrawler_0813180805_texture.fbx"),
+    "warriorbug": (
+        RAIZ + r"\warriorbug\source\bug_anim.fbx"),
+    "crywolf": (
+        RAIZ + r"\crywolf\source\Cry Wolf SETS.fbx"),
 }
 
 

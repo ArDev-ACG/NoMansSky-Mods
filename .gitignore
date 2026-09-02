@@ -82,6 +82,18 @@ work/models/fiendmesh/*
 !work/models/zombiemesh/
 work/models/zombiemesh/*
 !work/models/zombiemesh/pesos.json
+# La segunda hornada. Ademas del pesado entra `giros.json`, que es el giro de
+# mundo de cada hueso por clip: lo escribe Sway-NMSJoint.py leyendo los .ANIM
+# del juego, es propiedad del ESQUELETO y no de la malla, y sin el no se puede
+# recalcular ni el agarre ni el tope de vaiven.
+!work/models/warriorbugmesh/
+work/models/warriorbugmesh/*
+!work/models/warriorbugmesh/pesos.json
+!work/models/warriorbugmesh/giros.json
+!work/models/crywolfmesh/
+work/models/crywolfmesh/*
+!work/models/crywolfmesh/pesos.json
+!work/models/crywolfmesh/giros.json
 work/textures/
 *.blend
 # 20,9 MB. Decision del humano el 2026-08-15: entra, para que el proyecto de
@@ -111,3 +123,8 @@ Desktop.ini
 # --- Excepciones: esto SI se versiona ---
 !.gitignore
 !.gitkeep
+
+# --- Grafo Logseq (local, no se versiona) ---
+# logseq-graph/pages es un junction NTFS a docs/: los .md reales ya estan
+# versionados ahi. Aqui solo hay metadatos e indices de Logseq.
+logseq-graph/

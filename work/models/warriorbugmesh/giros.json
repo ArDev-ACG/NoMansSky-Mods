@@ -1,0 +1,320 @@
+{
+ "antenna_L0_0_jnt": {
+  "arthropodattack01.anim": 53.72,
+  "arthropodidle.anim": 30.45,
+  "arthropodrun.anim": 3.46,
+  "arthropodwalk.anim": 7.58
+ },
+ "antenna_L0_1_jnt": {
+  "arthropodattack01.anim": 98.76,
+  "arthropodidle.anim": 33.13,
+  "arthropodrun.anim": 15.04,
+  "arthropodwalk.anim": 30.38
+ },
+ "antenna_L0_2_jnt": {
+  "arthropodattack01.anim": 147.32,
+  "arthropodidle.anim": 62.07,
+  "arthropodrun.anim": 30.1,
+  "arthropodwalk.anim": 43.85
+ },
+ "antenna_R0_0_jnt": {
+  "arthropodattack01.anim": 62.17,
+  "arthropodidle.anim": 34.96,
+  "arthropodrun.anim": 1.56,
+  "arthropodwalk.anim": 7.4
+ },
+ "antenna_R0_1_jnt": {
+  "arthropodattack01.anim": 71.96,
+  "arthropodidle.anim": 39.62,
+  "arthropodrun.anim": 6.21,
+  "arthropodwalk.anim": 11.29
+ },
+ "antenna_R0_2_jnt": {
+  "arthropodattack01.anim": 99.43,
+  "arthropodidle.anim": 44.95,
+  "arthropodrun.anim": 11.89,
+  "arthropodwalk.anim": 15.21
+ },
+ "head_C0_0_jnt": {
+  "arthropodattack01.anim": 72.95,
+  "arthropodidle.anim": 30.03,
+  "arthropodrun.anim": 1.56,
+  "arthropodwalk.anim": 5.15
+ },
+ "leg_L0_0_jnt": {
+  "arthropodattack01.anim": 62.95,
+  "arthropodidle.anim": 3.12,
+  "arthropodrun.anim": 52.13,
+  "arthropodwalk.anim": 18.13
+ },
+ "leg_L0_1_jnt": {
+  "arthropodattack01.anim": 34.87,
+  "arthropodidle.anim": 2.19,
+  "arthropodrun.anim": 40.0,
+  "arthropodwalk.anim": 31.26
+ },
+ "leg_L0_2_jnt": {
+  "arthropodattack01.anim": 39.82,
+  "arthropodidle.anim": 1.84,
+  "arthropodrun.anim": 44.76,
+  "arthropodwalk.anim": 35.29
+ },
+ "leg_L0_3_jnt": {
+  "arthropodattack01.anim": 26.79,
+  "arthropodidle.anim": 1.72,
+  "arthropodrun.anim": 43.14,
+  "arthropodwalk.anim": 33.44
+ },
+ "leg_L0_end_jnt": {
+  "arthropodattack01.anim": 0.02,
+  "arthropodidle.anim": 0.01,
+  "arthropodrun.anim": 0.01,
+  "arthropodwalk.anim": 0.01
+ },
+ "leg_L1_0_jnt": {
+  "arthropodattack01.anim": 74.22,
+  "arthropodidle.anim": 7.37,
+  "arthropodrun.anim": 69.8,
+  "arthropodwalk.anim": 76.25
+ },
+ "leg_L1_1_jnt": {
+  "arthropodattack01.anim": 74.06,
+  "arthropodidle.anim": 6.71,
+  "arthropodrun.anim": 179.84,
+  "arthropodwalk.anim": 75.96
+ },
+ "leg_L1_2_jnt": {
+  "arthropodattack01.anim": 52.8,
+  "arthropodidle.anim": 4.48,
+  "arthropodrun.anim": 179.69,
+  "arthropodwalk.anim": 90.4
+ },
+ "leg_L1_3_jnt": {
+  "arthropodattack01.anim": 18.4,
+  "arthropodidle.anim": 5.55,
+  "arthropodrun.anim": 164.91,
+  "arthropodwalk.anim": 155.19
+ },
+ "leg_L1_end_jnt": {
+  "arthropodattack01.anim": 0.02,
+  "arthropodidle.anim": 0.01,
+  "arthropodrun.anim": 0.01,
+  "arthropodwalk.anim": 0.01
+ },
+ "leg_L2_0_jnt": {
+  "arthropodattack01.anim": 46.78,
+  "arthropodidle.anim": 2.66,
+  "arthropodrun.anim": 18.09,
+  "arthropodwalk.anim": 17.93
+ },
+ "leg_L2_1_jnt": {
+  "arthropodattack01.anim": 28.9,
+  "arthropodidle.anim": 1.94,
+  "arthropodrun.anim": 34.16,
+  "arthropodwalk.anim": 22.63
+ },
+ "leg_L2_2_jnt": {
+  "arthropodattack01.anim": 29.64,
+  "arthropodidle.anim": 1.85,
+  "arthropodrun.anim": 49.96,
+  "arthropodwalk.anim": 26.6
+ },
+ "leg_L2_3_jnt": {
+  "arthropodattack01.anim": 20.03,
+  "arthropodidle.anim": 1.82,
+  "arthropodrun.anim": 29.81,
+  "arthropodwalk.anim": 26.76
+ },
+ "leg_L2_end_jnt": {
+  "arthropodattack01.anim": 0.01,
+  "arthropodidle.anim": 0.01,
+  "arthropodrun.anim": 0.01,
+  "arthropodwalk.anim": 0.01
+ },
+ "leg_R0_0_jnt": {
+  "arthropodattack01.anim": 64.41,
+  "arthropodidle.anim": 3.12,
+  "arthropodrun.anim": 53.23,
+  "arthropodwalk.anim": 16.75
+ },
+ "leg_R0_1_jnt": {
+  "arthropodattack01.anim": 85.77,
+  "arthropodidle.anim": 2.19,
+  "arthropodrun.anim": 39.1,
+  "arthropodwalk.anim": 29.88
+ },
+ "leg_R0_2_jnt": {
+  "arthropodattack01.anim": 110.31,
+  "arthropodidle.anim": 1.84,
+  "arthropodrun.anim": 45.93,
+  "arthropodwalk.anim": 34.95
+ },
+ "leg_R0_3_jnt": {
+  "arthropodattack01.anim": 179.49,
+  "arthropodidle.anim": 1.72,
+  "arthropodrun.anim": 43.82,
+  "arthropodwalk.anim": 34.58
+ },
+ "leg_R0_end_jnt": {
+  "arthropodattack01.anim": 0.01,
+  "arthropodidle.anim": 0.01,
+  "arthropodrun.anim": 0.01,
+  "arthropodwalk.anim": 0.01
+ },
+ "leg_R1_0_jnt": {
+  "arthropodattack01.anim": 76.12,
+  "arthropodidle.anim": 3.01,
+  "arthropodrun.anim": 83.0,
+  "arthropodwalk.anim": 25.24
+ },
+ "leg_R1_1_jnt": {
+  "arthropodattack01.anim": 45.68,
+  "arthropodidle.anim": 1.94,
+  "arthropodrun.anim": 54.58,
+  "arthropodwalk.anim": 29.77
+ },
+ "leg_R1_2_jnt": {
+  "arthropodattack01.anim": 42.66,
+  "arthropodidle.anim": 1.65,
+  "arthropodrun.anim": 44.39,
+  "arthropodwalk.anim": 33.06
+ },
+ "leg_R1_3_jnt": {
+  "arthropodattack01.anim": 29.53,
+  "arthropodidle.anim": 1.62,
+  "arthropodrun.anim": 33.65,
+  "arthropodwalk.anim": 33.47
+ },
+ "leg_R1_end_jnt": {
+  "arthropodattack01.anim": 0.01,
+  "arthropodidle.anim": 0.01,
+  "arthropodrun.anim": 0.01,
+  "arthropodwalk.anim": 0.01
+ },
+ "leg_R2_0_jnt": {
+  "arthropodattack01.anim": 41.64,
+  "arthropodidle.anim": 2.66,
+  "arthropodrun.anim": 28.3,
+  "arthropodwalk.anim": 17.76
+ },
+ "leg_R2_1_jnt": {
+  "arthropodattack01.anim": 41.23,
+  "arthropodidle.anim": 1.94,
+  "arthropodrun.anim": 35.28,
+  "arthropodwalk.anim": 22.33
+ },
+ "leg_R2_2_jnt": {
+  "arthropodattack01.anim": 40.57,
+  "arthropodidle.anim": 1.86,
+  "arthropodrun.anim": 39.59,
+  "arthropodwalk.anim": 26.13
+ },
+ "leg_R2_3_jnt": {
+  "arthropodattack01.anim": 30.45,
+  "arthropodidle.anim": 1.82,
+  "arthropodrun.anim": 28.81,
+  "arthropodwalk.anim": 26.29
+ },
+ "leg_R2_end_jnt": {
+  "arthropodattack01.anim": 0.01,
+  "arthropodidle.anim": 0.01,
+  "arthropodrun.anim": 0.01,
+  "arthropodwalk.anim": 0.01
+ },
+ "legbase_L0_0_jnt": {
+  "arthropodattack01.anim": 38.14,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 5.83
+ },
+ "legbase_L1_0_jnt": {
+  "arthropodattack01.anim": 38.14,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 5.83
+ },
+ "legbase_L2_0_jnt": {
+  "arthropodattack01.anim": 38.14,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 5.83
+ },
+ "legbase_R0_0_jnt": {
+  "arthropodattack01.anim": 38.14,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 5.83
+ },
+ "legbase_R1_0_jnt": {
+  "arthropodattack01.anim": 44.54,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 14.19
+ },
+ "legbase_R2_0_jnt": {
+  "arthropodattack01.anim": 38.14,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 5.83
+ },
+ "local_C0_0_jnt": {
+  "arthropodattack01.anim": 0.0,
+  "arthropodidle.anim": 0.0,
+  "arthropodrun.anim": 0.0,
+  "arthropodwalk.anim": 0.0
+ },
+ "mandible_L0_0_jnt": {
+  "arthropodattack01.anim": 52.82,
+  "arthropodidle.anim": 31.3,
+  "arthropodrun.anim": 3.97,
+  "arthropodwalk.anim": 16.67
+ },
+ "mandible_L0_1_jnt": {
+  "arthropodattack01.anim": 52.82,
+  "arthropodidle.anim": 31.3,
+  "arthropodrun.anim": 3.97,
+  "arthropodwalk.anim": 16.77
+ },
+ "mandible_R0_0_jnt": {
+  "arthropodattack01.anim": 52.82,
+  "arthropodidle.anim": 31.3,
+  "arthropodrun.anim": 3.56,
+  "arthropodwalk.anim": 22.0
+ },
+ "mandible_R0_1_jnt": {
+  "arthropodattack01.anim": 52.82,
+  "arthropodidle.anim": 31.3,
+  "arthropodrun.anim": 3.56,
+  "arthropodwalk.anim": 17.75
+ },
+ "root_C0_0_jnt": {
+  "arthropodattack01.anim": 0.0,
+  "arthropodidle.anim": 0.0,
+  "arthropodrun.anim": 0.0,
+  "arthropodwalk.anim": 0.0
+ },
+ "spine_C0_0_jnt": {
+  "arthropodattack01.anim": 38.14,
+  "arthropodidle.anim": 0.83,
+  "arthropodrun.anim": 2.24,
+  "arthropodwalk.anim": 5.83
+ },
+ "tail_C0_0_jnt": {
+  "arthropodattack01.anim": 118.67,
+  "arthropodidle.anim": 1.52,
+  "arthropodrun.anim": 3.16,
+  "arthropodwalk.anim": 12.72
+ },
+ "tail_C0_1_jnt": {
+  "arthropodattack01.anim": 63.98,
+  "arthropodidle.anim": 2.67,
+  "arthropodrun.anim": 5.66,
+  "arthropodwalk.anim": 7.05
+ },
+ "tail_C0_2_jnt": {
+  "arthropodattack01.anim": 53.91,
+  "arthropodidle.anim": 3.9,
+  "arthropodrun.anim": 14.17,
+  "arthropodwalk.anim": 8.74
+ }
+}
