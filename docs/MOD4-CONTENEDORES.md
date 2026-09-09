@@ -1,5 +1,15 @@
 # Mod 4 — Contenedores: qué se puede y qué no
 
+> ❌ **CERRADO EL 2026-09-05. La idea se descarta y el mod se retira.**
+> `MOD4_Contenedores_PRUEBA01` subía el cofre 1 de 50 a 100 casillas con un solo campo. Se
+> midió en partida y **el cofre siguió saliendo de 50**. La firma escrita antes de entrar decía
+> que, si salía con 50, el layout **viene horneado en la partida** y comprobarlo exigía una
+> partida nueva; se decide no gastarla. El mod sale de `GAMEDATA\MODS\` a `MODS_Retirados\`.
+>
+> **Este documento se queda**, y no por nostalgia: no es la doc de un mod vivo, es el mapa de
+> **qué se puede tocar y qué no** en los diez cofres globales, medido sobre los `.pak`. Vale
+> igual —o más— ahora que la respuesta es «no se puede».
+
 **Investigación del 2026-08-27.** Todo lo de aquí está **medido** sobre los `.pak` de la
 instalación local (NMS 6.45, MBINCompiler 6.45.0.1), no supuesto. Donde no se ha medido, lo
 dice.

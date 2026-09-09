@@ -14,15 +14,16 @@ y **sobre qué criatura actúa**.
 
 ---
 
-## ⚠️ Estado de esta tabla — 2026-08-13
+## ⚠️ Estado de esta tabla — 2026-09-05
 
-**Las filas cubren la 0.3.2 y el mod desplegado es la 0.6.3.** La última revisión campo por
-campo contra los MBIN de `GAMEDATA\MODS` fue el **2026-08-07**. Lo de abajo sigue siendo
-cierto salvo donde diga lo contrario, pero **falta la pasada completa**.
+**Las filas de conducta llegan hasta la `0.9.0`, que es lo desplegado**, con las tres del
+interés (#75-77) añadidas el 05/09. Las filas más viejas cubren la `0.3.2` y **falta la pasada
+completa campo por campo**: la última fue el **2026-08-07**, contra los MBIN de `GAMEDATA\MODS`.
+Lo de abajo sigue siendo cierto salvo donde diga lo contrario.
 
 | Instalado hoy | |
 |---|---|
-| Mod | `HorribleTerror_Infestation_4-Hardcore` **0.6.3** — **11 MBIN** desde `ModBackups\`, con `GLOBALS\` movido a mano |
+| Mod | `HorribleTerror_Infestation_4-Hardcore` **0.9.0** — **11 MBIN** desde `ModBackups\`, con `GLOBALS\` movido a mano |
 | Mod 1 | **no instalado** (correcto: se instala uno o el otro) |
 | NMS | 170671, rama Public · MBINCompiler 6.45.0.1 |
 
@@ -124,6 +125,9 @@ Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 | 10 | `PercentagePlayerPredators` | Fracción de depredadores que atacan al jugador en vez de cazar fauna | Depredadores | 0.5 | — | 0.6 | **1.0** | **1.0** |
 | 11 | `MaxEcosystemCreaturesNormal` | Tope duro de criaturas vivas a la vez. Entero | **Todas las criaturas** | 40 | 45 | 50 | 60 | 70 |
 | 12 | `PlayerPredatorBoredomDistance` | A qué distancia se aburren y te sueltan | Depredadores | 80 | — | — | — | **150** |
+| 🆕 75 | `PredatorBoredomDistance` | Lo mismo que #12 **para el otro temperamento.** El juego trae dos, `TEMPERAMENT_PREDATOR` y `TEMPERAMENT_PLAYERPREDATOR`, y hasta la `0.9.0` sólo se le había subido a uno | Depredadores | 80 | — | — | — | **150** ⬆️ `0.9.0` |
+| 🆕 76 | `PlayerPredatorRegainInterestTime` | **Segundos que te ignora antes de volver a fijarse en ti.** Treinta segundos es lo que en partida se lee como «se van y no vuelven» | Depredadores | 30 | — | — | — | **2** ⬇️ `0.9.0` |
+| 🆕 77 | `PredatorRegainInterestTime` | Igual que #76, en el otro temperamento | Depredadores | 30 | — | — | — | **2** ⬇️ `0.9.0` |
 
 > Interacción: con percepción 80 y aburrimiento 150 el margen para escapar es de 70 m. Si
 > escapar se vuelve imposible, la corrección es subir el aburrimiento, **no** bajar la
@@ -133,9 +137,9 @@ Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 13 | `FiendMaxAttackers` | Cuántos te pegan **a la vez**. Entero | **Fiend** | 2 | — | 3 | 4 | **8** |
-| 14 | `FiendMaxEngaged` | Cuántos están en combate contigo. Entero | Fiend | 6 | — | 8 | 10 | **16** |
-| 15 | `MaxFiendsToSpawn` | Tope de Fiends generados por un evento. Entero | Fiend | 6 | — | 8 | 10 | **16** |
+| 13 | `FiendMaxAttackers` | Cuántos te pegan **a la vez**. Entero | **Fiend** | 2 | — | 3 | 4 | **24** ⬆️ `0.8.0` |
+| 14 | `FiendMaxEngaged` | Cuántos están en combate contigo. Entero | Fiend | 6 | — | 8 | 10 | **24** ⬆️ `0.8.0` |
+| 15 | `MaxFiendsToSpawn` | Tope de Fiends generados por un evento. Entero | Fiend | 6 | — | 8 | 10 | **24** ⬆️ `0.8.0` |
 | 16 | `FiendAggroTime` | Segundos que te persiguen tras perderte de vista | Fiend | 45 | — | 60 | 90 | **600** |
 
 > Hardcore sube estos cuatro en **0.3.1**. `MaxFiendsToSpawn` tiene que ir a la par de
@@ -197,11 +201,50 @@ Solo Hardcore. Estos cinco campos son el diagnóstico de «unos vienen y otros s
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 53 | `FiendAggroDecreasePerSpawn` | **Cuánto aggro gasta cada Fiend al nacer.** Ésta es la causa de fondo: romper un huevo suma +1.0, pero cada bicho que sale resta 0.1, así que una oleada de 12 vacía el medidor ella sola | **Fiend** | 0.1 | — | — | — | **0.0** |
+| 53 | `FiendAggroDecreasePerSpawn` | **Cuánto aggro gasta cada Fiend al nacer.** Romper un huevo suma +3.0, pero cada bicho que sale resta 0.1, así que una oleada la vacía ella sola. Estuvo en **0.0** desde la `0.3.1`, volvió a **0.1** en la `0.6.2` para desatascar la puerta del carguero, y desde la `0.7.0` va a un quinto de vanilla | **Fiend** | 0.1 | — | — | — | **0.02** ⬇️ `0.7.0` |
 | 54 | `FiendAggroIncreaseDamageEgg` | Aggro que suma **rozar** un huevo | Fiend | 1.0 | — | — | — | **3.0** |
 | 55 | `FiendAggroIncreaseDestroyEgg` | Aggro que suma **romperlo** | Fiend | 1.0 | — | — | — | **3.0** |
 | 56 | `FiendBeingShotMemoryTime` | Segundos que recuerda que le disparaste | Fiend | 10 | — | — | — | **60** |
 | 57 | `FiendDespawnDistance` | A cuántos metros se evapora si te alejas | Fiend | 150 | — | — | — | **300** |
+
+> 🔴 **`0.9.0` — los tres campos de interés (#75-77) NO eran la causa, medido el 05/09.**
+> Primera vuelta que tocaba el interés y no la presión. Se quedan puestos porque no hacen daño,
+> pero la respuesta en partida fue **«siguen alejándose en cuanto rugen»**, y esas tres palabras
+> apuntan al **único de los seis campos de interés que quedó fuera**: `FiendDistToConsiderTargetSwtich`
+> = **10** (el typo es del juego). El rugido **es** el parto —`SpawnBroodAnim` = `ROAR`—, o sea
+> que te sueltan justo cuando le nacen crías pegadas al cuerpo, y cada candidato a menos de 10 m
+> le hace replantearse a quién ataca. **Va sola en la `0.10.0` porque su signo no está claro**:
+> puede haber que bajarlo o que subirlo, y con una palanca por vuelta el resultado dice cuál.
+>
+> ✅ **`0.8.0` — CERRADA el 05/09** («si tal vez percibí más agresividad»). Las seis palancas se
+> quedan, y con ellas las dos de la `0.7.0`. Ni FPS ni puerta del carguero atascada, que eran los
+> dos riesgos escritos. **`B18` en [`ACUERDOS.md`](ACUERDOS.md): la presión está terminada** — no
+> se suben más contadores, alcance, cadencia ni drenaje.
+
+> ⬆️ **`0.8.0` — subir la agresividad otra vuelta, por petición del 04/09.** La `0.7.0` arregló
+> que el combate se apagara solo; esto es que además apriete. **Lo que se deja quieto a propósito:**
+> `RoarChanceOnHit` / `OnMiss` siguen en 0.0 aunque los globales de depredador valgan 0.6 y 0.7,
+> porque `SpawnBroodAnim` vale `ROAR` y subirlos es **parir por cada golpe** sin saber cuánto; y
+> `AllowSpawnBrood` del `BUGFIEND` sigue en `false`, que es **el techo de la oleada**.
+>
+> ⚠️ **Lo que hay que vigilar son los FPS**, y el orden de reversión va escrito: primero
+> `SpawnBroodTimer` vuelve a 10, luego los tres contadores (#13-15) a 16, y **sólo después**
+> `SteeringUpdateRate` a 0.25.
+
+> 🔄 **`0.7.0` — el combate se apagaba solo, y las tres quejas eran una.** En partida el
+> 03/09: *«el lobo se va después de rugir y va decreciendo el nivel de enemigos, y los
+> warrior bug se van separando»*. Las tres las explica **#53 multiplicado por el parto**.
+> `AllowSpawnBrood` (#27) es de la `0.3.1` y `SpawnBroodTimer` vale 10 s: con `FiendMaxAttackers`
+> a 8 son **0,8 de aggro cada 10 s** contra los 3,0 que da romper un huevo, o sea que la oleada
+> se desactiva sola en **menos de un minuto** — y al llegar el medidor a cero se suelta **toda**
+> de golpe, padre y crías. Baja a **0,02** y no a 0,0: a cero se quedó la primera puerta del
+> carguero abandonado pidiendo seguridad sin abrir nunca (`0.6.2`), y esa puerta necesita que el
+> medidor **se vacíe**. Con 0,02 se sigue vaciando, sólo que tarda cinco veces más.
+>
+> Y **#13 sube de 8 a 16**, que es el mismo número que `FiendMaxEngaged` (#14): con 8 sólo la
+> mitad de los enganchados podía pegar y la otra mitad esperaba alrededor, que es literalmente
+> el «se van separando» de las crías. **Lo que hay que volver a mirar**: la puerta del carguero
+> abandonado. Si vuelve a atascarse, es #53 y se sube a 0,05 antes que a 0,1.
 
 > **Por qué unos venían y otros no, en tres frases.** (1) Con huevos ×20 hay nidos que no
 > has tocado: sus Fiends nunca te fijaron, y lo que parece «perder el interés» es que
@@ -259,13 +302,18 @@ archivo, así que `ONCE` refuerza el ancla.
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 23 | `MinFlurryHits` | Golpes mínimos por racha de ataque. Entero | **Solo `FIEND`** | 2 | — | — | 3 | 3 |
-| 24 | `MaxFlurryHits` | Golpes máximos por racha. Entero | Solo `FIEND` | 4 | — | — | 5 | 6 |
-| 25 | `DelayBetweenPounceAttacks` | Segundos entre saltos sobre ti | Solo `FIEND` | 2.0 | — | 1.8 | 1.5 | 1.2 |
+| 23 | `MinFlurryHits` | Golpes mínimos por racha de ataque. Entero | **Solo `FIEND`** | 2 | — | — | 3 | **4** ⬆️ `0.8.0` |
+| 24 | `MaxFlurryHits` | Golpes máximos por racha. Entero | Solo `FIEND` | 4 | — | — | 5 | **8** ⬆️ `0.8.0` |
+| 25 | `DelayBetweenPounceAttacks` | Segundos entre saltos sobre ti | Solo `FIEND` | 2.0 | — | 1.8 | 1.5 | **0.7** ⬆️ `0.8.0` |
 | 26 | `AnimSpeedModifier` | Velocidad de la animación de ataque. **No toca el daño** | Solo `FIEND` | 1.0 | — | — | 1.1 | 1.2 |
+| 🆕 70 | `AllowSpitAlways` | Escupe **sin condición previa**, no sólo tras acercarse. **`BUGFIEND` ya lo trae en `true` de vanilla**: esto le copia al padre lo que el juego le da al hijo | Solo `FIEND` | `false` | — | — | — | **`true`** ⬆️ `0.8.0` |
+| 🆕 71 | `DelayBetweenSpitAttacks` | Segundos entre escupitajos | `FIEND` y `BUGFIEND` | 1.0 | — | — | — | **0.6** ⬆️ `0.8.0` |
+| 🆕 72 | `TurnToFaceTime` | Lo que tarda en encararte antes de pegar. Es tiempo muerto puro | `FIEND` y `BUGFIEND` | 0.3 | — | — | — | **0.15** ⬆️ `0.8.0` |
+| 🆕 73 | `FiendPounceDistanceModifier` | **Alcance del salto**, en globals. La palanca que más cambia la sensación y no cuesta un frame | Todos los Fiend | 1.7 | — | — | — | **3.0** ⬆️ `0.8.0` |
+| 🆕 74 | `FiendMaxVerticalForPounce` | **Desnivel máximo** que salva el salto, en metros. Con 0.3 subirte a una roca te salvaba | Todos los Fiend | 0.3 | — | — | — | **1.0** ⬆️ `0.8.0` |
 | 27 | `AllowSpawnBrood` | Activa que el bicho **pare crías mientras luchas** | Solo `FIEND` | `false` | — | — | — | **`true`** ✅ |
 | 28 | `SpawnBroodID` | Qué grupo pare. Copiado de `BUGQUEEN` vanilla | Solo `FIEND` → pare **`BUGFIENDS`** | *(vacío)* | — | — | — | `BUGFIENDS` ✅ |
-| 29 | `SpawnBroodTimer` | Segundos entre partos. `BUGQUEEN` usa 30; bajado para que se vea | Solo `FIEND` | 0.0 | — | — | — | 10 ✅ |
+| 29 | `SpawnBroodTimer` | Segundos entre partos. `BUGQUEEN` usa 30; bajado para que se vea | Solo `FIEND` | 0.0 | — | — | — | **5** ⬆️ `0.8.0` |
 
 ### 4b · Las crías igualadas al padre — 0.3.3
 
@@ -279,9 +327,9 @@ brood**: si la cría pariese también, el crecimiento sería exponencial y sin t
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 66 | `MinFlurryHits` | Igual que #23, en la cría | **Solo `BUGFIEND`** | 2 | — | — | — | 3 `[SIN PROBAR]` |
-| 67 | `MaxFlurryHits` | Igual que #24 | Solo `BUGFIEND` | 4 | — | — | — | 6 `[SIN PROBAR]` |
-| 68 | `DelayBetweenPounceAttacks` | Igual que #25 | Solo `BUGFIEND` | 2.0 | — | — | — | 1.2 `[SIN PROBAR]` |
+| 66 | `MinFlurryHits` | Igual que #23, en la cría | **Solo `BUGFIEND`** | 2 | — | — | — | **4** ⬆️ `0.8.0` |
+| 67 | `MaxFlurryHits` | Igual que #24 | Solo `BUGFIEND` | 4 | — | — | — | **8** ⬆️ `0.8.0` |
+| 68 | `DelayBetweenPounceAttacks` | Igual que #25 | Solo `BUGFIEND` | 2.0 | — | — | — | **0.7** ⬆️ `0.8.0` |
 | 69 | `AnimSpeedModifier` | Igual que #26 | Solo `BUGFIEND` | 1.0 | — | — | — | 1.2 `[SIN PROBAR]` |
 | — | `AllowSpawnBrood` | **Deliberadamente NO se toca en `BUGFIEND`** | — | `false` | — | — | — | `false` |
 

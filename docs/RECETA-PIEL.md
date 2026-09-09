@@ -7,7 +7,7 @@ en el juego. Lo que falta es **pegar nuestra malla a esos huesos**.
 Esta receta salió de hacerlo entero con el **SkrullCrawler** el 2026-08-15. Está escrita para
 repetirla con los otros tres modelos sin volver a investigar nada.
 
-Actualizado: **2026-09-02**, con la segunda hornada —el **warrior bug** y el **cry wolf**— que
+Actualizado: **2026-09-05**, con la segunda hornada —el **warrior bug** y el **cry wolf**— que
 sustituye a los dos bípedos y que **enseñó cuál era la causa de fondo de las dieciocho pruebas
 anteriores**. Está en §3, «la altura: la malla no puede subir por encima del esqueleto».
 
@@ -71,8 +71,30 @@ O sea: abrir 12 bytes por vértice y llenarlos.
 > 0c. tools/Export-NMSMesh.py -- <modelo>            gira, escala, asienta y exporta
 > 0d. tools/Graft-NMSScene.py      -> carpeta        el .SCENE vanilla con nuestra malla
 > 0e. tools/Patch-NMSGraft.py      -> .GEOMETRY      los cuatro arrays por hueso, del vanilla
+> 0e-bis. ...--bind <ANIM>#<fot>   -> .GEOMETRY      el bind, SI nuestra postura no es la del vanilla
 >     y despues recompilar el .GEOMETRY.MXML, que Patch- deja solo el XML
 > ```
+>
+> **Y las tres texturas, que van aparte y no dependen de la piel:**
+>
+> ```
+> tools/Bake-NMSNormal.py    -> .NORMAL.PNG   el relieve, HORNEADO del alto poly
+> tools/Make-NMSNormal.py    -> .NORMAL.PNG   apaño: lo saca de la luminancia
+> tools/Make-NMSMasks.py     -> .MASKS.PNG    el brillo, si el asset no trae rugosidad
+> tools/Make-NMSTexture.py   -> .DDS          codifica BC7 / ATI2 / ATI1
+> ```
+>
+> **`Bake-` antes que `Make-NMSNormal`, siempre que haya alto poly.** El de la luminancia
+> convierte la pintura en bultos y no puede inventar lo que el atlas no tiene: en el warrior
+> bug daba desviación **2,3** contra los 17,2 del vanilla, y horneado del `.fbx` de 133 108
+> triángulos da **20,1**. Ver `0.6.9` en [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md).
+>
+> ⚠️ **Una máscara plana es lo que se ve como plástico**, y no lo arregla cambiarle el nivel:
+> lo que le falta es **variación**. El vanilla varía ±30 alrededor de su media.
+>
+> ⚠️ **Y el fondo sin usar del atlas se queda a 0 en las máscaras**, se derrama después con
+> `--rellenar`. Invertir o normalizar el atlas entero manda ese fondo a brillo alto y sangra
+> por los mips: le pasó al cry wolf, con el 50,1 % de su atlas a 255.
 >
 > Lo que hay que decidir por modelo en el `0c` son **el giro y la altura**, y los dos se
 > miden en el AABB del bicho vanilla, no se adivinan:
@@ -174,6 +196,32 @@ error de datos en un cierre del juego.
 >
 > Por eso el paso 4 se corre **dos veces**: antes de poner el flag, para los índices, y después,
 > para el material. La segunda es la que autoriza a construir.
+
+---
+
+## 2b · 🔴 La vía muerta: `Retarget-NMSRig.py`. **No la uses**
+
+`tools/Retarget-NMSRig.py` existe, está entera y funciona, y **no está en la receta a
+propósito**. Se escribió el **04/09** para el cry wolf: reescribe los nueve `.ANIM` del vanilla
+como delta contra el fotograma 0 de `idle` aplicado sobre **nuestro** reposo, y calcula el bind
+con ellos.
+
+**Se construyó como `HT_CryWolf_PRUEBA06`, se desplegó, se midió y salió PEOR.** Se retiró el
+mismo día. La `PRUEBA07` —la que está en el juego y está congelada por `B16`— resuelve lo mismo
+**sin escribir un solo `.ANIM`**: con `--bind <ANIM>#<fotograma>` de
+[`../tools/Patch-NMSGraft.py`](../tools/Patch-NMSGraft.py), y su `.SCENE` va byte a byte el de
+la `PRUEBA05`.
+
+| | `Retarget-NMSRig.py` (vía muerta) | `--bind ANIM#fot` (la buena) |
+|---|---|---|
+| Qué escribe | los **nueve** `.ANIM` **y** el `.SCENE` | **44 matrices** y nada más |
+| Superficie de fallo | nueve archivos de animación reescritos | una constante por hueso |
+| Resultado medido | **peor** que la `PRUEBA05` | tensión 34,85 → **18,22** |
+
+**La lección, que es la que hay que llevarse:** el problema era el **bind**, no los clips. Un
+clip guarda una pose absoluta por fotograma, así que la tentación de reescribirlos es fuerte —
+pero el bind es una sola matriz por hueso y el clip son nueve archivos. **Si las dos vías
+arreglan lo mismo, gana la que escribe menos.** Ver `B15` en [`ACUERDOS.md`](ACUERDOS.md).
 
 ---
 
@@ -559,6 +607,135 @@ Se arregla con `giro=(-90, 0)` en vez de `(-90, 180)` en `Export-NMSMesh.py`. **
 tantear el `GIRO_Z` de `Weight-NMSMesh.py` para esto: ése gira el ESQUELETO, no nuestra malla,
 y el `Rz(180)` es el que lo pone de pie** — con 0 el esqueleto queda boca abajo, aunque el
 reparto parezca mejorar.
+
+> 🔴 **Y ese arreglo ERA AL REVÉS. Medido en partida el 02/09**: con `giro=(-90, 0)` los dos
+> entraron **de espalda**, así que el `180` que ya usaban las otras tres entradas del conducto
+> era el bueno y el volcado medía otra cosa — *el décimo superior de un insecto son las patas
+> levantadas, no la cabeza*. **La regla que queda: el giro no lo decide un volcado, lo decide
+> una entrada al juego.** El volcado sólo sirve para descartar, nunca para confirmar.
+
+### El giro de 180° ESPEJA el mapa a mano, y el assert sí lo caza
+
+**Los cortes de `regiones` están en coordenadas normalizadas de NUESTRA caja, y `Ry(180)`
+espeja dos de sus tres ejes: `u → 1−u` y `w → 1−w`.** Cambiar el giro sin espejarlos deja el
+mapa señalando al revés: en el warrior bug la región de la cabeza pasó a cazar la punta del
+abdomen —759 vértices en vez de 2 665— y `spine_C0_0_jnt` subió al **92,2 %** contra un tope
+de 85.
+
+No hay que re-derivar nada del histograma: es la **misma línea** con las dos sustituciones.
+`v` —la altura— no se toca.
+
+```
+("head_C0_0_jnt", lambda u, v, w: v > 0.70 and w > 0.55)   antes
+("head_C0_0_jnt", lambda u, v, w: v > 0.70 and w < 0.45)   después
+```
+
+### La POSTURA de reposo no la arregla ningún peso: si el bicho está mal plantado, es la malla
+
+**Medido el 04/09 en el cry wolf, y es la comprobación que hay que hacer ANTES de tocar pesos.**
+La queja era que la cabeza iba por delante. Se deformó **la misma malla** con `fiendwalk` usando
+dos repartos de peso distintos —el de la `PRUEBA03` y el de la `PRUEBA04`— y **los dos renders
+salen iguales**; y el `reposo.png`, que es la malla **sin animar**, ya traía el cuello adelante.
+
+**Y tiene que ser así, no es casualidad:** en la pose de bind la piel devuelve cada vértice a su
+sitio por construcción —`v' = Σ w · M·B⁻¹ · v` con `M = B` da `v` sea cual sea el reparto—. O sea
+que **ningún alfa, ningún tope y ningún agarre pueden cambiar la postura de reposo**. Es
+matemática, no ajuste.
+
+La prueba que lo separa, y cuesta dos corridas:
+
+```
+python tools/Pose-NMSMesh.py <bicho> --pesos <A>.json --clips <clip> --vista
+python tools/Pose-NMSMesh.py <bicho> --pesos <B>.json --clips <clip> --vista
+```
+
+Si los dos renders salen iguales, **no es el pesado**. Y `reposo.png` dice si ya venía de fábrica.
+
+**Arreglarlo es re-posar la geometría**, y en `Export-NMSMesh.py` hay un sitio para eso: la clave
+`pose` del modelo, que va **entre el giro y la escala** —en el marco de NMS, con Y arriba— y
+dobla una parte de la malla con una **rampa `smoothstep`**, no con un giro rígido. La rampa
+importa: un giro rígido deja un **pliegue** en la frontera, y un pliegue es geometría que el
+suavizado de los pesos no puede deshacer.
+
+**Y arrastra dos cosas, siempre:**
+
+1. **La caja cambia**, así que con `alto` fijo la escala uniforme cambia y **el cuerpo cambia de
+   tamaño** aunque la silueta mida lo mismo. En el lobo, doblar 30° dejó el cuerpo un **12 %**
+   más pequeño.
+2. **Los cortes del mapa de regiones hay que re-medirlos.** Van en coordenadas normalizadas: no
+   cambian con la escala —eso es `B14` de `ACUERDOS.md`— pero **sí con la forma**.
+
+Y con las aristas más cortas la `tensión` sube aunque el estirón baje, porque es una **razón**
+entre vecinos y la referencia se encogió. Cuando la forma cambia, el número que se compara es
+**`abre`, en metros**.
+
+
+### El tope tiene que leer TODOS los clips que el bicho reproduce, y el mod decide cuáles
+
+**Medido el 03/09 en el cry wolf, y costó una entrada al juego.** `clips_tope` llevaba cuatro
+animaciones —`walk`, `run`, `idle` y `attack`— y el `FIEND` tiene **nueve**. La que más tensa
+no es ninguna de las cuatro:
+
+| clip | roar | run | pounce | attack | walk | idle | attack2 | trot | attack3 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| tensión | **36,4** | 28,2 | 26,8 | 26,2 | 25,8 | 15,7 | 8,9 | 8,2 | 7,6 |
+
+Y la diferencia no es de matiz: en `roar` el giro de mundo de `RootJNT` vale **44,2** grados
+contra los **6,3** de `walk`, `NewBack1JNT` **49,4** contra 6,3 y `NewHeadJNT` **72,2** contra
+2,9. Con esos tres fuera de la lista, el tope se elige sobre un vaivén infravalorado **ocho
+veces**, y en partida se ve exactamente donde el tope no miraba.
+
+**Y cuál es el peor clip lo decide el MOD, no el vanilla.** Aquí `roar` importa porque
+`SpawnBroodAnim` del `FIEND` vale `ROAR` y el mod enciende `AllowSpawnBrood` con
+`SpawnBroodTimer` a 10 s: **el rugido es el parto**, así que es de los clips que más se
+reproducen. En vanilla, con `AllowSpawnBrood = false`, casi no sale.
+
+**La regla, entonces:** la lista de clips no se copia del bicho anterior. Se saca de
+`tools/AMUMSS/TOOLS/NMS_FULL_pak_list.txt` —que lista los `.ANIM` del esqueleto— y se cruza
+con lo que el mod enciende en `CREATUREDATATABLE`: `AllowPounce` mete `pounce`,
+`AllowSpitAlways` mete `spit`, `SpawnBroodAnim` mete el que diga. `Pose-NMSMesh.py --clips`
+los saca del `.pak` solo, así que medirlos todos cuesta una corrida.
+
+**Corolario que también costó una prueba:** una región **sin `agarre` no la topa nadie**.
+`alfas_de` sólo recorre `AGARRE`, así que un hueso que no esté ahí se queda con su vaivén
+entero por muy alto que sea — `NewBack1JNT` del lobo iba a **279** contra un objetivo de 170,
+siendo el hueso que `Pose-NMSMesh.py` culpaba en los nueve clips. Ya había pasado con
+`tail_C0_0_jnt` en el zombie. **Si una región aparece como culpable y no tiene ancla, ése es
+el fallo, y no hace falta partir la región en dos.**
+
+
+### El tope de vaivén NO es invariante de escala: escala con la malla
+
+**El vaivén es giro × PALANCA, y la palanca es la distancia de la región al pivote del hueso
+partida por el tamaño de la región.** El esqueleto del juego **no** crece con nosotros, así que
+doblar la malla sube la palanca **más** del doble — en el warrior bug la cabeza pasó de `4,4x`
+a `7,0x`.
+
+Con `objetivo` quieto, doblar el bicho **lo deja tieso**: el agarre de la cabeza subió del 53 %
+al 76 % y `spine` pasó a mandar el 90,1 %. Y el número nuevo **no se elige a ojo, es una
+ventana que se mide** en la propia corrida, leyendo la columna `todos` de cada región:
+
+| | Por debajo | Por encima |
+|---|---|---|
+| warrior bug 3,60 m | **255** — la cabeza (`todos` 510) pierde su hueso | **375** — las patas delanteras (`todos` 750) se sueltan del tórax |
+| warrior bug 2,70 m | **195** (`todos` 391) | **316** (`todos` 633) |
+| cry wolf 3,80 m | **155** (`todos` 309) | **250** (`todos` 506) |
+| cry wolf 2,85 m | **129** (`todos` 258) | **214** (`todos` 428) |
+
+**La ventana se mueve con cada cambio de `alto`, así que se vuelve a leer cada vez.** Dentro de
+ella el criterio es reproducir el reparto dominante de la entrega que ya se vio bien: **el tope
+nuevo es el que devuelve el reparto viejo.**
+
+> ⚠️ **Y el centro de la ventana no se coge a ciegas: se puntúa con `Pose-NMSMesh.py`.** En el
+> cry wolf a 2,85 m, `200` daba tensión 30,3/33,2/30,8 y costura 45/49/52 cm, y `170` la bajó a
+> 25,8/28,2/26,2 y 39/42/46 **con el mismo reparto**. Dos números válidos por el assert no son
+> el mismo bicho.
+
+> **Lo que la escala NO explica, en el cry wolf.** A 3,80 m abría 45/49/56 cm y a 2,85 abre
+> 39/42/46: bajarle un cuarto de tamaño casi no lo movió, y la `PRUEBA01` a 1,90 abría 10/12/13.
+> El medidor pone la costura en `NewBack1JNT` en los cuatro clips, o sea **el cuello largo
+> colgando del pecho**. Si en partida se ve abrir ahí, el arreglo no es el tope —ya está en el
+> centro de su ventana— sino **partir `NewBack1JNT` en dos regiones, cuello y pecho**.
 
 ### La proporción: dos cuadrúpedos pueden no casar, y entonces hace falta el mapa igual
 

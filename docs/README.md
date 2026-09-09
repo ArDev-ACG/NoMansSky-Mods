@@ -10,15 +10,16 @@ Destino: Nexus Mods, categoría Creatures.
 | Doc | Cuándo se abre |
 |---|---|
 | ⭐ [`PENDIENTES.md`](PENDIENTES.md) | **Siempre, primero.** Lo que está en el juego sin medir, la cola, y las preguntas sin responder. Nada más |
-- [`ACUERDOS.md`](ACUERDOS.md) — **lo ya aprobado en partida y que no se toca**, con quién lo comprueba. Se lee antes de cambiar cualquier constante
-- [`MOD4-CONTENEDORES.md`](MOD4-CONTENEDORES.md) — investigacion del mod 4: los diez cofres globales, que se puede tocar y que no, y los iconos en texto
+| [`ACUERDOS.md`](ACUERDOS.md) | **Lo ya aprobado en partida y que no se toca**, con quién lo comprueba. Se lee antes de cambiar cualquier constante |
 | [`MODIFICACIONES.md`](MODIFICACIONES.md) | «¿Qué campo toca el mod y sobre qué bicho?» — tabla viva |
 | [`ASSETS.md`](ASSETS.md) | «¿Cómo cambio el aspecto?» — texturas, colores, partes, y **Blender + NMSDK** en §4 |
 | [`../BLENDER/README.md`](../BLENDER/README.md) | «¿Qué carpeta abro para ver el modelo que hay en el juego?» — banco de Blender, la vuelta completa y el prefijo que hay que quitar |
 | [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) | «¿Qué campo controla percepción / acecho / ataque?» |
 | [`IDEAS.md`](IDEAS.md) | Mapa de spawn y cola de ideas sin comprometer |
 | [`FAUNA_REFERENCE.md`](FAUNA_REFERENCE.md) | Arquetipos y tablas de fauna vanilla |
-| [`NEXUS.md`](NEXUS.md) | Publicación y textos de la página |
+| [`NEXUS.md`](NEXUS.md) | Publicación y textos de la página del **mod 1** (conducta) |
+| [`NEXUS-BETA.md`](NEXUS-BETA.md) | Publicación y textos de la **beta: una sola página con los 5 archivos** (conducta + los 4 modelos). Se empaqueta con `tools\Package-SinFuente.ps1`, **sin el `.lua`**, y los permisos **no** son los del mod 1: mandan las licencias CC de los modelos. Lleva también el orden de las capturas y el aviso de los dos formatos que sí llevan dentro los releases publicados del mod 1 |
+| ~~[`MOD4-CONTENEDORES.md`](MOD4-CONTENEDORES.md)~~ | **Cerrado el 05/09.** El mod 4 no funcionó y la idea se descartó. Se queda porque es el mapa de qué **no** se puede tocar en los diez cofres globales |
 
 ### Historia — el «por qué» de cada decisión
 

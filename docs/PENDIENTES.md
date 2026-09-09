@@ -9,15 +9,32 @@ toque. Si buscas *por qué* se hizo algo, está en
 es el nombre del `.lua` cuando la prueba tiene uno (`HT_EggMesh_PRUEBA03`), y un código corto
 cuando es una pregunta y no un mod (`N1`, `Q-GLOW`).
 
+Actualizado: **2026-09-05** (decimotercera vuelta, y **es la de cerrar**: se miden seis
+pruebas de una sentada y cuatro salen de aquí para no volver. La **malla del cry wolf se
+congela** en la `PRUEBA07` —«dejamos el lobo como está ahorita in game»—; la **piel del warrior
+bug se congela** y `Q-TEXBUG` cierra por descarte, porque el atlas a 4096 no se ve; la `0.8.0`
+**cierra** y con ella la presión, que ya no se sube más; y el mod 4 se **descarta entero**. Lo
+que queda vivo es lo que la partida pidió a cambio: **mapear las patas** para las animaciones
+—`M6-PATAS`—, y el desenganche, que sigue abierto con **un solo sospechoso nombrado**:
+«siguen alejándose en cuanto rugen», y el rugido **es** el parto).
+
+<details>
+<summary>Lo que decía la cabecera anterior</summary>
+
+Actualizado: **2026-09-03** (duodécima vuelta, y **es la primera que mide conducta**: entran a
+la vez las tres cosas que la partida pidió. El **cry wolf** vuelve en `PRUEBA04` con el mismo
+cuerpo y otro reparto de peso —el tope de vaivén se había elegido sin mirar `roar`, que resulta
+ser el peor de los nueve clips—; el **warrior bug** entra en `PRUEBA05` con el atlas a 4096, que
+es la otra mitad de `Q-TEXBUG` y no toca una UV; y el mod pasa a **0.7.0**, que arregla que el
+combate se apagaba solo. Las mallas siguen congeladas: **ninguna de las dos mueve un vértice**).
+
+
 Actualizado: **2026-09-02** (décima vuelta, y **cambian los dos bichos**: el zombie y el
 necromorfo se retiran y entran el **warrior bug de Starship Troopers** sobre el `BUGFIEND` y
 el **cry wolf** sobre el `FIEND`, los dos en `PRUEBA01` y mod nuevo. Los dos **medidos fuera
 de la partida antes de construirlos** con `tools/Pose-NMSMesh.py`, y el cry wolf sale **mejor
 que la `PRUEBA10` del zombie ya aceptada**. El hallazgo de fondo: **la causa de las dieciocho
 pruebas anteriores no era el bipedismo, era la escala** — ver `B10` en `ACUERDOS.md`).
-
-<details>
-<summary>Lo que decía la cabecera anterior</summary>
 
 Actualizado: **2026-09-01** (novena vuelta: entregada la `HT_ZombieMesh_PRUEBA10` —
 `M4-SIMETRIA`—, la **primera prueba de la serie medida antes de construirla**, con
@@ -36,30 +53,20 @@ en adelante solo se trabajan esos dos**; lo demás baja a §5 hasta que cierren)
 
 ## 1 · En el juego ahora, sin medir
 
-**Solo se trabajan el zombie y el necromorfo.** Todo lo demás está parado y esperando turno
-en §5. Construido **y desplegado** en `GAMEDATA\MODS` el **2026-09-01 a las 00:01**, verificado
-descompilando el `.MBIN` de `GAMEDATA\MODS` —no el de `ModBackups`—: `Check-NMSGraft.py` da
-**salida 0** en los dos, con el flag y los tres samplers leídos, y el buffer desplegado da el
-**mismo md5** que el construido.
+**Queda una sola fila, y lleva ahí desde el 21/08.** La vuelta del 05/09 vació esta sección:
+la malla del cry wolf y la piel del warrior bug **se congelan**, la `0.8.0` cierra, la `0.9.0`
+dice que el interés no era y el mod 4 se descarta. Los seis veredictos, en
+[`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md), entrada del 05/09.
 
 | ID | Qué mirar |
 |---|---|
-| 🆕 **`HT_WarriorBug_PRUEBA01`** | **¿Entra y anda el bicho de Starship Troopers en el sitio del zombie?** Mod **nuevo**, 0.1.0. **El zombie se retira**: era un bípedo sobre un artrópodo. Malla 133 108 → 36 000 tris, 20 257 vértices exportados, atlas de **doce** texturas a 2048. Pesado con mapa a mano de 7 regiones, agarre, tope 120 y alfa 0,4 en abdomen y patas traseras. **Medido antes de construir**: tensión 25,9 andando · 38,7 corriendo · 55,3 atacando, y la costura abre 11 / 17 / 28 cm; `flex` 1,12-3,06, o sea que **no es una estatua**. Asimetría **0,000** contra 0,018 del vanilla. **Cuatro finales:** entra plantado y anda con las patas → el conducto cierra · sale estirado → el flag está y los pesos no, mirar el mapa · sale rígido de una pieza → es el flag, no el mapa · textura a remolinos → es el casado de los doce slots del atlas |
-| 🆕 **`HT_CryWolf_PRUEBA01`** | **¿Entra y anda el cuadrúpedo de cuello largo en el sitio del necromorfo?** Mod **nuevo**, 0.1.0. **El necromorfo se retira.** Se eligió contra el `crying-head` con motivo medido: aquél es una esfera con veinte brazos radiales y su masa vive arriba, o sea el mismo fallo por otra vía. 9 672 vértices → 11 100 exportados, **cero** aristas de UV rotas de 56 760, y **normal y rugosidad reales del asset** —lo primero de la serie: el zombie y el necromorfo llevaban normal inventado de la luminancia y máscaras planas—. **Medido antes de construir**: tensión 16,2 / 12,6 / 15,0 y abre 10 / 12 / 13 cm, o sea **mejor que la `HT_ZombieMesh_PRUEBA10` ya aceptada** (11,5 / 17,0 / 13,0 y 7 / 13 / 21 cm). Asimetría 0,000 contra 0,005. **Tres finales:** anda con las cuatro patas y el cuello no saca cuchilla → cierra · el cuello se estira → es la palanca de `NewHeadJNT`, bajarle el alfa · rígido de una pieza → es el flag |
+| `HT_CeilingPlague_PRUEBA03` | **¿Brota el nido del techo?** Desplegado el **21/08** y todavía sin una sola lectura. **Buscado el 05/09 y no apareció, y eso no es un veredicto**: el nido colgante del carguero abandonado es un hallazgo raro, así que la fila se queda esperando a que salga uno. El detalle, en §5.1 |
 
-> 🔬 **Los dos se midieron fuera de la partida antes de construirlos, y la vista lo enseña.**
-> `BLENDER/vista_anim/warriorbug/` y `.../crywolf/` traen los fotogramas deformados con los
-> `.ANIM` del juego. Puestos al lado de `BLENDER/vista_anim/necromorph/`, que es **lo que
-> estaba desplegado**, la diferencia se ve sin medir: el necromorfo sale aplastado y con las
-> cuchillas de varios metros que esta misma sección describía, y los dos nuevos salen enteros.
-
-> 🔴 **Y el hallazgo de fondo de la sesión, que cambia la lectura de dieciocho pruebas:**
-> **la causa nunca fue el bipedismo, fue la ESCALA.** Los acuerdos `B1` y `B2` subieron el
-> necromorfo a 3,62 m y el zombie a 2,43 m porque a tamaño vanilla se veían enanos, y el
-> precio no se midió hasta ahora: el esqueleto del `FIEND` mide **1,34 m** y el del
-> `ARTHROPOD` **1,05 m**, así que **más de la mitad de la malla quedaba por encima del último
-> hueso** —59,5 % y 60,7 %— donde el pesado no encuentra más que tronco. Ver `B10` en
-> [`ACUERDOS.md`](ACUERDOS.md). El bipedismo lo agravaba; no era la causa.
+> **Lo que está desplegado y ya no se mide** porque cerró: `HT_CryWolf_PRUEBA07` (malla
+> congelada), `HT_WarriorBug_PRUEBA05` (piel congelada), `HorribleTerror_Infestation_4-Hardcore`
+> `0.9.0` (contiene la `0.8.0`, que cerró; los tres campos de interés se quedan puestos aunque
+> no fueran la causa), `HT_EggMesh_PRUEBA05`, `HT_ScuttlerMesh_PRUEBA17`, `HT_DerelictBugs_PRUEBA02`
+> y `HT_PredatorParts_PRUEBA03`. La lista completa, en §3.
 
 ---
 
@@ -67,8 +74,19 @@ descompilando el `.MBIN` de `GAMEDATA\MODS` —no el de `ModBackups`—: `Check-
 
 | ID | Por qué |
 |---|---|
+| ✅ `HT_CryWolf_PRUEBA07` | **Se queda desplegada, pero sale de la cola.** Medida el 05/09: «dejamos ya las pruebas con el lobo como está ahorita in game». **La malla del cry wolf se congela** — no se toca un vértice ni un peso sin que se pida |
+| ~~`HT_CryWolf_PRUEBA05`~~ | Ya estaba retirada el 05/09 por la `PRUEBA07`. **No tiene veredicto propio y no lo va a tener**: el `.SCENE` de la `07` es byte a byte el suyo (md5 `2c30d9cf`), así que su doblez de cuello a 65° **se acepta dentro de la `07`** |
+| ✅ `HT_WarriorBug_PRUEBA05` | **Se queda desplegada, pero sale de la cola.** Medida el 05/09: «no hubo mucho aumento». El atlas a 4096 se ve igual que el de 2048, o sea que **la resolución nunca fue el techo** — `Q-TEXBUG` cierra por descarte. **La piel se congela**; lo que entra en su lugar es `M6-PATAS` |
+| 🔴 `Infestation 4-Hardcore 0.9.0` | **Los tres campos de interés no eran.** Medida el 05/09: «siguen alejándose **en cuanto rugen**». Se quedan puestos porque no hacen daño, pero `Q-INTERES` no cierra por ahí. Lo que sí trae la queja es el **disparador**: el rugido es el parto, y eso apunta a `FiendDistToConsiderTargetSwtich`, que va sola en la `0.10.0` |
+| ✅ `Infestation 4-Hardcore 0.8.0` | **Cierra.** Medida el 05/09: «si tal vez percibí más agresividad». Las seis palancas del 04/09 y las dos de la `0.7.0` se quedan; ni FPS ni puerta del carguero atascada, que eran los dos riesgos escritos. Pasan a [`ACUERDOS.md`](ACUERDOS.md). **La presión está terminada** |
+| ❌ ~~`MOD4_Contenedores_PRUEBA01`~~ | **La idea se cierra entera**, decidido el 05/09: «no funcionó, vamos a cerrar la idea y quitar lo referente de él». El cofre sigue saliendo de 50 y comprobarlo exigía gastar una partida nueva. A `MODS_Retirados\` el 05/09. [`MOD4-CONTENEDORES.md`](MOD4-CONTENEDORES.md) se queda marcado como cerrado: es el mapa de qué **no** se puede tocar, y eso vale igual |
+| ~~`HT_CryWolf_PRUEBA05`~~ | La sustituye la `PRUEBA07`, que escribe los mismos archivos. Se midió el 04/09 y la respuesta fue **«sigue flotando y las patas están tiesas»**: el doblez del cuello entró bien, pero el fallo era otro y estaba debajo —el bind—. A `MODS_Retirados\` el 05/09 |
+| ~~`HT_CryWolf_PRUEBA03`~~ | La sustituye la `PRUEBA04`, que escribe los mismos archivos. Se midió el 03/09 y salió **buena de tamaño y de sitio**; lo que no salió es el reparto de peso. A `MODS_Retirados\` el 03/09 |
+| ~~`HT_WarriorBug_PRUEBA04`~~ | La sustituye la `PRUEBA05`. **Medida el 03/09: el bicho se ve igual que la `PRUEBA03`**, así que lo que arreglaba —normal horneado y máscaras con variación— no era lo que se veía. Los dos archivos siguen dentro de la `05`. A `MODS_Retirados\` el 03/09 |
 | ~~`HT_ZombieMesh_PRUEBA10`~~ | Escribe los mismos `BUGFIEND.*` que el warrior bug: **no pueden convivir.** Movido a `GAMEDATA\MODS_Retirados\` el 02/09 |
 | ~~`HT_FiendMesh_PRUEBA09`~~ | Escribe los mismos `FIEND.*` que el cry wolf. Movido a `MODS_Retirados\` el 02/09. **Se retira sin medir en partida**: llevaba desde el 01/09 desplegado sin mirar |
+| ~~`HT_WarriorBug_PRUEBA01` y `PRUEBA02`~~ | Las sustituye la `PRUEBA03`, que escribe los mismos archivos. La `01` medía **1,80 m** y entraba **de espalda**; la `02` la giró bien pero a **3,60 m** salió demasiado grande. A `MODS_Retirados\` el 02 y el 03/09 |
+| ~~`HT_CryWolf_PRUEBA01` y `PRUEBA02`~~ | Mismo caso: **1,90 m** de espalda y **3,80 m** demasiado grande. A `MODS_Retirados\` el 02 y el 03/09 |
 
 <details>
 <summary>Lo que decían las dos entregas retiradas, para no perder el rastro</summary>
@@ -123,9 +141,11 @@ descompilando el `.MBIN` de `GAMEDATA\MODS` —no el de `ModBackups`—: `Check-
 
 | ID | Pregunta | Dónde se contestaría |
 |---|---|---|
+| **`Q-INTERES`** | 🔴 **El interés NO era, medido el 05/09**, y la queja trae el dato que faltaba: **«siguen alejándose en cuanto rugen».** Los tres campos que entraron en la `0.9.0` —`PredatorBoredomDistance` 80 → 150 y los dos `RegainInterestTime` 30 s → 2— no cambiaron nada; se quedan puestos porque no hacen daño. Antes ya se habían descartado con medida el despliegue (las 36 palancas de la `0.8.0` llegan exactas al `GCCREATUREGLOBALS.MBIN` de `GAMEDATA\MODS`) y el árbol de comportamiento (`GetTarget`, `MoveToTarget`, `MaintainRange` no llevan ni temporizador de rendición ni correa). **Queda un solo campo de los seis, y ahora tiene disparador nombrado.** | 🆕 **`FiendDistToConsiderTargetSwtich` = 10** (el typo es del juego), solo en la **`0.10.0`**. El rugido **es** el parto —`SpawnBroodAnim = ROAR`—, así que el instante en que te sueltan es el instante en que le nacen crías **pegadas al cuerpo**, y cada candidato a menos de 10 m le hace replantearse a quién ataca. Encaja también con que empeorase al subir los contadores de 8 a 24. **Va sola porque su signo no está claro**: 10 puede querer decir «cambia si hay algo a menos de 10 m» —y se **baja**— o «cambia sólo si el nuevo está 10 m más cerca» —y se **sube**—. Con una palanca por vuelta, el resultado dice el signo |
 | **`Q-IDBICHO`** | A qué `CreatureID` corresponde el mini-Fiend que sale del nido del carguero: la `CREATUREFILENAMETABLE` dice que el nido suelta `SCUTTLER`, no `MINIFIEND` | `HT_FiendMarkers_PRUEBA05` → [`../work/scripts/marcadores/README.md`](../work/scripts/marcadores/README.md) |
 | **`Q-TECHO`** | ¿Por qué el huevo de interior borra la planta del techo y no pone nada en su sitio? | **Hipótesis del 13/08:** el giro de 180° vive en el envoltorio y el `.LSYSTEM` lo tira. Prueba `N1` A/B → [`ASSETS.md`](ASSETS.md) §5.7 |
 | **`Q-MASCARAS`** | ¿Qué canal del `gMasksMap` es qué? El vanilla del huevo da `R` media 179 y `G` media 73, que no cuadra con «R = metalicidad». **Contestada a medias el 22/08:** en criaturas el mapa es `ATI1` de **un canal**, y ese canal **se comporta como brillo, no como rugosidad** — con 174 el bicho sale mojado, y el vanilla mide 85, que es justo `255 − 174`. Qué nombre tiene el canal sigue sin saberse; cómo se usa, ya sí | La `HT_ScuttlerMesh_PRUEBA13` lo confirma o lo tumba → §2.1 |
+| ~~**`Q-TEXBUG`**~~ | ✅ **CERRADA POR DESCARTE el 05/09: la resolución nunca fue el techo.** La vía (b) —`HT_WarriorBug_PRUEBA05`, atlas de 2048/celdas 512 a **4096/celdas 1024**, ×4 píxeles por trozo, `.DDS` de 14 a 56 MB, sin mover una UV— se midió en partida y **«no hubo mucho aumento»**. Con el 18 % del atlas pintado y once PNG de origen a 2048, subían los texeles y no subía lo que se ve. La vía (a) —repacar apretando las islas— ya estaba descartada porque el hueco viene dentro de cada PNG y apretarlo exige UV nuevas, o sea reabrir la malla congelada; la (c), 8192, por los ~270 MB | **El techo está en el material o en la luz, no en el número de píxeles** — y eso vale para los cuatro modelos, no sólo para el bug. El atlas de 4096 se queda porque ya está desplegado y no cuesta un frame medido, pero **deja de ser línea de trabajo**. Lo que entra en su lugar es `M6-PATAS` |
 | **`Q-GLOW`** | ¿Cómo se enciende un emisivo de verdad? Hoy la emisión del marker va **horneada dentro del color base** | Ninguna prueba escrita → [`ASSETS.md`](ASSETS.md) §1.4 |
 | **`Q-REFPATHS`** | ¿Se puede recolocar una malla vanilla en otro rig con `ReferencePaths`? **Dato nuevo del 21/08:** en el `BUGFIEND` **no están vacíos** —los ocho apuntan a `ARTHROPOD.SCENE.MBIN`—, así que el campo sí se usa. Vacíos estaban los 172 del `TREX` | [`ASSETS.md`](ASSETS.md) §3. Sube de curiosidad a vía posible |
 | **`Q-CHANCE`** | ¿Qué hace un `Chance > 0` en un descriptor? | Los 172 valen 0.0 en vanilla; no hay ejemplo del que copiar → [`ASSETS.md`](ASSETS.md) §3 |
@@ -134,22 +154,21 @@ descompilando el `.MBIN` de `GAMEDATA\MODS` —no el de `ModBackups`—: `Check-
 
 ---
 
-## 3 · Qué está instalado — 2026-09-02 (tras cambiar los dos bichos)
+## 3 · Qué está instalado — 2026-09-05 (con la malla y la piel congeladas)
 
-Todo se mide con **`HorribleTerror_Infestation_4-Hardcore` 0.6.5**, que contiene al mod 1.
+Todo se mide con **`HorribleTerror_Infestation_4-Hardcore` 0.9.0**, que contiene al mod 1.
 `HorribleTerror_Predators` **no debe estar instalado**: escriben los mismos archivos.
 
-**Leído de `GAMEDATA\MODS` el 2026-09-02, carpeta por carpeta.** Nuestros siguen siendo
-**nueve**: los dos de malla cambian de bicho, no de número.
+**Leído de `GAMEDATA\MODS` el 2026-09-05, carpeta por carpeta.** Nuestros pasan de nueve a
+**ocho**: sale `MOD4_Contenedores_PRUEBA01`, que se descartó ese mismo día.
 
 | Mod | Qué entrega | |
 |---|---:|---|
-| `HorribleTerror_Infestation_4-Hardcore` **0.6.5** | 11 MBIN | |
+| `HorribleTerror_Infestation_4-Hardcore` **0.9.0** | 11 MBIN | ✅ la `0.8.0` que contiene **cerró** el 05/09 |
 | `HT_EggMesh_PRUEBA05` — obelisco entero, con textura **y a su tamaño** | 1 + 5 `ADD_FILES` | |
 | **`HT_ScuttlerMesh_PRUEBA17`** — la `16` con el `AttackLight` de vuelta a cero | **8** `ADD_FILES` | ✅ **medida y CONGELADA el 28/08**: ojo apagado y espalda limpia. **No se toca más** — es la versión buena del SkrullCrawler |
-| **`HT_CryWolf_PRUEBA01`** — el **cuadrúpedo de cuello largo** sustituye al necromorfo en el `FIEND` | **7** `ADD_FILES` | 🆕 desplegado el **02/09**, **sin medir en partida** pero **medido fuera**: tensión 16,2 / 12,6 / 15,0 y abre 10 / 12 / 13 cm. Único de la serie con **normal y rugosidad reales del asset**. Verificado descompilando el `.MBIN` de `GAMEDATA\MODS`: `Check-NMSGraft` **salida 0** |
-| **`HT_WarriorBug_PRUEBA01`** — el **bicho de Starship Troopers** sustituye al zombie en el `BUGFIEND` | **8** `ADD_FILES` | 🆕 desplegado el **02/09**, **sin medir en partida** pero **medido fuera**: tensión 25,9 / 38,7 / 55,3 y abre 11 / 17 / 28 cm. Atlas de **doce** texturas a 2048, el doble de resolución que el zombie. Verificado sobre lo desplegado: `Check-NMSGraft` **salida 0** |
-| **`MOD4_Contenedores_PRUEBA01`** — el cofre 1 de **50 a 100** casillas, un solo campo | **1** MBIN | 🔴 medido y **no funcionó**. Se queda instalado —no choca con nada de malla— y **en espera**: §5 |
+| **`HT_CryWolf_PRUEBA07`** — el **cuadrúpedo de cuello largo** sustituye al necromorfo en el `FIEND`; bind por `--bind fiendwalk#24` | **7** `ADD_FILES` | ✅ **malla congelada** el 05/09 |
+| **`HT_WarriorBug_PRUEBA05`** — el **bicho de Starship Troopers** sustituye al zombie en el `BUGFIEND`; atlas a **4096** | **7** `ADD_FILES` | ✅ **piel congelada** el 05/09 |
 | `HT_CeilingPlague_PRUEBA03` — la `02` **más** el campo que hace brotar | 2 MBIN | desplegado el 21/08, **sin medir** y **en espera**: §5 |
 | `HT_DerelictBugs_PRUEBA02` | 1 MBIN | |
 | `HT_PredatorParts_PRUEBA03` | 1 MBIN | |
@@ -159,7 +178,7 @@ Y aparte, nuestro pero de calidad de vida: **`BetterExtractorsDepots`**, 1 MBIN
 —comprobado el 27/08— y no hay **ningún** `.pak`: los demás mods que la tocan son carpetas de
 Vortex con sólo `.EXML`, que el juego no lee. Ver §1.
 
-**Los dos despliegues del 02/09 están verificados descompilando el `.MBIN` de `GAMEDATA\MODS`**,
+**Los dos despliegues del 03/09 están verificados descompilando el `.MBIN` de `GAMEDATA\MODS`**,
 no el de `ModBackups`, y `Check-NMSGraft.py` da **salida 0** sobre lo desplegado en los dos:
 
 | | Warrior bug | Cry wolf |
@@ -170,8 +189,9 @@ no el de `ModBackups`, y `Check-NMSGraft.py` da **salida 0** sobre lo desplegado
 | Samplers | los **tres** a `…/WARRIORBUG.BASE*.DDS` | los **tres** a `…/CRYWOLF.BASE*.DDS` |
 | Nodos, leídos sobre lo desplegado | 53 `JOINT`, 1 `MESH` | 44 `JOINT`, 1 `MESH` |
 | Vértices exportados | 20 257 | 11 100 |
-| Altura | **1,80 m** (1,7× el vanilla) | **1,90 m** (1,4× el vanilla) |
-| Influencias por vértice | 2,17 | 2,22 |
+| Altura | **2,70 m** (2,6× el esqueleto) | **2,85 m** (2,1× el esqueleto) |
+| Giro en Y | **180°** | **180°** |
+| Influencias por vértice | 2,42 | 2,54 |
 | Asimetría, nuestra / del vanilla | **0,000** / 0,018 | **0,000** / 0,005 |
 | Buffer de vértices desplegado vs. construido | **md5 idéntico** | **md5 idéntico** |
 | `.SCENE` y `.MATERIAL` desplegados vs. construidos | **md5 idéntico** | **md5 idéntico** |
@@ -190,10 +210,11 @@ no el de `ModBackups`, y `Check-NMSGraft.py` da **salida 0** sobre lo desplegado
 > verifica una entrega de `ADD_FILES` es **el recuento de archivos** —7 y 8— y el `Check` sobre lo
 > desplegado.
 
-**Retirados a `GAMEDATA\MODS_Retirados\`** — **11 carpetas** el 02/09:
-`HT_FiendMesh_PRUEBA04`, `05`, `07`, `08` y **`09`**, y `HT_ZombieMesh_PRUEBA04`, `05`,
-`06_sin_flag`, `07`, `08` y **`10`**. Las dos últimas se retiran hoy porque escriben los
-mismos archivos que el warrior bug y el cry wolf.
+**Retirados a `GAMEDATA\MODS_Retirados\`** — **11 carpetas** el 02/09
+(`HT_FiendMesh_PRUEBA04`, `05`, `07`, `08` y **`09`**, y `HT_ZombieMesh_PRUEBA04`, `05`,
+`06_sin_flag`, `07`, `08` y **`10`**) **y 4 más entre el 02 y el 03/09**:
+`HT_WarriorBug_PRUEBA01` y `PRUEBA02`, `HT_CryWolf_PRUEBA01` y `PRUEBA02`, que las sustituye
+la `PRUEBA03` de cada uno.
 Todas escriben los mismos archivos que su sustituta, así que **no pueden convivir**.
 
 > ⚠️ **Aquí ponía «28 carpetas» y era falso.** Contado carpeta por carpeta el 29/08 hay **tres**:
@@ -231,15 +252,19 @@ dejó el interruptor general apagado.
 
 ---
 
-## 5 · En espera — se retoma cuando cierren el zombie y el necromorfo
+## 5 · La cola, ya sin bloqueo
 
-**Nada de aquí se toca hasta entonces.** Es una decisión del 2026-09-01: una prueba a la vez y
-las dos mallas de superficie primero.
+**El bloqueo se levantó el 03/09**, al cerrar el warrior bug y el cry wolf, y el **05/09 se
+congelan las dos**: la malla del uno y la piel del otro no se vuelven a tocar sin que se pida.
+Sigue valiendo **una prueba a la vez**.
+
+De las dos que estaban desplegadas, `MOD4_Contenedores_PRUEBA01` **se descartó** el 05/09 y
+`HT_CeilingPlague_PRUEBA03` sigue en §1 esperando a que aparezca un nido. Aquí queda lo que ni
+siquiera está construido, y **la primera fila es lo que la partida pidió el 05/09**:
 
 | ID | Qué | Estado |
 |---|---|---|
-| **`MOD4_Contenedores_PRUEBA01`** | El cofre 1 de **50 a 100** casillas, un solo campo en `METADATA\GAMESTATE\DEFAULTSAVEDATA.MBIN` | 🔴 **medido y NO funcionó.** Sigue desplegado porque no choca con nada de malla. Cuando se retome: la firma decía que si sale con 50, el layout viene horneado en la partida y hay que probarlo en una **partida nueva** antes de decidir nada |
-| **`HT_CeilingPlague_PRUEBA03` + `Infestation 0.6.5`** | La segunda vuelta del nido: los dos MBIN son ya byte a byte iguales | ⬜ desplegado el 21/08 y **sin medir**. El detalle, en §5.1 |
+| 🆕 **`M6-PATAS`** | **Mapear las patas para las animaciones**, pedido el 05/09 en lugar de seguir con la piel. Es la frontera que ya topó el cry wolf en su quinto final: las dos mallas cuelgan de **`*Leg1JNT`, que es la cadera** y sube con el cuerpo, así que la pata se mueve **poco**. El arreglo es partir la pata y colgar la parte baja de **`Leg3`**, y eso **sí es re-pesar**: reabre el reparto de peso de los dos bichos, no el buffer de vértices. Se mide fuera de la partida antes de construir, con [`../tools/Pose-NMSMesh.py`](../tools/Pose-NMSMesh.py) | ⬜ sin escribir · empieza por el **warrior bug**, que es el que se pidió |
 | **`HT_FiendMarkers_PRUEBA05`** | Marcadores de Horror. En el juego no hay ninguno: el `PRUEBA04` está retirado | ✍️ escrito, sin construir · **choca**, ver abajo |
 | **`HT_DerelictBugs`** | Devolver `CARG` y `MEDI`, **de una en una** | ⬜ sin escribir · [`../work/scripts/derelict/README.md`](../work/scripts/derelict/README.md) |
 | **`N1`** | **Huevo de interior**: prueba **A** (control con `DEBRISLARGE_COMMON`) y luego **B** (huevo de `SPACEBASE`) | ⬜ la **A** escrita, la **B** no · [`ASSETS.md`](ASSETS.md) §5.1 y §5.7 |
@@ -313,3 +338,52 @@ la mitad de lo que hay que mirar en partida. Si sale a manadas donde no toca, se
 > `CombineModPak N`, `CopyToGamefolder N`, `UseExtraFilesInPAK N`, `UseLuaScriptInPak N`).
 > Hay que lanzarlo con **codepage 850** y sin `NoDefaultCurrentDirectoryInExePath`.
 > Con `CopyToGamefolder N` **no despliega**: los `.MBIN` se copian a mano desde `ModBackups`.
+
+---
+
+## 6 · Lo siguiente: revisar la CONDUCTA de los dos bichos
+
+**Cerrar las mallas desbloquea esto, y no es una coincidencia de calendario: es la
+herramienta que faltaba.** Desde la `0.2.0` no se ha medido en partida **ni un solo** cambio
+de conducta —la prueba del 04/08 midió la `0.1.0`—, y entre la `0.2.0` y la `0.3.3` hay
+**veintiún cambios estrenándose a la vez**. La razón por la que se dejó parado está escrita en
+`MODIFICACIONES.md`: casi todo lo que hay que mirar es **quién hace qué**, y hasta hoy los dos
+bichos eran el mismo bicho con otra piel.
+
+> 🔓 **El desbloqueo concreto, y estaba escrito como imposible.** `AllowSpawnBrood` decía:
+> *«hace falta un sitio con Fiends pero sin huevos cerca: con `FiendMaxEngaged = 12` y huevos
+> ×20, **una cría es indistinguible de un Fiend recién eclosionado**»*. Ya no: el `FIEND` es un
+> **cuadrúpedo de cuello largo de 2,85 m** y el `BUGFIEND` es un **insecto de cuatro patas de
+> 2,70 m**. Se distinguen de un vistazo y a contraluz. La condición que pedía aquella prueba
+> —un escenario sin huevos— **deja de hacer falta**.
+
+### Qué mirar, en este orden
+
+Una entrada al juego por bloque, y **el bloque 1 antes que nada**: si la conducta base está
+rota, todo lo demás se mide sobre ruido.
+
+| # | Qué | Cómo se mira | Qué campos hay detrás |
+|---|---|---|---|
+| **1** | **¿Vienen derechos, o hacen eses?** | **Un Fiend SOLO**, en campo abierto. Es la prueba que separa las causas: si uno suelto ya viene derecho, era el *steering*; si sigue zigzagueando solo, no era ninguno de los dos y toca `PathOverestimate` | `SteeringUpdateRate` #44 · `MaxTurnRadius` #45 |
+| **2** | **¿Acechan o cargan?** | Dejarte ver a **~35 m** en campo abierto. Tiene que arrancar **sin pausa** y llegar sin pararse a mitad | filas 40-42 |
+| **3** | **¿Se mueven como horda?** | Manada de 5-7 depredadores: bloque, no fila india ni desperdigados | filas 46-50 |
+| **4** | **¿Se multiplican?** — `AllowSpawnBrood` | **Ahora sí se puede**: cuenta cuántos insectos de cuatro patas aparecen mientras peleas con el cuadrúpedo. Los que salgan del huevo son cuadrúpedos; las crías, insectos | filas 27-29 |
+| **5** | **¿Sigue el aggro sin agotarse?** | Alejarse en línea recta y ver si suelta la presa | `0.3.1` |
+| **6** | **FPS** | 70 criaturas recalculando rumbo 10 veces/s. **Si cae, `SteeringUpdateRate` es el primero a revertir** | #44 |
+
+### Antes de entrar
+
+1. **Backup de partidas** — lo corre Claude, no el usuario.
+2. **Comprobar `DisableAllMods`** en `GCMODSETTINGS.MXML`: un cierre lo deja en `true` y la
+   sesión entera se mide contra vanilla sin enterarse.
+3. **Verificar sobre lo desplegado**, no sobre `ModBackups`: el conteo del `REPORT` dice que la
+   build salió, no que esté instalada.
+4. **Arrancar por Steam**, no por Vortex.
+
+### Lo que NO se toca al hacer esto
+
+**Las mallas están congeladas.** Si algo de conducta obliga a tocar un `.SCENE` o un
+`.GEOMETRY`, se anota y se para: la conducta vive en `GCCREATUREGLOBALS`,
+`CREATUREDATATABLE`, `CREATUREBEHAVIOURTREES` e `INFESTATION`, y ninguno de esos cuatro es un
+archivo de malla. El orden para revertir, si algo va mal, está al final de
+[`MODIFICACIONES.md`](MODIFICACIONES.md).

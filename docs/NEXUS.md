@@ -38,6 +38,30 @@ ancho, así que **no** se usa de imagen principal: esa debe ir a 1920×1080.
 
 ---
 
+> 🔴 **SIN VERIFICAR, Y HAY QUE VERIFICARLO: los zips publicados llevan `.EXML` delta, no
+> `.MBIN`.** Visto el 2026-09-05 al empaquetar los mods nuevos. Abierto
+> `releases\2.1.0\HorribleTerror_Predators_4-Hardcore_v2.1.0.zip`: **cero `.MBIN`**, sólo los
+> `.EXML` de `CreatedMODS`, y el de `GCCREATUREGLOBALS` trae **34 marcas `!# CHANGED`** al
+> final de línea. Esta misma documentación llama a eso un **informe** —§«Las cuatro trampas»
+> de [`README.md`](README.md), y `C5` en [`ACUERDOS.md`](ACUERDOS.md)—, y en esta máquina lo
+> que corre son `.MBIN`.
+>
+> **Lo que NO está probado, y por eso esto no dice «roto»:** que NMS rechace ese delta. El
+> `.EXML` a secas sí es un formato válido —**55 de los 88 mods instalados son sólo `.EXML`** y
+> funcionan—, pero los suyos van **limpios, sin una sola marca** (comprobado contra *Asteroid
+> Ribbons*). La duda es el delta anotado, no el `.EXML`.
+>
+> **Cómo se cierra, y es media hora:** extraer el zip publicado tal cual en `GAMEDATA\MODS`,
+> con la carpeta de mods limpia, arrancar por Steam y mirar si los valores llegan. Si no
+> llegan, `Package-Release.ps1` tiene que empaquetar desde `ModBackups` como hace
+> [`Package-SinFuente.ps1`](../tools/Package-SinFuente.ps1) —incluido el arreglo de los
+> `GLOBALS` que caen en la raíz— y volver a subir los cuatro archivos.
+>
+> Los ocho zips de la tanda del 05/09 (modelos e Infestation) **no tienen este problema**:
+> llevan `.MBIN` y cero `.EXML`. Ver [`NEXUS-BETA.md`](NEXUS-BETA.md).
+
+---
+
 ## Formato de distribución — VERIFICADO
 
 **Se distribuye la carpeta, no un `.pak`.**

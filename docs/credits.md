@@ -17,7 +17,22 @@ No Man's Sky © Hello Games. Este mod no está afiliado ni respaldado por Hello 
 
 ## Assets de terceros
 
-Ninguno usado en el mod.
+**Sí hay, desde los mods de modelo.** Los tres son libres, permiten uso comercial y exigen
+crédito. Las atribuciones van **dentro del zip** (`README.txt`) **y en la página de Nexus**;
+las dos, no una. Detalle de permisos en [`NEXUS-BETA.md`](NEXUS-BETA.md).
+
+| Modelo base | Autor | Link | Licencia | Dónde acaba |
+|---|---|---|---|---|
+| Cry Wolf Game Character | SkinRender | https://skfb.ly/6VFUz | **CC BY 4.0** | `infestedCryWolf` |
+| Warrior bug from *Starship Troopers* | wtf_fox | https://skfb.ly/o87nr | **CC BY 4.0** | `infestedWarriorBug` |
+| Marker 1 | username11420 | https://skfb.ly/6SzLo | **CC BY-SA 4.0** | `infestedMarkerEgg` |
+
+⚠️ **El Marker 1 es ShareAlike y eso se contagia.** El derivado —los `.MBIN` y `.DDS` del
+huevo— tiene que salir bajo `CC BY-SA 4.0`, o sea que **no se puede publicar como «no
+reutilizable»**. Los dos `CC BY` no obligan a eso, pero tampoco dejan añadir restricciones
+sobre el modelo original.
+
+El **SkullCrawler** (`infestedSkullCrawler`) es modelo propio, no derivado de nada.
 
 ## Material de referencia (NO redistribuible)
 

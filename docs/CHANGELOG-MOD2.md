@@ -15,6 +15,630 @@ Cada entrada anota la **versión de NMS** contra la que se probó.
 
 ---
 
+## Vuelta de medida del 05/09 — la malla se cierra, y el interés no era (2026-09-05)
+
+**Seis pruebas medidas en partida de una sentada.** Dos cierran con la malla congelada, una
+descarta su hipótesis, una cierra el mod de conducta anterior, una sigue sin encontrarse y una
+se descarta entera.
+
+### ✅ `HT_CryWolf_PRUEBA07` — aceptada. **La malla del cry wolf se congela**
+
+«Dejamos ya las pruebas con el lobo como está ahorita in game.» El bind por `--bind
+fiendwalk#24` entra y se queda: es el que hay desplegado. **No se vuelve a tocar un vértice ni
+un peso del cry wolf** sin que se pida.
+
+Con esto se cierra la serie de siete pruebas que abrió el 02/09, y el hallazgo que la cierra
+es `B15` en [`ACUERDOS.md`](ACUERDOS.md): el `JointBindings` del vanilla sólo vale si nuestra
+malla está modelada en la postura en que se pesó la suya.
+
+### ⬜ `HT_CryWolf_PRUEBA05` — no tiene veredicto propio, y no lo va a tener
+
+«No sabría ya si esta prueba funcionó, pero la que tenemos actual es la buena.» Es correcto y
+no hay nada que medir: **el `.SCENE` de la `PRUEBA07` es byte a byte el de la `PRUEBA05`**, md5
+`2c30d9cf`. El doblez de cuello a 65° que introdujo la `05` **está dentro de la `07`**, así que
+se acepta con ella. Lo que la `05` no pudo demostrar por separado es cuánto de la mejora era
+suyo: entre las dos había un bind roto que tapaba el resultado.
+
+> **La lección de método, que es la tercera vez que sale:** una prueba que entra encima de un
+> fallo sin diagnosticar no se puede leer. La `05` se midió el 04/09 y devolvió «sigue flotando
+> y las patas están tiesas», que no era su culpa.
+
+### ❌ `HT_WarriorBug_PRUEBA05` — «no hubo mucho aumento». **`Q-TEXBUG` cierra por descarte**
+
+El atlas a **4096 con celdas de 1024** —×4 píxeles por trozo, `.DDS` de 14 a 56 MB— se ve
+prácticamente igual que la `PRUEBA04`. Es el segundo de los cuatro finales escritos antes de
+entrar: **la resolución nunca fue el techo.**
+
+Lo que eso deja probado, y vale para los cuatro modelos: con el 18 % del atlas pintado y once
+PNG de origen a 2048, **subían los texeles y no subía lo que se ve**. El techo está en el
+material o en la luz, no en el número de píxeles. Las dos vías de `Q-TEXBUG` quedan cerradas:
+la (a) exigía UV nuevas y la (b) —ésta— no dio.
+
+**La piel del warrior bug se congela tal como está.** El atlas de 4096 se queda porque ya está
+desplegado y no cuesta un frame medido, pero **deja de ser una línea de trabajo**.
+
+**Y en su lugar entra lo que sí se pidió: mapear las patas para las animaciones.** Es la misma
+frontera que topó el cry wolf en su quinto final —colgamos de `*Leg1JNT`, que es la **cadera** y
+sube con el cuerpo, en vez de partir la pata y colgar la parte baja de `Leg3`—, y es trabajo de
+peso de hueso, no de textura. Ficha nueva `M6-PATAS` en [`PENDIENTES.md`](PENDIENTES.md).
+
+### 🔴 `Infestation 4-Hardcore 0.9.0` — **el interés no era.** Y la queja trae el dato que faltaba
+
+«Siguen alejándose **en cuanto rugen**.» Es el segundo de los cuatro finales: los tres campos
+de interés —`PredatorBoredomDistance` a 150 y los dos `RegainInterestTime` a 2 s— no cambiaron
+la conducta. Se quedan puestos porque no hacen daño, pero **`Q-INTERES` no cierra por ahí.**
+
+**Lo nuevo está en las tres palabras «en cuanto rugen»,** y señalan directamente al único campo
+que la `0.9.0` dejó fuera a propósito. El rugido **es** el parto —`SpawnBroodAnim = ROAR`—, o
+sea que el instante en que te sueltan es exactamente el instante en que **le nacen crías
+pegadas al cuerpo**. Y `FiendDistToConsiderTargetSwtich` vale **10**: cada candidato a menos de
+10 m le hace replantearse a quién ataca. Hasta ahora era una sospecha por correlación —empeoró
+según subían los contadores de 8 a 24—; ahora hay un **disparador nombrado**, y encaja entero.
+
+Va sola en la `0.10.0`, y sigue en pie la razón de separarla: **su signo no está claro** —puede
+querer decir «cambia si hay algo a menos de 10 m», y entonces se **baja**, o «cambia sólo si el
+nuevo está 10 m más cerca», y entonces se **sube**—. Con una sola palanca en la vuelta, el
+resultado dice el signo.
+
+### ✅ `Infestation 4-Hardcore 0.8.0` — cierra
+
+«Si tal vez percibí más agresividad.» Las seis palancas del 04/09 —los tres contadores a 24, el
+parto cada 5 s, el salto a 3,0× y 1,0 m, la cadencia y las rachas, `AllowSpitAlways` y
+`TurnToFaceTime` a 0,15— **se quedan**, y con ellas las dos de la `0.7.0`. Ninguna costó FPS y
+ninguna atascó la puerta del carguero, que eran los dos riesgos escritos. Pasan a
+[`ACUERDOS.md`](ACUERDOS.md).
+
+**La presión está terminada.** De aquí en adelante las vueltas de conducta van al
+desenganche, no a apretar más.
+
+### ⬜ `HT_CeilingPlague_PRUEBA03` — sigue sin encontrarse, y eso no es un veredicto
+
+«Sigo buscando in game, no me ha vuelto a aparecer; no significa que no sirva ni nada.» Queda
+en §1 tal cual. Lleva desplegado desde el **21/08** sin una sola lectura, y el problema no es
+el mod: es que **el nido colgante del carguero abandonado es un hallazgo raro**. Detalle en
+§5.1 de [`PENDIENTES.md`](PENDIENTES.md).
+
+### ❌ `MOD4_Contenedores_PRUEBA01` — la idea se cierra
+
+«No funcionó, vamos a cerrar la idea y quitar lo referente de él.» El cofre sigue saliendo de
+50 casillas. La firma escrita antes de entrar decía que, si salía con 50, **el layout viene
+horneado en la partida** y hacía falta una partida nueva para decidir; se decide no gastar esa
+partida. El mod sale de `GAMEDATA\MODS\` a `MODS_Retirados\`.
+
+[`MOD4-CONTENEDORES.md`](MOD4-CONTENEDORES.md) **se queda, marcado como cerrado.** No es
+documentación de un mod vivo: es el mapa de qué se puede tocar y qué no en los diez cofres
+globales, y eso vale igual cuando la respuesta es «no se puede».
+
+---
+
+## `HT_CryWolf_PRUEBA07` — el bind deja de ser el del vanilla (2026-09-05)
+
+**Las dos quejas del 04/09 —«sigue flotando» y «las patas están tiesas»— son un solo fallo.**
+
+### La causa
+
+`Patch-NMSGraft.py` copiaba `JointBindings` del vanilla tal cual. Esa matriz **no es una
+constante del hueso**: es la inversa de la pose de mundo **en que se pesó la malla**, porque el
+juego hace `v' = Σ peso · mundo(t) · bind · v`. Copiarla vale mientras nuestra malla esté
+modelada en la misma postura que la del vanilla. La del cry wolf no lo está.
+
+Medido sobre la `PRUEBA05` **descompilando el `.MBIN` de `GAMEDATA\MODS`** (45 de 45 binds
+iguales al vanilla): con la pose de reposo puesta, `mundo · bind` debería dar la identidad y
+desplaza la cabeza **1,69 m**, el cuello 1,45 y las patas de 0,45 a 1,27. Sólo `RootJNT` sale
+a cero.
+
+**Y el reposo del `.SCENE` no es el sustituto**: se probó y sale **peor** —tensión 87 contra
+35—, porque la malla del vanilla tampoco está pesada en su reposo.
+
+### Por qué eso produce los dos síntomas
+
+Como cada región que se agarraba a su hueso salía disparada, el tope de vaivén se fue
+apretando prueba tras prueba hasta dejar el agarre en 0,10 y 0,20 en las patas delanteras.
+Resultado medido: **ninguna pata mandaba en un solo vértice**, y los pies de la malla colgaban
+un **70,6 % del torso** y sólo un 29,4 % de las patas. Por eso no se abrían —tiesas— y por eso
+subían y bajaban con el cuerpo en vez de quedarse en el suelo —flotando—.
+
+### Lo que se entrega
+
+`Patch-NMSGraft.py` gana **`--bind <ANIM.MXML>#<fotograma>`**: el bind pasa a ser la inversa de
+la pose de mundo del **vanilla** en ese fotograma, así que `mundo(t) · bind` es el movimiento
+del hueso **desde** ese fotograma, y eso sí se le puede aplicar a nuestra malla tal como está
+modelada. **Es un retarget y no reescribe ni un `.ANIM` ni el `.SCENE`** —el `.SCENE` va byte a
+byte el de la `PRUEBA05`, md5 `2c30d9cf`—, que es lo que separa esta prueba de la `PRUEBA06`,
+retirada el 04/09 por empeorar.
+
+El fotograma se barrió contra los **nueve** clips a la vez, por tensión y por distancia al
+suelo: gana `fiendwalk` **f24**. Y con el bind bueno se suelta el agarre: el pesado pasa de
+`obj110` a **`obj200`**, que ya estaba barrido en disco.
+
+### Los números, sobre los archivos que se entregan
+
+| | `PRUEBA05` | `PRUEBA07` |
+|---|---:|---:|
+| tensión, peor de los 9 clips | 34,85 | **18,22** |
+| `flex` p99 | 3,33 | **2,46** |
+| `abre` | 33 cm | **20 cm** |
+| alto medio de la malla | 2,42 m | **2,85 m** |
+| patas al andar | 0,45 m | **0,87 m** |
+| peso de pata en los pies | 29,4 % | **46,4 %** |
+
+Los pies del propio vanilla recorren **1,06 m**, así que 0,87 es el 82 % de lo que hace el
+bicho al que sustituimos.
+
+**El suelo, por clip** (antes → ahora): `walk` 0,44-0,67 → **−0,02-0,22** · `idle` 0,49-0,60 →
+**0,01-0,11** · `run` 0,60-0,75 → **0,17-0,30** · `roar` 0,26-0,62 → −0,27-0,38 · `pounce`
+0,22-1,17 → −0,25-0,74.
+
+> ⚠️ **El precio, entregado sabiéndolo.** `trot`, `attack2` y `attack3` pasan de 0,00-0,09 a
+> **hundirse entre 24 y 47 cm**. El vaivén vertical del esqueleto del `FIEND` son **0,83 m** y
+> el bind sólo puede **correr** esa ventana, no estrecharla: antes estaba entera por encima del
+> suelo —flotaba siempre y no se hundía nunca— y ahora está centrada. Estrecharla de verdad
+> pide colgar la parte baja de la pata de `Leg3` en vez de `Leg1JNT`, que es la **cadera** y
+> sube con el cuerpo, y eso es re-pesar en Blender.
+
+### Dos guardas que cambian
+
+- **`Patch-NMSGraft.py`** comprueba que la inversa que escribe sea de verdad la inversa y
+  aborta si no (`peor < 1e-6`).
+- **`Pose-NMSMesh.py`** ya no da por hecho que el bind sea el reposo del `.SCENE`: **busca** la
+  pose de referencia entre el reposo y todos los fotogramas de los clips, y aborta si no la
+  encuentra en ninguna. El assert viejo **abortaba una entrega buena**; el nuevo sigue cazando
+  un `JOINTINDEX` o una transpuesta mal, que es para lo que existe. Sobre lo entregado dice
+  «inversa de `fiendwalk` fotograma 24 en **7 de 7** huesos».
+
+Verificado descompilando el `.MBIN` **desplegado**: bind correcto en los 7 huesos con peso,
+error 4,4e-08 —que es la precisión `float32` del binario—, y md5 idéntico al construido
+(`94c0277a`). `Check-NMSGraft.py` salida **0**.
+
+---
+
+## [0.9.0] — 2026-09-05 · NMS 170671
+
+**La primera vuelta que toca el interés en vez de la presión.**
+
+Diez vueltas subiendo cuántos caben, cuánto pegan y cuánto ven —y el interés no se había
+tocado nunca—. La queja seguía siendo la misma: **se van sin hacer caso**.
+
+### Lo que se descartó primero, con medida
+
+1. **El despliegue no era.** Descompilado `GCCREATUREGLOBALS.MBIN` de `GAMEDATA\MODS`: la
+   `0.8.0` estaba viva y **las 36 palancas llegaban exactas**.
+2. **El árbol de comportamiento tampoco.** Sus nodos —`GetTarget`, `MoveToTarget`,
+   `MaintainRange`— no llevan ni temporizador de rendición ni correa: sólo `TargetKey`,
+   `ArriveDist` y velocidades. La decisión de soltarte está en código.
+3. **Y `GCCREATUREGLOBALS` es el único fichero de IA de criaturas del juego**: los otros seis
+   `GLOBALS\*` son robot, asentamiento, UI, colocación, tabla de juego y depuración.
+
+### Lo que apareció
+
+En ese fichero hay **exactamente seis** campos que gobiernan perder y recuperar el interés.
+El mod había subido **dos** y dejado **cuatro** en vanilla.
+
+| campo | vanilla | 0.8.0 | 0.9.0 |
+|---|---:|---:|---:|
+| `FiendBeingShotMemoryTime` | 10 | 60 | 60 |
+| `PlayerPredatorBoredomDistance` | 80 | 150 | 150 |
+| `PredatorBoredomDistance` | 80 | **80** | **150** |
+| `PlayerPredatorRegainInterestTime` | 30 | **30** | **2** |
+| `PredatorRegainInterestTime` | 30 | **30** | **2** |
+| `FiendDistToConsiderTargetSwtich` | 10 | **10** | **10** — fuera a propósito |
+
+`PredatorBoredomDistance` es **el gemelo** del que ya estaba subido: el juego trae dos
+temperamentos —`TEMPERAMENT_PREDATOR` y `TEMPERAMENT_PLAYERPREDATOR`— y sólo se le había
+subido la distancia de aburrimiento a uno.
+
+> **No se ponen a cero a propósito, y la lección es de esta misma casa:** en la `0.6.1` el
+> drenaje de aggro se puso a cero y dejó la primera puerta del carguero abandonado sin abrirse
+> nunca. Un temporizador **se encoge, no se anula**.
+
+### El cuarto se queda fuera, y por qué
+
+`FiendDistToConsiderTargetSwtich` (el typo es del juego) es **el sospechoso más gordo**: con 24
+Horrores enganchados y manadas de 5-7 encima, un Fiend se replantea a quién ataca cada vez que
+hay un candidato a menos de 10 m —o sea permanentemente—, y encaja con que empeorara según
+subían los contadores de 8 a 24, porque eso multiplica las ocasiones de replantearse.
+
+**Se queda fuera porque su signo no está claro:** 10 puede significar «cambia si hay algo a
+menos de 10 m» —y hay que **bajarlo**— o «cambia sólo si el nuevo está 10 m más cerca» —y hay
+que **subirlo**—. Son direcciones opuestas, así que va solo en la `0.10.0`.
+
+**No cambia nada más**: ni un contador, ni el salto, ni la cadencia, ni el drenaje, ni la malla,
+ni el árbol. Tres números. Verificado descompilando el `.MBIN` **desplegado**.
+
+---
+
+## [0.8.0] — 2026-09-04 · NMS 170671
+
+### Changed — subir la agresividad otra vuelta, por petición expresa
+
+La `0.7.0` arregló que el combate **se apagara solo**. Esto es que además **apriete**. Seis
+palancas, todas números sueltos: no se toca el árbol de comportamiento ni la malla.
+
+| Campo | En quién | Antes | Ahora | Vanilla |
+|---|---|---:|---:|---:|
+| `FiendMaxAttackers` · `FiendMaxEngaged` · `MaxFiendsToSpawn` | globals | 16 | **24** | 2 · 6 · 6 |
+| `SpawnBroodTimer` | `FIEND` | 10 | **5** | 0 |
+| `FiendPounceDistanceModifier` | globals | 1.7 | **3.0** | 1.7 |
+| `FiendMaxVerticalForPounce` | globals | 0.3 | **1.0** | 0.3 |
+| `DelayBetweenPounceAttacks` | los dos | 1.2 | **0.7** | 2.0 |
+| `MinFlurryHits` / `MaxFlurryHits` | los dos | 3 / 6 | **4 / 8** | 2 / 4 |
+| `AllowSpitAlways` | `FIEND` | `false` | **`true`** | `false` |
+| `DelayBetweenSpitAttacks` | los dos | 1.0 | **0.6** | 1.0 |
+| `TurnToFaceTime` | los dos | 0.3 | **0.15** | 0.3 |
+
+**Los tres contadores van a la par a propósito:** si caben 24 comprometidos pero sólo nacen 16,
+el cupo extra no lo llena nadie. Y `SpawnBroodTimer` a 5 s **sólo se puede permitir porque la
+`0.7.0` dejó el drenaje de aggro en 0,02**: con el drenaje vanilla, doblar los partos habría
+doblado la velocidad a la que la oleada se desactivaba sola.
+
+**El salto es la palanca que más cambia la sensación y no cuesta un frame.** Con
+`FiendMaxVerticalForPounce` en 0.3, subirte a una roca era refugio; con 1.0 no.
+
+**`AllowSpitAlways` no es un invento, es copiarle al padre lo del hijo.** Verificado en el
+`CREATUREDATATABLE` **descompilado del juego**, no supuesto: el `BUGFIEND` lo trae en **`true`
+de vanilla** y el `FIEND` en `false`. O sea que la cría ya disparaba de lejos y el padre era el
+único de los dos que no. `AllowSpit` es `true` en los dos y `SpitFacingRequirement` 0.95 en los
+dos, así que la condición que queda es la misma.
+
+**Lo que se deja quieto, y por qué:** `RoarChanceOnHit` y `RoarChanceOnMiss` siguen en **0.0**
+aunque los globales de depredador valgan 0.6 y 0.7 — `SpawnBroodAnim` vale `ROAR`, así que
+subirlos es **parir por cada golpe** sin saber cuánto. Y `AllowSpawnBrood` del `BUGFIEND` sigue
+en `false`: es **el techo de la oleada**, y encenderlo es crecimiento exponencial.
+
+⚠️ **Lo que hay que vigilar son los FPS**, y el orden de reversión va escrito de antemano: con
+`MaxEcosystemCreaturesNormal` en 70 —vanilla 40—, `SteeringUpdateRate` en 0.10 y ahora 24
+enganchados pariendo cada 5 s, si el juego se atasca **primero** `SpawnBroodTimer` vuelve a 10,
+**luego** los tres contadores a 16, y **sólo después** `SteeringUpdateRate` a 0.25.
+
+Construido con 0 `[ERROR]` / 0 `[WARNING]` / 0 `[NOTICE]`, **80 cambios en 11 MBIN** (72 + 8).
+Verificado **descompilando el MBIN de `GAMEDATA\MODS`**.
+
+### Changed — `HT_CryWolf_PRUEBA05`: se re-posa el cuello, y **esta sí mueve vértices**
+
+Las cuatro anteriores tocaron escala, giro, textura y peso de hueso; **ninguna tocó la forma**.
+Ésta reabre el modelo, a petición expresa tras medir que no había otra vía (ver abajo).
+
+**La medida del cuello.** Sobre la malla ya girada, el cuello arranca en `w 0,45` —donde el ancho
+en x salta de 0,08 a 0,15, o sea donde empieza el pecho— y la cabeza vive en `w 0,00-0,10`. Del
+arranque a la cabeza **sube 0,151 y avanza 0,213**: el cuello iba a **35° sobre la horizontal**.
+Se dobla **30°** y pasa a **65°**.
+
+**No es un giro rígido, es una rampa.** Va en `Export-NMSMesh.py`, entre el giro y la escala, con
+un *smoothstep* que vale 0 en el arranque del cuello y 1 en la cabeza: el cuello **curva** y la
+cabeza gira entera, con tangente cero en los dos extremos. Un giro rígido habría dejado un
+**pliegue** en la frontera, y un pliegue es geometría — el suavizado de los pesos no lo deshace.
+Toca 3719 vértices, el **38,5 %**.
+
+**Dos efectos secundarios, medidos y aceptados:**
+
+1. La caja pasa de `1,356 × 2,85 × 3,102` a `1,199 × 2,85 × 2,292`. Con el alto clavado en
+   2,85 m, la escala uniforme cae de 5,834 a 5,158: **el cuerpo sale un 12 % más pequeño** aunque
+   la silueta mida lo mismo. Si se ve pequeño, el arreglo es **un número** (`alto` 3,22 devuelve
+   el cuerpo a su tamaño) y ya se sabe que 3,80 salió demasiado grande.
+2. **Los cortes del mapa se re-miden**, porque van en coordenadas normalizadas: no cambian con la
+   escala, pero **sí con la forma**. El arranque del cuello baja de `w 0,45` a **`w 0,35`**.
+
+**Y el tope baja de 140 a 110.** Con las aristas un 12 % más cortas la `tensión` sube aunque el
+estirón baje —es una razón entre vecinos y la referencia se encogió—, así que aquí manda `abre`,
+**el estirón en metros, que es lo que se ve**. Barrido sobre los nueve clips, en cm:
+
+| | walk | run | attack | idle | roar | pounce |
+|---|---:|---:|---:|---:|---:|---:|
+| `PRUEBA04` (sin doblez) | 33 | 36 | 41 | 23 | **19** | 33 |
+| `PRUEBA05` obj 170 | 36 | 35 | 35 | 28 | 28 | 50 |
+| `PRUEBA05` obj 140 | 30 | 28 | 31 | 23 | 23 | 42 |
+| **`PRUEBA05` obj 110** | **23** | **25** | **26** | **18** | 20 | **33** |
+
+**110 gana o empata en los seis**, y el `flex` de locomoción queda en 3,02 y 3,33 —**más suelto**
+que el 2,78 y 3,40 de la `PRUEBA04`—, así que no es la estatua contra la que avisa `alfas_de`. La
+pata delantera izquierda se queda en **0,9x**, un 10 % menos que la propia piel del vanilla, y se
+acepta: es el 8,8 % de la malla contra la costura, que es lo que se mira.
+
+Asimetría **0,000** contra 0,005 del vanilla, 2,71 asignaciones por vértice, `Check-NMSGraft` en
+salida 0. **Las texturas no se tocan y no hace falta: el doblez mueve vértices, no UV.**
+
+### Known — por qué hizo falta tocar la malla: **no era el pesado**
+
+Medido el 04/09 con las capturas nuevas delante. Se deformó la misma malla con `fiendwalk`
+usando los pesos de la `PRUEBA03` y los de la `PRUEBA04`, mismo fotograma: **los dos renders son
+casi el mismo**. Y el `reposo.png` —la malla sin animar— ya trae el cuello largo saliendo hacia
+delante.
+
+Es decir: lo que se ve **estaba antes del pesado y sigue después**, porque es la postura de
+reposo del asset. Ningún reparto de peso la cambia: en la pose de bind la piel devuelve el
+vértice a su sitio por construcción. **Arreglarlo es re-posar el cuello en Blender y volver a
+exportar**, o sea buffer de vértices nuevo, pesos nuevos y la altura de 2,85 m a re-medir — es
+reabrir el modelo congelado. Queda **anotado y sin hacer**, a decisión del usuario.
+
+---
+
+## [0.7.0] — 2026-09-03 · NMS 170671
+
+### Fixed — el combate se apagaba solo, y las tres quejas eran el mismo número
+
+Lo que se vio jugando la `0.6.9`: **«el lobo se va después de rugir y va decreciendo el nivel
+de enemigos, y los warrior bug también se van separando»**. Las tres son
+`FiendAggroDecreasePerSpawn` multiplicado por el parto.
+
+| Campo | Antes | Ahora | Vanilla |
+|---|---:|---:|---:|
+| `FiendAggroDecreasePerSpawn` | 0.1 | **0.02** | 0.1 |
+| `FiendMaxAttackers` | 8 | **16** | 2 |
+
+**La cuenta.** `AllowSpawnBrood` está encendido en el `FIEND` desde la `0.3.1` y
+`SpawnBroodTimer` vale **10 s**, así que cada Horror pare una cría cada diez segundos — y
+**cada bicho que nace resta 0,1 de aggro**. Con ocho atacantes son **0,8 cada 10 s** contra los
+**3,0** que da romper un huevo: la oleada **se desactiva sola en menos de un minuto**, sin que
+el jugador haga nada. Y cuando el medidor toca cero no se suelta uno: se suelta **la oleada
+entera**, padre y crías. De ahí las tres quejas a la vez.
+
+**Y el rugido no es casualidad.** `SpawnBroodAnim` del `FIEND` vale `ROAR`, o sea que **el
+rugido ES el parto**. «Se va después de rugir» es literalmente «se va después de gastar aggro».
+
+**Por qué 0,02 y no 0,0.** A cero estuvo desde la `0.3.1` y la `0.6.2` lo devolvió a vanilla
+por una razón concreta: la **primera puerta del carguero abandonado** pedía seguridad adicional
+y no abría nunca, porque esa puerta necesita que el medidor **se vacíe**. Con 0,02 se sigue
+vaciando —cinco veces más despacio—, que es el tiempo que dura una pelea y no el que dura la
+partida. **Si la puerta vuelve a atascarse, se sube a 0,05 antes que a 0,1.**
+
+**`FiendMaxAttackers` 8 → 16** es el mismo número que `FiendMaxEngaged`. Con 8, sólo la mitad
+de los enganchados podía pegar y la otra mitad se quedaba esperando alrededor: eso es el «se
+van separando» de las crías, y no hacía falta ningún campo de dispersión para producirlo.
+
+**No se toca ni la malla ni el árbol de comportamiento.** Construido con 0 `[ERROR]` / 0
+`[WARNING]` / 0 `[NOTICE]`, **72 cambios en 11 MBIN** —uno más que los 71 de la `0.6.4`, y es
+exactamente `FiendAggroDecreasePerSpawn`, que a 0,1 coincidía con vanilla y no contaba—.
+Verificado **descompilando el MBIN de `GAMEDATA\MODS`**, no el `.EXML` del build.
+
+> ⚠️ **Trampa de AMUMSS que costó un build:** una comilla doble dentro de `MOD_DESCRIPTION`
+> cierra la cadena Lua. El error que sale es `'}' expected (to close '{' at line 59)`, que
+> apunta a la llave y no a la comilla. En las descripciones se entrecomilla con guiones.
+
+### Fixed — el cry wolf: el tope de vaivén no veía el peor clip de los nueve
+
+`HT_CryWolf_PRUEBA04`. **La geometría no se toca**: seis de los siete archivos van byte a byte
+los de la `PRUEBA03` y el séptimo —el buffer de vértices— mide los mismos 513 252 bytes con los
+mismos 11 100 vértices en el mismo sitio. Lo único que cambia es **el peso de hueso**.
+
+Lo que se vio jugando: **las dos patas traseras se deforman al rugir y al atacar, y camina como
+si le pesara la cabeza**. Dos causas medidas, y son una sola vista dos veces.
+
+**1 · El tope leía cuatro clips y el `FIEND` tiene nueve.** Medidos los nueve con
+`Pose-NMSMesh.py` sobre la `PRUEBA03` ya desplegada, el que más tensa **no es ninguno de los
+cuatro**:
+
+| clip | roar | run | pounce | attack | walk | idle | attack2 | trot | attack3 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| tensión | **36,4** | 28,2 | 26,8 | 26,2 | 25,8 | 15,7 | 8,9 | 8,2 | 7,6 |
+
+Y en `roar` el giro de mundo de `RootJNT` pasa de los **6,3** que veía el tope a **44,2**
+—siete veces—, `NewBack1JNT` de 6,3 a **49,4** y `NewHeadJNT` de 2,9 a **72,2**. El 170 de la
+`PRUEBA03` se eligió sobre un vaivén **infravalorado ocho veces**. Y `roar` no es un clip raro
+en este mod: es el que más se ve, porque **es la animación del parto**.
+
+**2 · Al cuello no lo topaba nadie.** `NewBack1JNT` es el hueso del que cuelga el cuello largo,
+y es el que `Pose-NMSMesh.py` culpa en **los nueve clips**. No tenía `agarre`, y `alfas_de`
+**sólo recorre las regiones que lo tienen**: se quedaba en vaivén **279** contra un objetivo de
+170, sin que ningún tope lo mirase. Es el mismo fallo exacto que el zombie tuvo con
+`tail_C0_0_jnt` hasta su `PRUEBA09`. **La firma de la `PRUEBA03` pedía partir `NewBack1JNT` en
+cuello y pecho y no hacía falta: no le faltaba una región, le faltaba un ancla.**
+
+Barrido de `objetivo` puntuado con los nueve clips, y se entrega **140**:
+
+| | peor clip | costura walk/run/attack | flex locomoción |
+|---|---:|---:|---:|
+| `PRUEBA03` | 36,4 | 39 / 42 / 46 cm | 3,74 y 5,25 |
+| obj 200 | 27,8 | 45 / 49 / 52 cm | 3,53 y 4,50 |
+| obj 170 | 23,7 | 39 / 42 / 46 cm | 3,15 y 3,95 |
+| **obj 140** | **19,6** | **33 / 36 / 41 cm** | **2,78 y 3,40** |
+| obj 110 | 15,5 | 26 / 29 / 33 cm | 2,37 y 2,82 |
+
+No se coge 110 por el aviso del propio guion —apretar el alfa baja la tensión **siempre** y al
+final deja una estatua—: a 110 la pata delantera izquierda se queda en **0,9x**, o sea moviendo
+**menos que la propia piel del vanilla**. A 140 la locomoción queda en flex 2,78 y 3,40, por
+encima del 1,84-2,36 con el que se aceptó el zombie.
+
+Contra la `PRUEBA03`: **roar 36,4 → 15,2**, run 28,2 → 16,9, attack 26,2 → 15,5, walk 25,8 →
+19,0, y la pata trasera derecha —el hueso con más tensión propia después de los dos del tronco—
+baja de **6,09 a 1,77**. Asimetría **0,000** contra 0,005 del vanilla, `Check-NMSGraft` en
+salida 0.
+
+### Known — el despegue del suelo es traslación, y no lo arregla ningún peso
+
+Medido y escrito antes de entrar: en `roar` el pivote de `RootJNT` **sube 58 cm** y en `pounce`
+el bicho entero sube **1,39 m**. Eso es traslación del propio `.ANIM` del juego, y la
+traslación **no se multiplica por la palanca ni la corrige ningún peso**: mueve 1:1 todo lo que
+cuelgue del hueso. El vanilla da el mismo salto con un bicho de 1,2 m y por eso no canta. Si el
+lobo «vuela» **al saltar**, es esto.
+
+### Changed — el warrior bug a ×4 de píxeles, que es la otra mitad de `Q-TEXBUG`
+
+`HT_WarriorBug_PRUEBA05`. La `0.6.9` arregló lo que **no** era resolución y en partida el bicho
+**se sigue viendo igual**. Queda lo que su propia firma dejó apuntado.
+
+**El agujero, medido sobre el atlas entregado:** 73,4 % negro puro, **81,9 % por debajo de 6**,
+la fila de arriba —cuatro celdas— **completamente vacía** y la mejor celda al 64,7 %. Lo
+pintado ocupa el **18 %** de los cuatro millones de píxeles, o sea ~760 000 texeles para un
+bicho de 2,70 m: **menos de los que tiene el `ARTHROPOD` vanilla en su atlas de 1024**, que es
+al que sustituye. El bug iba con **menos** resolución que el vanilla, no con más.
+
+El atlas pasa a **4096 con celdas de 1024**: ×4 píxeles por trozo, y de tirar 15 de cada 16
+píxeles de los PNG de origen a tirar 3 de cada 4. Los tres `.DDS` pasan de 14 MB a **56**.
+
+**Y no se toca una UV.** La rejilla sigue siendo 4×4 —`LADO = atlas // celda`— y las
+coordenadas se calculan en **fracción** del atlas, así que salen idénticas: el buffer de
+vértices va byte a byte el de la `PRUEBA03`, y ése es el comprobante. El normal se vuelve a
+hornear a 4096 y da desviación **17,2 / 17,3** con medias 127,9 / 128,0 —la `0.6.9` daba
+20,1 / 20,2 a 2048—: no baja porque se aplane, baja porque la misma pendiente repartida entre
+cuatro veces más texeles cambia menos de un texel al siguiente. Las máscaras salen del atlas
+nuevo y miden lo mismo, útil **146,1 / 30,6** contra 146,6 / 30,6 del vanilla.
+
+**La otra vía de `Q-TEXBUG` queda descartada, no aplazada:** repacar las islas apretando el
+81 % vacío exige **UV nuevas**, y UV nuevas son buffer de vértices nuevo, o sea reabrir la
+malla que se congeló el 03/09. El hueco **no lo crea el atlas**, viene dentro de cada PNG de
+origen.
+
+### Added — `--tamano` en `tools/Make-NMSTexture.py`
+
+La cabecera DDS se copia byte a byte del vanilla, y con ella venían sus dimensiones: subir el
+atlas era imposible sin un donante de 4096. `--tamano N` parchea **cuatro campos** —alto,
+ancho, `linearSize` y número de mips— y deja formato, flags y bloque DX10 como los del juego.
+Los tres archivos se validan bloque a bloque contra lo que exige su propia cabecera.
+
+---
+
+## [0.6.9] — 2026-09-03 · NMS 170671
+
+### Fixed — el warrior bug no se veía de plástico por una causa, sino por dos
+
+`HT_WarriorBug_PRUEBA04`. **La malla no se toca**: seis de los ocho archivos van byte a byte
+los de la `PRUEBA03`, verificado por md5 contra `ModBackups`. Cambian **dos**, y lo que mide
+esta entrega son dos cosas separadas que se leían como una sola.
+
+| | Antes (`PRUEBA03`) | Ahora | Vanilla |
+|---|---:|---:|---:|
+| Normal, desviación R / G | **2,3 / 3,6** | **20,1 / 20,2** | 17,2 / 18,3 (`FIEND`) |
+| Normal, media R / G | 127,7 / 127,7 | 128,6 / 128,5 | 127,1 / 127,9 |
+| Máscaras, media / desviación útil | **87,0 / 0,0** | **146,1 / 30,6** | 146,6 / 30,6 (`ARTHROPOD`) |
+
+**«Plano» y «de plástico» no eran el mismo defecto.** El normal iba **siete veces más liso**
+que el del vanilla porque `Make-NMSNormal.py` lo saca de la luminancia del color y las doce
+texturas de este asset vienen pintadas muy planas: no había relieve que extraer. Y las
+máscaras eran **el número 87 repetido en los cuatro millones de píxeles** —desviación exacta
+0,0—, y un brillo idéntico en todo el cuerpo es justo lo que el ojo lee como plástico. Encima
+el 87 se había copiado del `FIEND`, que es el vanilla del **otro** bicho: el `ARTHROPOD` mide
+146,6.
+
+### Added — `tools/Bake-NMSNormal.py`: el relieve sale de la geometría, no de la pintura
+
+El asset entra con **133 108** triángulos y el juego se lleva **36 000**, así que tres cuartas
+partes de la forma estaban esperando en el `.fbx`. El guion nuevo las hornea sobre las UV de
+nuestra malla con Cycles, `selected_to_active`.
+
+**No se subió `--fuerza` al mapa viejo, y es a propósito:** multiplicar por siete un relieve
+sacado de la pintura convierte cada línea pintada en un bulto, que es el efecto «baba» que ya
+costó la `PRUEBA12` del SkrullCrawler.
+
+Dos trampas medidas, las dos con guarda dentro del guion:
+
+1. **Las dos mallas no importan en el mismo sitio.** Miden lo mismo hasta el milímetro y están
+   separadas **4,556**, porque `Decimate-NMSMesh.py` asienta la malla y el `.fbx` sigue en su
+   origen. Se alinean por el centro de la caja; si las **medidas** no casan, aborta.
+2. **Un normal no es color.** Guardado en sRGB, el PNG sale con la media en **187,6** en vez de
+   128 —0,502 lineal pasa a 0,735 con la curva— y el plano deja de estar en el centro. La
+   imagen se marca `Non-Color`.
+
+Y el assert que de verdad corta: **si la desviación sale por debajo de 8, no ha horneado nada**
+y el guion no deja un PNG que parece bueno.
+
+### Added — `tools/Make-NMSMasks.py`: variación cuando el asset no trae rugosidad
+
+El brillo sale de la **luminancia del propio atlas de color**, y es una aproximación elegida a
+sabiendas: en un modelo pintado las grietas van oscuras y son mates y los bultos van claros y
+brillan. Se tipifica y se vuelve a escalar a la media y la desviación del vanilla, porque lo
+que falta no es el nivel, **es la variación**.
+
+**El fondo se queda a 0 y ese es el punto.** El **81,3 %** del atlas del bug es fondo sin usar;
+normalizarlo entero lo mandaría al valor medio y a partir del cuarto mip sangraría hacia dentro
+de cada isla. Es la misma trampa que el `--invertir` del conversor le hizo al cry wolf, que le
+dejó el **50,1 %** de su atlas a **255**, o sea a brillo máximo. El derrame se hace después, con
+`--rellenar`.
+
+### Known — el cry wolf tiene ese fallo y **no se ha tocado**
+
+Medido el 03/09 y anotado sin arreglar, por decisión del usuario —«el lobo está bien»—:
+
+```
+CRYWOLF.BASE.MASKS.DDS   media 214,4   contra los 85,6 del FIEND vanilla
+  50,1% del atlas es fondo sin usar, invertido a 255 = brillo maximo
+  zona util 173,7, el doble del vanilla
+```
+
+Su **normal sí está bien** —126,7 / 127,3 / 244,1 en la zona útil—; lo que bajaba la media a 63
+era el fondo negro del atlas, no el mapa. Si algún día el lobo se ve mojado, esto es lo primero
+que mirar, y es **un solo archivo**.
+
+---
+
+## [0.6.8] — 2026-09-03 · NMS 170671
+
+### 🏁 Cerrada la malla: el warrior bug y el cry wolf quedan congelados
+
+`HT_WarriorBug_PRUEBA03` y `HT_CryWolf_PRUEBA03`. **Estos son los modelos definitivos del
+mod y no se vuelven a tocar.** Con esto termina la línea que empezó el 13/08 con el huevo y
+que se llevó dieciocho pruebas del zombie y el necromorfo antes de cambiar de bicho.
+
+| | Warrior bug | Cry wolf |
+|---|---|---|
+| Sustituye a | el zombie, en el `BUGFIEND` | el necromorfo, en el `FIEND` |
+| Altura | **2,70 m** | **2,85 m** |
+| Giro en Y | **180°** | **180°** |
+| Reparto dominante | spine 76,5 % · head 13,6 % · tail 9,9 % | Root 42,6 % · Head 35,5 % · Back 18,3 % |
+| Asimetría, nuestra / vanilla | **0,000** / 0,018 | **0,000** / 0,005 |
+| Tensión `walk` / `run` / `attack` | 14,4 · 26,0 · 30,9 | 25,8 · 28,2 · 26,2 |
+| La costura abre | 9 · 18 · 26 cm | 39 · 42 · 46 cm |
+| `Check-NMSGraft` sobre lo desplegado | **salida 0** | **salida 0** |
+
+### Changed — el tamaño y el giro los decidió la partida, no el volcado
+
+Tres entregas en dos días, y las dos correcciones vinieron de mirar el bicho en el juego:
+
+| | Bug | Lobo | Veredicto |
+|---|---:|---:|---|
+| `PRUEBA01` | 1,80 m, `giro (-90, 0)` | 1,90 m | 🔴 **entraban de espalda** |
+| `PRUEBA02` | 3,60 m, `giro (-90, 180)` | 3,80 m | 🔴 **girados bien, pero demasiado grandes** |
+| `PRUEBA03` | **2,70 m** | **2,85 m** | 🏁 **cerrada** |
+
+**El giro de la `PRUEBA01` se eligió con un volcado y el volcado medía otra cosa.** Decía que
+con `180` el décimo superior de la malla caía en `w 0,38` contra la cabeza vanilla en `w 0,84`,
+o sea «montado del revés». En un insecto **el décimo superior son las patas levantadas, no la
+cabeza**. Corrige `B11` en [`ACUERDOS.md`](ACUERDOS.md): el giro no lo confirma un volcado, lo
+confirma una entrada al juego.
+
+**Y la regla «1,4-1,7× el vanilla» de `B10` duró un día.** A 2,70 y 2,85 los dos van a **2,6×
+y 2,1× su esqueleto**, muy por encima de aquel tope, **y el pesado pasa igual**. Lo que aquella
+regla explicaba era el fallo del **vecino más cercano**, no un límite de tamaño: con mapa a mano
+la cobertura del esqueleto deja de mandar.
+
+### Added — `B14`: cambiar la altura obliga a re-medir el tope de vaivén
+
+Dos cosas que sólo se ven al tocar la escala, y que ahora están en `RECETA-PIEL.md` §3:
+
+1. **El mapa de regiones se espeja si cambia el giro.** Va en coordenadas normalizadas de
+   nuestra caja, y `Ry(180)` espeja `u` y `w`. Sin espejar los cortes, la región de la cabeza
+   del bug cazaba la punta del abdomen —759 vértices en vez de 2 665— y `spine_C0_0_jnt` subía
+   al **92,2 %** contra un tope de 85. Es la misma línea con `u → 1−u` y `w → 1−w`; `v` no se
+   toca.
+2. **El tope de vaivén NO es invariante de escala.** El vaivén es giro × palanca, y la palanca
+   es la distancia de la región al pivote partida por el tamaño de la región: el esqueleto del
+   juego **no** crece con nosotros. La cabeza del bug va **4,4×** a 1,80 m, **5,4×** a 2,70 y
+   **7,0×** a 3,60. Con el tope quieto en 120, agrandar el bicho **lo deja tieso** —el agarre de
+   la cabeza subía al 76 %— y además rompe el assert.
+
+El número nuevo es una **ventana**, no un valor, y se lee en la columna `todos` de la propia
+corrida:
+
+| | Por debajo, la cabeza pierde su hueso | Por encima, las patas se sueltan | Elegido |
+|---|---:|---:|---:|
+| Bug 2,70 m | 195 | 316 | **300** |
+| Lobo 2,85 m | 129 | 214 | **170** |
+
+**Y dentro de la ventana no se coge el centro a ciegas: se puntúa con `Pose-NMSMesh.py`.** En el
+lobo, `200` daba tensión 30,3 / 33,2 / 30,8 y costura 45 / 49 / 52 cm, y `170` la bajó a
+25,8 / 28,2 / 26,2 y 39 / 42 / 46 **con el mismo reparto**. Dos números que el assert acepta
+igual no son el mismo bicho.
+
+### Known — al lobo le queda costura, y no es la escala
+
+**El cry wolf abre 39-46 cm y la `PRUEBA01` abría 10-13.** No lo explica el tamaño: a 3,80 m
+abría 45-56 y bajarlo a 2,85 casi no lo movió. `Pose-NMSMesh.py` pone la costura en
+`NewBack1JNT` en los cuatro clips, o sea **el cuello largo colgando del pecho**. Si algún día
+molesta en partida, el arreglo **no es el tope** —ya está en el centro de su ventana— sino
+**partir `NewBack1JNT` en dos regiones, cuello y pecho**. Se deja anotado y **no se toca**: el
+modelo está cerrado por decisión del 03/09.
+
+---
+
 ## [0.6.7] — 2026-08-22 · NMS 170671
 
 ### Fixed — `M-BABA`: el `gMasksMap` no estaba flojo, estaba al revés
