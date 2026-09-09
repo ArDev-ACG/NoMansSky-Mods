@@ -15,6 +15,7 @@ build/
 # nada que este dentro de un directorio excluido.
 tools/*
 !tools/*.py
+!tools/*.ps1
 !tools/tests/
 tools/tests/*
 !tools/tests/*.py
@@ -30,6 +31,9 @@ work/pcbanks/
 *.DDS
 *.mbin.PC
 BankSignatures.bin
+# Indice de rutas de los .pak que vuelca MBINCompiler. 15 MB, se regenera
+# en un rato, y lleva dentro la ruta local de la instalacion de Steam.
+filenames.json
 
 # --- Backups de partidas (datos personales, nunca a git) ---
 backups/
@@ -95,6 +99,9 @@ work/models/crywolfmesh/*
 !work/models/crywolfmesh/pesos.json
 !work/models/crywolfmesh/giros.json
 work/textures/
+# Volcados de pose de Blender: 50-60 MB cada uno, siete de ellos, y se
+# regeneran corriendo Pose-NMSMesh.py sobre los .ANIM del juego.
+*.npz
 *.blend
 # 20,9 MB. Decision del humano el 2026-08-15: entra, para que el proyecto de
 # Blender quede reproducible sin depender de volver a correr el script.
@@ -119,6 +126,7 @@ Desktop.ini
 ~$*
 .vscode/
 .idea/
+.obsidian/
 
 # --- Excepciones: esto SI se versiona ---
 !.gitignore
