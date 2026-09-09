@@ -1,4 +1,4 @@
-# `malla/` — las series `HT_EggMesh` y `HT_ScuttlerMesh`
+# `malla/` — geometría propia dentro del juego
 
 Geometría nuestra dentro del juego, por la vía Blender + NMSDK. **Dos series, 18 `.lua`**:
 cinco de `HT_EggMesh` (el obelisco, Etapa 2) y trece de `HT_ScuttlerMesh` (el bicho, Etapas 3
@@ -55,6 +55,7 @@ el bicho conserva comportamiento, colisión, IA y sonido.
 | `PRUEBA14` | **`M-UVIDX`.** El **index buffer** arreglado: NMSDK serializaba el de **antes** de partir los vértices de costura. Las cinco texturas y el material van byte a byte los de la `13` | 🏁 **medida el 25/08 y parte en dos.** ✅ **De frente, perfecta**: cráneo, ojos y pinzas se leen, la textura es continua y no queda un solo dibujo de estrella — `M-UVIDX` y `M-BABA` cerrados. 🔴 **Por detrás no**: la espalda sale como una lona negra con tiras planas y astillas rectas → `M-PALETA` |
 | `PRUEBA15` | **`M-ESTRELLA`.** El color base con el hueco de UV derramado desde la isla vecina | ⬜ escrita el 24/08 y **nunca construida**. La adelanta la `PRUEBA16`: los dibujos de estrella ya no estaban en las capturas de la `14`, así que esto se queda sin síntoma que medir |
 | `PRUEBA16` | **`M-PALETA`.** Los canales 5 y 6 rehechos: candidatos del `SkinMatrixLayout` vanilla, copia de los **8** vecinos de la piel vanilla y **12** pasadas de suavizado por nuestras aristas. Sólo cambian los tres archivos de geometría | 🟡 **cosida el 26/08, sin construir.** 14 huesos, todos subconjunto de los 19 del vanilla; `RootJNT` 43,5% contra 45,9%; asimetría 0,026 contra 0,000; `Check-NMSGraft` salida 0 |
+| `PRUEBA17` | La `16` con el `AttackLight` de vuelta a cero. La geometría va **byte a byte** como la `16`, verificado con `cmp`: sólo cambian **seis flotantes del `.SCENE`** | 🏁 **medida el 28/08 y CERRADA. Ojo apagado y espalda limpia.** Cierra `M-OJO` y confirma la `PRUEBA16` entera. **Esta es la versión buena del SkrullCrawler y se congela: no se vuelve a tocar** |
 
 > **Las dos cosas de la `PRUEBA12` fueron en el MISMO `.lua` y las midió una sola entrada al
 > juego, y el desempate escrito de antemano acertó**: el bicho salió **bien plantado y con la
@@ -234,6 +235,12 @@ Tercera ranura, y la primera que **no** se hizo a mano: el cuerpo del `FIEND`
 |---|---|---|
 | `HT_FiendMesh_PRUEBA01` | La malla **rígida** + atlas de color y normal propios | ✅ **salió el 21/08**: entero, de pie y con los colores en su sitio. 🔴 **se veía pequeño** — se midió a la altura del AABB vanilla (1,81 m) y ese bicho es bajo pero **5 m de largo**, así que al lado se ve enano. Rehecho a **3,62 m** y redesplegado |
 | `HT_FiendMesh_PRUEBA02` | **La misma malla y la misma textura**, decimada a **30 000** triángulos en vez de 5 999 | ⬜ desplegado el 21/08, `Check-NMSGraft` en **salida 0**. Sin medir. Mide si el color deja de salir a confeti: el asset viene horneado **por triángulo** y se entregaba el 2,2 % de la malla. **30 000 y no más** porque a 36 000 el export dio 69 261 vértices con `Indices16Bit`, cuyo techo son 65 536 |
+| `HT_FiendMesh_PRUEBA04` | **`M3-PIEL` con mapa a mano** región → hueso, normal rehecho y máscaras propias. 7 huesos, el mayor al 21,0 % (era `RootJNT` al 79,5 %) | 🟡 **medida el 27/08 y parte en dos.** ✅ **La textura sale sana y sin baba** — `M-TEX` y `M-BABA` cerrados. 🔴 **Los brazos y las piernas salen estirados en cuchillas de varios metros** → `M3-ESLABON` |
+| `HT_FiendMesh_PRUEBA05` | **`M3-ESLABON`.** El mapa pasa del **tercer** eslabón de pata al **primero** —`*FirstLeg1JNT` y `*FourthLeg1JNT`— y el pesado llena las **cuatro ranuras** | 🔴 **medida el 28/08: rígida y sin estirarse a la vez**, que es la firma de que **no se está pesando nada**. El `FIEND_MAT` que entregó **no declara `_F02_SKINNED`** —md5 contra la `04`—, y sin ese flag el juego no aplica el esqueleto. El `COMMENT` del `.lua` decía «CON _F02_SKINNED» y era falso: el archivo se rehizo después → `M3-FLAG` |
+| `HT_FiendMesh_PRUEBA06` | **`M3-FLAG`.** `_F02_SKINNED` de vuelta y **nada más**: los otros seis archivos van byte a byte como la `05` | 🟡 **construida y desplegada el 29/08, sin medir.** `FIEND_MAT` **md5 idéntico al de la `PRUEBA04`**; `Check-NMSGraft` salida 0 sobre lo desplegado, con el flag verificado. El pesado no se toca, y queda confirmado por medida contra los `.ANIM`: `Leg1` gana o empata en los cuatro miembros |
+| `HT_FiendMesh_PRUEBA07` | **`M3-AGARRE`.** Los pesos: cada region se queda solo parte de su giro propio y el resto lo sigue a la region vecina. **Solo cambia el buffer de vertices**, los otros seis archivos van byte a byte como la `06` | 🔴 **medida en partida el 31/08**: los brazos salen **tiesos pero ya no estiran**, y al andar **se estira la mitad de abajo**. La causa, leída de los `.ANIM`: la pata trasera izquierda del `FIEND` gira **69,5°** al andar contra los **26,2°** de la derecha, 2,7 veces más, y nuestro mapa parte la mitad de abajo por un plano duro en `u 0,50` y cuelga cada mitad de una de las dos → `M3-ESPEJO`. La `06` midio **textura correcta, se mueve y vuelven las cuchillas**, y su firma decia subir `SUAVIZADOS`: **se midio y no era eso** — con 12 pasadas nuestra piel ya es mas suave que la del propio vanilla, p99 **0,180 contra 0,500**. Lo que si es: **la palanca**. `LFirstLeg1JNT` tiene nuestro brazo a **2,77 m** y su propia piel a **0,15 m**: **18,4x**. Las piernas, que se ven bien, van a 3,9x. Con `objetivo=4.0` los brazos bajan a 4,0x y la cabeza tambien, **y las piernas no se tocan**. Asimetria **0,005 contra 0,005** del vanilla; deriva 0,5 puntos sobre un tope de 5; `Check-NMSGraft` salida 0 sobre lo desplegado |
+| `HT_FiendMesh_PRUEBA08` | **`M3-ESPEJO`.** El vaivén de cada miembro se iguala con el de su espejo **por el lado más quieto**: la pierna izquierda baja de **271 a 113** para igualar a la derecha, que en partida se ve bien. **Brazos y cabeza congelados** en el alfa de la `07`, a petición expresa. **Solo cambia el buffer de vértices**, los otros seis archivos van byte a byte como la `07` | 🔴 **desplegada el 31/08 a las 06:13 y medida esa noche en tres capturas: la medida no se puede leer.** Lo que domina las tres son **los brazos en cuchillas** y **el cuerpo despegado del suelo**, que es justo lo que la `08` no tocó, así que la pierna izquierda no se aísla. Y los números lo explican: con el alfa congelado los brazos se quedan en vaivén **207 y 154** contra los **113** de las piernas; en `attack` los dos van a **220**, la pierna derecha —que el espejo deja entera— a **258**, y la cabeza a **142** en `idle`. `Check-NMSGraft` salida 0 sobre lo desplegado: 44 `JOINT`, 1 `MESH`, stride 20 con los canales 2, 3, 5 y 6 → `M3-TOPE` |
+| 🆕 `HT_FiendMesh_PRUEBA09` | **`M3-TOPE`.** Los brazos se **descongelan** y entra el tope global de vaivén a **113**, que es el número al que el espejo dejó las piernas en la `08`. El brazo izquierdo baja de **207 a 113** —agarre del 88 % a `NewBack1JNT`— y el derecho de **154 a 113** —82 %—. La cabeza sigue congelada en 0,65. **Solo cambia el buffer de vértices** | 🟡 **construida y desplegada el 01/09 a las 00:01, sin medir.** El alfa congelado de la `07` -0,22 y 0,25- se eligió con la **palanca sola**, y la palanca no sabe cuánto gira el hueso: `LFirstLeg1JNT` amplifica 18,4× y gira 51,0° al andar, así que 0,22 de 939 seguía siendo 207. 2,42 influencias por vértice; 16048 de 16048 vértices con peso; asimetría **0,017** contra 0,005 del vanilla; costura p99 0,160; `Check-NMSGraft` salida 0 sobre lo desplegado y el buffer desplegado con **el mismo md5** que el construido. **Los brazos van a salir más tiesos, y se entrega sabiéndolo**: es decisión del 31/08 tras ver que seguían estirando |
 
 **Lo que la serie del SCUTTLER costó descubrir, aquí ya viene hecho.** Las once pruebas de
 `HT_ScuttlerMesh` se comprimen en una porque los cinco pasos previos a la piel quedaron
@@ -321,6 +328,12 @@ Horror pare al rugir en Hardcore. Rig `ARTHROPOD`, 53 huesos, **once** nodos `ME
 |---|---|---|
 | `HT_ZombieMesh_PRUEBA01` | La malla **rígida** a 2,43 m + color y normal propios + el `.DESCRIPTOR` recortado | ⬜ desplegado el 21/08, `Check-NMSGraft` en **salida 0**. Sin medir |
 | `HT_ZombieMesh_PRUEBA02` | **La misma malla y la misma textura**, decimada a **36 000** triángulos en vez de 5 999 | ⬜ desplegado el 21/08, `Check-NMSGraft` en **salida 0**. Sin medir. Aquí caben los 36 000 completos —salen 31 475 vértices— porque el asset trae **un** material y desenvuelto continuo: parte 0,87 vértices por triángulo contra los 1,92 del necromorfo |
+| `HT_ZombieMesh_PRUEBA04` | **`M4-PIEL` con mapa a mano** y máscaras propias en ruta propia. 7 huesos, el mayor al 23,7 % (era `spine_C0_0_jnt` al 80,1 %) | 🟡 **medida el 27/08 y parte en dos.** ✅ **Sale seco y se mueve natural** — `M-BABA` cerrado entero. 🔴 **La textura se estira**: manos y pies en cuchillas y una lámina de torso tirada a un lado → `M4-ESLABON` |
+| `HT_ZombieMesh_PRUEBA05` | **`M4-ESLABON`.** El mapa pasa de `leg_*_1_jnt` a **`legbase_*`** y el pesado llena las **cuatro ranuras** | 🔴 **medida el 28/08: rígida, sin estirarse y con la textura peor.** **Dos cosas en el mismo archivo**: el `ARTHROPODTHORAX01MAT` no declara **`_F02_SKINNED`** —de ahí rígido— y el `gMasksMap` **ha vuelto a `ARTHROPODTHORAX01.BASE.MASKS.DDS`**, la máscara compartida por toda la fauna artrópodo: `M-BABA` otra vez. Y debajo, un tercer fallo real: `legbase_*` **no tiene ni una clave** en ningún `.ANIM` → `M4-FLAG` |
+| `HT_ZombieMesh_PRUEBA06` | **`M4-FLAG`.** `_F02_SKINNED` y el `gMasksMap` de vuelta, **y** el mapa a `leg_*_0_jnt`, el primer eslabón **con claves** | 🟡 **construida y desplegada el 29/08, sin medir.** Material **md5 idéntico al de la `PRUEBA04`** y las tres texturas ya lo eran. 2,04 influencias por vértice; asimetría 0,052 contra 0,018 del vanilla; vértice medio a 0,872 sobre 3,05; `SkinMatrixLayout` desplegado `[2,3,7,19,25,37,42]`; `Check-NMSGraft` salida 0 con el flag y los samplers verificados |
+| `HT_ZombieMesh_PRUEBA07` | **`M4-AGARRE`.** Lo mismo que en el necro: los brazos y la cabeza agarrados a `spine_C0_0_jnt` y las piernas a `tail_C0_0_jnt`. **Solo cambia el buffer de vertices** | 🔴 **medida en partida el 31/08**: **cuello, hombros y brazos estiran** y **las piernas no se mueven**. La `07` eligió los alfas con la **palanca sola**, y con `objetivo=4.0` de palanca los brazos se quedaron en vaivén **202 y 209** mientras las piernas caían a **59 y 65** → `M4-TOPE`, que topa el vaivén y no la palanca. Misma causa medida: `leg_R0_0_jnt` tiene nuestro brazo a **1,30 m** y su piel a **0,17 m**, o sea **7,7x**, contra las piernas a 3,6x y 2,1x, que se ven bien. Con `objetivo=4.0` los brazos bajan a 4,0x y las piernas no se tocan. 2,19 influencias por vertice; asimetria **0,040 contra 0,018** del vanilla, mejor que el 0,052 de la `06`; deriva 2,2 puntos; `Check-NMSGraft` salida 0 sobre lo desplegado |
+| `HT_ZombieMesh_PRUEBA08` | **`M4-TOPE`.** Tope de **vaivén absoluto en 120**, no de palanca: los brazos bajan de **355 y 411**. Aquí el espejo no vale —el `ARTHROPOD` es simétrico, 52,1° y 53,2° al correr—, lo que sobra es el vaivén absoluto. Piernas y cabeza sin tocar. **Solo cambia el buffer de vértices** | 🟡 **desplegada el 31/08 a las 06:13 y medida esa noche en cinco capturas: pasa la mitad.** ✅ **Los brazos ya no hacen cuchillas** en ninguna de las cinco, en una anda entero y correcto, y la textura sigue sana y seca. 🔴 Ahora **estira la cabeza** —cráneo y cuello disparados en dos capturas— **y la mitad de abajo**, en cono hacia el suelo. Los dos están medidos: el tope solo mira `walk` y `run`, y ahí la cabeza vale **21**, así que se queda en alfa 1,0 — en `attack01` vale **299**. Y el ancla `tail_C0_0_jnt`, de la que cuelga la mitad de abajo, gira **119°** en `attack01` y **no se puede topar**: `alfas_de()` solo recorre las regiones con `agarre`. `Check-NMSGraft` salida 0 sobre lo desplegado: 53 `JOINT`, 1 `MESH` → `M4-ATAQUE` |
+| 🆕 `HT_ZombieMesh_PRUEBA09` | **`M4-ATAQUE`.** El **tope** pasa a medirse sobre **los cuatro clips** —`walk`, `run`, `idle` y `attack01`— y el **espejo** se queda en locomoción: cada regla lee sus propios clips. La cabeza entra por primera vez, de **300 a 120** con un agarre del 60 % al torso; la pierna izquierda de 169 a 120; los brazos de 428 y 497 a 120. Y `tail_C0_0_jnt`, el ancla, **estrena `agarre`** para dejar de ser un punto ciego. **Solo cambia el buffer de vértices** | 🟡 **construida y desplegada el 01/09 a las 00:01, sin medir.** 2,32 influencias por vértice; 17983 de 17983 vértices con peso; `SkinMatrixLayout` `[2, 3, 7, 19, 25, 37, 42]`; `Check-NMSGraft` salida 0 sobre lo desplegado y el buffer desplegado con **el mismo md5** que el construido. 🔴 **Un número que empeora y se dice:** la asimetría sube a **0,058** contra 0,018 del vanilla —la `08` daba 0,040—, y es el precio de topar la pierna izquierda a 120 mientras la derecha se queda en 86. Si abajo sale descuadrado de un lado, el siguiente paso es encender el espejo también aquí |
 
 **Lo nuevo aquí es el descriptor, y es lo único que puede cerrar el juego.** El injerto borra
 diez de los once nodos `MESH`, y **siete de las ocho entradas del descriptor los nombran**. Si
@@ -349,6 +362,55 @@ el descriptor** y por tanto siempre está.
 
 > **Y este asset sí trae normal esculpido**: desviación **51,8**, contra los 17,2 del vanilla
 > y los 4,7 del necromorfo generado desde la luminancia. Aquí no hay que fabricar nada.
+
+## Las series `HT_WarriorBug` y `HT_CryWolf` — 🏁 las dos cerradas
+
+**Sustituyen al zombie y al necromorfo, y son los modelos definitivos del mod.** El motivo del
+cambio no fue estético: los dos anteriores eran **bípedos montados sobre una araña**, y eso se
+llevó dieciocho pruebas. Estos dos son **del mismo tipo de animal que su vanilla** — un insecto
+de cuatro patas sobre el `ARTHROPOD` de seis, y un cuadrúpedo de cuello largo sobre el `FIEND`.
+
+Escriben los mismos archivos que `HT_ZombieMesh` y `HT_FiendMesh`, así que **no pueden convivir
+con ellas** ni una serie con la otra.
+
+| `.lua` | Qué cambia | Veredicto |
+|---|---|---|
+| `HT_WarriorBug_PRUEBA01` · `HT_CryWolf_PRUEBA01` | Bicho nuevo, 1,80 y 1,90 m, `giro (-90, 0)`, mapa a mano de 7 regiones, agarre y tope 120 | 🔴 **entraron de espalda.** El volcado que eligió el `giro 0` medía el décimo superior de la malla, y en un insecto eso son las patas levantadas |
+| `HT_WarriorBug_PRUEBA02` · `HT_CryWolf_PRUEBA02` | `giro (-90, 180)`, el mapa de regiones **espejado** y el tope re-medido. 3,60 y 3,80 m | 🔴 **girados bien, demasiado grandes** |
+| **`HT_WarriorBug_PRUEBA03`** · **`HT_CryWolf_PRUEBA03`** | Lo mismo a **2,70** y **2,85 m**, con el tope de vaivén otra vez re-medido: 300 y 170 | 🏁 **medidas el 03/09 y CONGELADAS. No se tocan más** |
+| **`HT_WarriorBug_PRUEBA04`** | **Sólo piel, la malla no se toca**: seis de los ocho archivos van byte a byte los de la `03`. Normal **horneado del alto poly** (desv. 2,3 → **20,1**) y máscaras **con variación** (87 plano → **146,1 / 30,6**) | 🔴 **medida el 03/09: se ve IGUAL.** Lo que arreglaba no era lo que se veía. Sus dos archivos siguen dentro de la `PRUEBA05` |
+| 🆕 **`HT_CryWolf_PRUEBA04`** | **Sólo el peso de hueso**: mismos 11 100 vértices y mismos 513 252 bytes. `clips_tope` pasa de cuatro clips a seis —entran `roar` y `pounce`— y `NewBack1JNT` estrena `agarre` a `RootJNT`. El objetivo baja de 170 a **140**, medido | ⬜ desplegada el 03/09, sin medir |
+| 🆕 **`HT_WarriorBug_PRUEBA05`** | **Sólo textura, y sin tocar una UV**: el atlas pasa a **4096 con celdas de 1024** —×4 píxeles—, el normal se re-hornea a 4096 (desv. **17,2 / 17,3**) y las máscaras salen del atlas nuevo. Los tres `.DDS`, de 14 a 56 MB | ⬜ desplegada el 03/09, sin medir |
+| 🆕 **`HT_CryWolf_PRUEBA05`** | **La única de la serie que mueve vértices.** El cuello se dobla **30°** con rampa dentro de `Export-NMSMesh.py`: pasa de 35° a 65° sobre la horizontal. Obliga a re-medir los cortes del mapa (`w 0,45` → `0,35`) y el tope (140 → **110**) | ⬜ desplegada el 04/09, sin medir |
+
+**Lo que enseñaron, y está en `ACUERDOS.md` `B14` y en `RECETA-PIEL.md` §3:** el mapa a mano va
+en coordenadas normalizadas y **no** cambia con la escala, pero **se espeja con `Ry(180)`**
+(`u → 1−u`, `w → 1−w`), y el **tope de vaivén sí escala**, porque el vaivén es giro × palanca y
+el esqueleto del juego no crece con nosotros. Cada cambio de altura obliga a volver a leer la
+ventana del tope en la columna `todos` de la propia corrida.
+
+| | Bug 2,70 m | Lobo 2,85 m |
+|---|---|---|
+| Tensión `walk` / `run` / `attack` | 14,4 · 26,0 · 30,9 | 25,8 · 28,2 · 26,2 |
+| La costura abre | 9 · 18 · 26 cm | 39 · 42 · 46 cm |
+| Asimetría, nuestra / vanilla | 0,000 / 0,018 | 0,000 / 0,005 |
+
+> 🔓 **Al lobo le quedaba el TOPE, y no era la costura ni la escala.** Esta nota decía que
+> el arreglo sería «partir `NewBack1JNT` en dos regiones» y **no hacía falta**: medido el 03/09,
+> a esa región **no la topaba nadie**, porque `alfas_de` sólo recorre las que tienen `agarre` y
+> ésa no lo tenía. Se quedaba en vaivén **279** contra un objetivo de 170 —el mismo fallo que el
+> zombie tuvo con `tail_C0_0_jnt` hasta su `PRUEBA09`—. Y encima el tope leía **cuatro** de los
+> nueve `.ANIM` del `FIEND`, y el peor —`roar`, que en este mod es la animación del parto— **no
+> estaba**: ahí `RootJNT` gira 44,2 grados en vez de los 6,3 de `walk`. Con las dos cosas puestas
+> y el objetivo a 140, la costura baja de 39-42-46 cm a **33-36-41** y `roar` de 36,4 a **15,2**.
+> Lo arregla la `PRUEBA04`, y **sin mover un vértice**: no reabre el modelo.
+
+> 🔓 **Al bug le quedaba piel, y la `PRUEBA04` le arregla dos cosas**: el normal ya no se
+> inventa de la luminancia —se hornea del alto poly de 133 108 triángulos— y las máscaras dejan
+> de ser una plancha de 87. Lo que sigue abierto es la **resolución**: sus once PNG de origen
+> son 2048×2048, el atlas los guarda a 512×512 y el 81,3 % de ese atlas está vacío. Ver
+> `Q-TEXBUG` en [`../../../docs/PENDIENTES.md`](../../../docs/PENDIENTES.md) §2. Todo eso es
+> textura, no malla: **no reabre el modelo**.
 
 ## Qué escribe cada uno
 
