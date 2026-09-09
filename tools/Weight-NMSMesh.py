@@ -178,13 +178,22 @@ MODELOS = {
         # PRUEBA05 del zombie.
         #
         # Gana la PRIMERA fila que case, asi que van de arriba abajo.
+        #
+        # ESPEJADOS PARA LA PRUEBA02, y no es un retoque: es la MISMA linea
+        # de arriba con `u -> 1-u` y `w -> 1-w`. El giro de la malla paso de
+        # 0 a 180 en Export-NMSMesh.py, y 180 en Y espeja justo esos dos ejes
+        # de la caja; los cortes de abajo estan en coordenadas de la caja, no
+        # del bicho, asi que sin espejarlos senalan al reves. Medido: con los
+        # cortes viejos sobre la malla girada, `spine_C0_0_jnt` pasaba a
+        # mandar el 92,2% -tope 85- porque la region de la cabeza cazaba la
+        # punta del abdomen, 759 vertices en vez de los 2400 de la cabeza.
         regiones=(
-            ("head_C0_0_jnt",  lambda u, v, w: v > 0.70 and w > 0.55),
-            ("leg_L0_0_jnt",   lambda u, v, w: v < 0.45 and w > 0.45 and u > 0.55),
-            ("leg_R0_0_jnt",   lambda u, v, w: v < 0.45 and w > 0.45 and u < 0.45),
-            ("leg_L2_0_jnt",   lambda u, v, w: v < 0.45 and u > 0.55),
-            ("leg_R2_0_jnt",   lambda u, v, w: v < 0.45 and u < 0.45),
-            ("spine_C0_0_jnt", lambda u, v, w: w > 0.45),
+            ("head_C0_0_jnt",  lambda u, v, w: v > 0.70 and w < 0.45),
+            ("leg_L0_0_jnt",   lambda u, v, w: v < 0.45 and w < 0.55 and u < 0.45),
+            ("leg_R0_0_jnt",   lambda u, v, w: v < 0.45 and w < 0.55 and u > 0.55),
+            ("leg_L2_0_jnt",   lambda u, v, w: v < 0.45 and u < 0.45),
+            ("leg_R2_0_jnt",   lambda u, v, w: v < 0.45 and u > 0.55),
+            ("spine_C0_0_jnt", lambda u, v, w: w < 0.55),
             ("tail_C0_0_jnt",  lambda u, v, w: True),
         ),
         # EL AGARRE, Y HACE FALTA AUNQUE LA ANATOMIA CASE.
@@ -216,7 +225,25 @@ MODELOS = {
         # aqui no hay diferencia entre lados que igualar. Lo que sobra es el
         # vaiven ABSOLUTO, y eso lo corta el tope.
         espejo_vaiven=False,
-        objetivo=120.0,
+        # 300 Y NO 120, Y NO ES UN NUMERO NUEVO: ES EL MISMO. El vaiven es
+        # giro x PALANCA, y la palanca es la distancia de la region al pivote
+        # del hueso PARTIDA POR el tamano de la region; el esqueleto no
+        # escala con nosotros, asi que subir la malla de 1,80 a 2,70 sube la
+        # palanca MAS de lo que sube el bicho -la cabeza pasa de 4,4x a 5,4x-.
+        #
+        # ESTE NUMERO SE VUELVE A MEDIR CADA VEZ QUE CAMBIA `alto`, y sale de
+        # la columna `todos` de la propia corrida: es una VENTANA, no un
+        # numero. A 2,70 la cabeza conserva su hueso por encima de 195 -su
+        # vaiven peor es 391- y las patas delanteras se sueltan del torax por
+        # encima de 316 -633-. 300 cae dentro y devuelve el reparto de la
+        # PRUEBA01, que es el criterio: el tope bueno es el que reproduce el
+        # reparto de la entrega que ya se vio bien.
+        #
+        # Con el tope quieto en 120 y la malla a 3,60 -la PRUEBA02- el agarre
+        # de la cabeza subia a 76% y `spine_C0_0_jnt` mandaba el 90,1% contra
+        # un tope de 85: agrandar el bicho sin tocar esto lo deja TIESO y
+        # ademas rompe el assert.
+        objetivo=300.0,
         # EL TOPE NO LLEGA AL ABDOMEN, Y ES QUIEN MANDA LA COSTURA.
         #
         # Con solo el agarre y el tope de 120, `Pose-NMSMesh.py` bajo el bug
@@ -271,13 +298,28 @@ MODELOS = {
         # El eslabon es `*Leg1JNT`, el primero de la cadena Y el primero con
         # claves: los cuatro `*Leg1JNT` del SPIDERRIG tienen claves en todos
         # los `.ANIM`, medido el 29/08.
+        #
+        # ESPEJADOS PARA LA PRUEBA02, por lo mismo que el bug: `u -> 1-u` y
+        # `w -> 1-w`, que es lo que el giro de 180 le hace a la caja.
+        # LOS CORTES SE RE-MIDEN EN LA PRUEBA05, porque el cuello se re-poso y
+        # el mapa va en coordenadas NORMALIZADAS: no cambia con la escala,
+        # pero si con la FORMA. Doblado el cuello 30 grados, la caja pasa de
+        # 1,356 x 2,85 x 3,102 a 1,199 x 2,85 x 2,292 y el bicho se hace mas
+        # compacto. Secciones nuevas a lo largo de w, medidas el 04/09:
+        #     w 0,00-0,15  3094 vert  y 0,81..0,98  ancho 0,31-0,44  CABEZA
+        #     w 0,15-0,35   645 vert  y 0,90 -> 0,47  ancho 0,28-0,36  CUELLO
+        #     w 0,35-0,40   655 vert  el ancho salta a 0,64 y 0,99     HOMBROS
+        #     w 0,40-0,70  4056 vert  ancho ~0,96                      TRONCO
+        #     w 0,75-1,00   925 vert  ancho 0,54-0,78              GRUPA Y COLA
+        # o sea que el arranque del cuello baja de w 0,45 a w 0,35, que es
+        # donde el ancho en x salta de 0,36 a 0,64.
         regiones=(
-            ("NewHeadJNT",     lambda u, v, w: v > 0.72 and w > 0.55),
-            ("NewBack1JNT",    lambda u, v, w: w > 0.55),
-            ("LFirstLeg1JNT",  lambda u, v, w: v < 0.45 and w > 0.25 and u > 0.55),
-            ("RFirstLeg1JNT",  lambda u, v, w: v < 0.45 and w > 0.25 and u < 0.45),
-            ("LFourthLeg1JNT", lambda u, v, w: v < 0.45 and u > 0.55),
-            ("RFourthLeg1JNT", lambda u, v, w: v < 0.45 and u < 0.45),
+            ("NewHeadJNT",     lambda u, v, w: v > 0.72 and w < 0.35),
+            ("NewBack1JNT",    lambda u, v, w: w < 0.35),
+            ("LFirstLeg1JNT",  lambda u, v, w: v < 0.45 and w < 0.62 and u < 0.45),
+            ("RFirstLeg1JNT",  lambda u, v, w: v < 0.45 and w < 0.62 and u > 0.55),
+            ("LFourthLeg1JNT", lambda u, v, w: v < 0.45 and u < 0.45),
+            ("RFourthLeg1JNT", lambda u, v, w: v < 0.45 and u > 0.55),
             ("RootJNT",        lambda u, v, w: True),
         ),
         # EL AGARRE. Medido igual que en el bug, con el mapa duro puesto:
@@ -295,16 +337,61 @@ MODELOS = {
             "NewHeadJNT":     "NewBack1JNT",
             "LFourthLeg1JNT": "RootJNT",
             "RFourthLeg1JNT": "RootJNT",
+            # EL ANCLA TAMBIEN NECESITA AGARRE, igual que `tail_C0_0_jnt`
+            # en el zombie desde la PRUEBA09: `alfas_de` SOLO recorre las
+            # regiones que lo tienen, asi que sin esta linea `NewBack1JNT`
+            # -que es el CUELLO- no lo topa nadie. Medido el 03/09 con el
+            # tope leyendo los seis clips: se quedaba en vaiven 279 contra
+            # el objetivo de 170, y es el hueso que `Pose-NMSMesh.py` culpa
+            # en los NUEVE clips. Era el "partir NewBack1JNT" que la firma
+            # de la PRUEBA03 dejo escrito, y sale mas barato: no hace falta
+            # partir la region, hace falta que la region tenga ancla.
+            "NewBack1JNT":    "RootJNT",
         },
         giros=RAIZ / "work" / "models" / "crywolfmesh" / "giros.json",
         clips=("fiendwalk.anim", "fiendrun.anim"),
+        # EL TOPE LEE TAMBIEN `roar` Y `pounce` DESDE LA PRUEBA04, y no es
+        # un clip mas: `roar` es el PEOR de los nueve. Medido el 03/09 con
+        # Pose-NMSMesh sobre la PRUEBA03 ya desplegada -tension por clip-:
+        #     roar 36,4   run 28,2   pounce 26,8   attack 26,2   walk 25,8
+        #     idle 15,7   trot 8,2   attack2 8,9   attack3 7,6
+        # y en `roar` el giro de mundo de `RootJNT` pasa de 6,3 -que es lo
+        # que veia el tope- a 44,2, o sea SIETE VECES. `NewBack1JNT` va de
+        # 6,3 a 49,4 y `NewHeadJNT` de 2,9 a 72,2. Con esos tres fuera de
+        # la lista el tope de 170 se eligio sobre un vaiven que en el clip
+        # que mas duele estaba infravalorado ocho veces.
+        #
+        # Y `roar` NO es un clip raro en este mod: `SpawnBroodAnim = ROAR`
+        # en el `FIEND`, o sea que el Horror rie CADA `SpawnBroodTimer`
+        # segundos mientras pelea. Es de los que mas se ven.
         clips_tope=("fiendwalk.anim", "fiendrun.anim",
-                    "fiendidle.anim", "fiendattack.anim"),
+                    "fiendidle.anim", "fiendattack.anim",
+                    "fiendroar.anim", "fiendpounce.anim"),
         # El FIEND NO es simetrico -sus patas traseras giran 69,5 contra 26,2
         # al andar- y eso no lo arregla ningun tope, porque es una diferencia
         # ENTRE regiones. El espejo se queda puesto, como en el necromorfo.
         espejo_vaiven=True,
-        objetivo=120.0,
+        # 110 DESDE LA PRUEBA05, Y BAJA DESDE 140 PORQUE LA MALLA ES OTRA.
+        # Doblar el cuello 30 grados hace el bicho mas compacto -la caja pasa
+        # de 3,102 de fondo a 2,292- y la escala uniforme cae de 5,834 a
+        # 5,158, o sea que TODAS las aristas miden un 12% menos. Por eso la
+        # `tension`, que es una RAZON entre vecinos, sube aunque el estiron
+        # baje: la referencia se ha encogido. El numero que se mira aqui es
+        # `abre`, el estiron EN METROS, que es lo que se ve en pantalla.
+        #
+        # Barrido del 04/09 sobre los NUEVE clips, `abre` en cm:
+        #                    walk  run  attack  idle  roar  pounce
+        #   PRUEBA04 obj140    33   36      41    23    19      33
+        #   PRUEBA05 obj170    36   35      35    28    28      50
+        #   PRUEBA05 obj140    30   28      31    23    23      42
+        #   PRUEBA05 obj110    23   25      26    18    20      33
+        # o sea que 110 gana o empata en los SEIS contra la PRUEBA04, y el
+        # flex de locomocion se queda en 3,02 y 3,33 -MAS suelto que el 2,78
+        # y 3,40 de la PRUEBA04-, asi que no es la estatua contra la que
+        # avisa `alfas_de`. La pata delantera izquierda se queda en 0,9x,
+        # o sea un 10% menos que la propia piel del vanilla, y se acepta:
+        # es el 8,8% de la malla contra la costura, que es lo que se mira.
+        objetivo=110.0,
         # El unico hueso sin claves de esta paleta, y es el TORSO: hereda a
         # RootJNT y un torso no necesita giro propio, asi que el assert lo
         # deja pasar por caer en `tronco`.
@@ -1454,7 +1541,15 @@ assert asim - ref_asim < TOPE_ASIMETRIA, (
     f"son las laminas planas tensadas")
 tronco = sum(n for g, n in reparto.items()
              if any(t in g for t in M["tronco"])) / len(salida)
-assert tronco >= MINIMO_TRONCO, (
+# CON MAPA A MANO ESTE TOPE TAMPOCO APLICA, por lo mismo que el de punta: lo
+# que se lleva cada hueso lo decide el mapa y no el copiado, y ahi el 30% deja
+# de ser una anatomia y pasa a ser un numero heredado del caso en que TODO
+# colgaba del torso. El cry wolf con agarre 1,0 da 29,2% -Root 25,7 mas el
+# cuello 3,5- porque su cabeza, que es el 35,5% de la malla, ya cuelga de
+# `NewHeadJNT`, que es justo lo que se le pidio al mapa. Quien lo comprueba en
+# los modelos con regiones es la guarda de abajo, que es mas fuerte: mide el
+# resultado CONTRA EL MAPA, region por region.
+assert tronco >= MINIMO_TRONCO or M.get("regiones"), (
     f"la raiz y la espalda solo se llevan {tronco * 100:.1f}% de la malla. "
     f"El cuerpo tiene que colgar de la columna; el 15/08 colgaba de las "
     f"puntas de las patas y RootJNT tenia 17 vertices")

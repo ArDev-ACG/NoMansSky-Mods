@@ -233,6 +233,65 @@ def _revisar_acordados(raiz_escena):
     return fallos
 
 
+def _revisar_material(carpeta, temporal):
+    """El flag de piel y los samplers, que se pierden al recoser.
+
+    Existe por la PRUEBA05 de los dos bipedos. `Skin-NMSGeometry.py` COPIA la
+    carpeta de origen entera, y en la de origen el .MATERIAL no lleva
+    `_F02_SKINNED`: el flag es el paso 5 de la receta y se pone al final, sobre
+    la copia. Asi que cada vez que se rehace la piel el flag se PIERDE en
+    silencio, y con el cualquier sampler reapuntado.
+
+    Sin `_F02_SKINNED` el juego NO aplica el esqueleto: el bicho entra rigido.
+    Y como no se deforma nada, tampoco se estira, asi que parece que el pesado
+    ha mejorado cuando lo que pasa es que ya no se pesa. Eso fue la PRUEBA05:
+    los dos bichos quietos, y el zombie ademas mojado porque el `gMasksMap`
+    habia vuelto al del ARTHROPOD vanilla que comparte toda la fauna.
+    """
+    material = next(carpeta.glob("*.MATERIAL.MXML"), None)
+    if material is None:
+        binario = next(carpeta.glob("*.MATERIAL.MBIN"), None)
+        if binario is None:
+            return []      # hay injertos que no entregan material
+        copia = Path(temporal) / binario.name
+        shutil.copy2(binario, copia)
+        material = nmsgeom.descompilar(copia)
+
+    raiz = ET.parse(material).getroot()
+    flags = {p.get("value") for p in raiz.iter()
+             if p.get("name") == "MaterialFlag"}
+    print(f"  .MATERIAL  {material.name}")
+    print(f"  flags      {'con' if '_F02_SKINNED' in flags else 'SIN'} "
+          f"_F02_SKINNED")
+
+    fallos = []
+    if "_F02_SKINNED" not in flags:
+        fallos.append(
+            "el .MATERIAL no declara _F02_SKINNED, asi que el juego NO aplica "
+            "el esqueleto y el bicho entra RIGIDO -y como no se deforma, "
+            "tampoco se estira: parece que el pesado ha mejorado-. Es la "
+            "PRUEBA05 de los dos bipedos. Lo pone tools/Flag-NMSMaterial.py "
+            "<material> --poner _F02_SKINNED")
+
+    # Un sampler que apunta a la textura del bicho vanilla es una que se
+    # comparte con toda su fauna: nuestro .DDS se entrega y no lo lee nadie.
+    for sampler in raiz.iter():
+        if sampler.get("value") != "TkMaterialSampler":
+            continue
+        campos_s = {p.get("name"): p.get("value") for p in sampler}
+        ruta = (campos_s.get("Map") or "").upper()
+        nombre = campos_s.get("Name", "?")
+        print(f"  {nombre:<16} {ruta}")
+        if nombre == "gMasksMap" and "ARTHROPODTHORAX01.BASE.MASKS" in ruta:
+            fallos.append(
+                f"{nombre} ha vuelto a la mascara del ARTHROPOD vanilla, que "
+                f"comparte TODA la fauna artropodo: el zombie sale mojado y "
+                f"nuestro ZOMBIE.BASE.MASKS.DDS se entrega sin que lo lea "
+                f"nadie. Era M-BABA. Lo reapunta tools/Set-NMSSampler.py")
+    print()
+    return fallos
+
+
 def _hace_falta(carpeta, patron, de):
     """El .MXML, sacandolo del .MBIN si solo esta el binario.
 
@@ -315,7 +374,8 @@ def revisar(carpeta):
 
     with tempfile.TemporaryDirectory(prefix="check-nmsgraft-") as temporal:
         fallos += _revisar_piel(carpeta, geo, mallas, temporal)
-    return fallos, _revisar_acordados(raiz_escena)
+        perdidos = _revisar_material(carpeta, temporal)
+    return fallos, _revisar_acordados(raiz_escena) + perdidos
 
 
 if __name__ == "__main__":

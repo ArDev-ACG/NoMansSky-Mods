@@ -100,11 +100,13 @@ MODELOS = {
     ),
     # LOS DOS DE LA SEGUNDA HORNADA, y sustituyen a los dos bipedos.
     #
-    # El giro es el mismo -90 y 180- y esta MEDIDO, no copiado: en los dos, el
-    # decimo superior de la malla cae en Y NEGATIVO -el bug en -1,046 y el
-    # lobo en -0,322- o sea que los dos llevan la cabeza delante, en Y-. Con
-    # X -90 eso pasa a +Z, y el 180 en Y la lleva a -Z, que es hacia donde
-    # mira el bicho vanilla.
+    # EL GIRO VUELVE A 180, Y LO DECIDE LA PARTIDA, NO EL VOLCADO. La
+    # PRUEBA01 salio con `giro=(-90, 0)` porque el decimo superior de la malla
+    # caia en w 0,38 contra la cabeza vanilla en w 0,84, o sea el volcado
+    # decia que con 180 el bicho iba montado del reves. En partida los dos
+    # salieron DE ESPALDA con el 0, asi que el volcado media otra cosa -el
+    # decimo superior de un insecto son las patas levantadas, no la cabeza- y
+    # el 180 de las otras tres entradas era el bueno.
     #
     # EL ALTO NO ES EL DE LOS ACUERDOS B1 Y B2, Y ESO ES LA DECISION DEL
     # 2026-09-02. Medido, no elegido a gusto.
@@ -125,9 +127,19 @@ MODELOS = {
     # necromorfo y diez del zombie, y que se leia como "es que son bipedos":
     # el bipedismo lo agravaba, pero lo que rompe es la escala.
     #
-    # 1,80 y 1,90 dejan al bicho en 1,7x y 1,4x su vanilla -grande y bien
-    # visible, que era lo que B1 y B2 querian- con el esqueleto cubriendo el
-    # 70-75% de la malla en vez del 40%. Aprobado por el usuario el 02/09.
+    # 1,80 y 1,90 dejaban al bicho en 1,7x y 1,4x su vanilla con el esqueleto
+    # cubriendo el 70-75% de la malla en vez del 40%, y asi salio la PRUEBA01.
+    #
+    # LA PRUEBA02 LOS DOBLO -3,60 y 3,80- a peticion del usuario, y EN PARTIDA
+    # SALIERON DEMASIADO GRANDES. La PRUEBA03 se queda en x1,5 de la PRUEBA01
+    # -2,70 y 2,85-, tambien elegido en partida y no en la mesa.
+    #
+    # Lo que sobrevive de la 02 es el METODO, y son dos cosas que no se ven
+    # hasta que se toca la escala: el mapa a mano de Weight-NMSMesh.py va en
+    # coordenadas NORMALIZADAS y por tanto NO cambia con el tamano, pero el
+    # TOPE DE VAIVEN si, porque el vaiven es giro x palanca y el esqueleto del
+    # juego no crece con nosotros. Cada cambio de `alto` obliga a volver a
+    # medir la ventana del `objetivo`. Ver RECETA-PIEL.md §3.
     "warriorbug": dict(
         origen=RAIZ + r"\BLENDER\proyectos\warriorbug_atlas.blend",
         objeto="warriorbug",
@@ -137,8 +149,8 @@ MODELOS = {
         escena="BUGFIEND",
         material=(r"MODELS\PLANETS\CREATURES\ARTHROPOD\BUGFIEND"
                   r"\ARTHROPODTHORAX01MAT.MATERIAL.MBIN"),
-        giro=(-90, 0),
-        alto=1.800,
+        giro=(-90, 180),
+        alto=2.700,
     ),
     "crywolf": dict(
         origen=RAIZ + r"\BLENDER\proyectos\crywolf_atlas.blend",
@@ -149,8 +161,25 @@ MODELOS = {
         escena="FIEND",
         material=(r"MODELS\PLANETS\CREATURES\SPIDERRIG\FIEND"
                   r"\FIEND_MAT.MATERIAL.MBIN"),
-        giro=(-90, 0),
-        alto=1.900,
+        giro=(-90, 180),
+        # EL DOBLEZ DEL CUELLO, y es lo unico que separa la PRUEBA05 de la 04.
+        #
+        # Medido el 04/09 sobre la malla ya girada: el cuello arranca en
+        # z 0,45 -donde el ancho en x salta de 0,08 a 0,15, o sea donde
+        # empieza el pecho- y la cabeza vive en z 0,00..0,10. Del arranque a
+        # la cabeza sube 0,151 y avanza 0,213, o sea que el cuello va a
+        # 35 GRADOS SOBRE LA HORIZONTAL. Eso es lo que en partida se lee como
+        # "la cabeza va por delante" y "le pesa la cabeza", y NO es el pesado:
+        # el 04/09 se deformo la misma malla con los pesos de la PRUEBA03 y
+        # los de la PRUEBA04 y los dos renders salen iguales. Es la postura
+        # del asset.
+        #
+        # Se dobla 30 grados en X con rampa suave: `desde` no se mueve nada y
+        # `hasta` va entero, asi que el doblez se reparte por el cuello y la
+        # cabeza gira rigida. Con 30 el cuello pasa de 35 a 65 grados y la
+        # cabeza pasa de 0,213 a 0,109 por delante del arranque.
+        pose=dict(grados=30.0, desde=0.45, hasta=0.15),
+        alto=2.850,
     ),
     "zombie": dict(
         origen=RAIZ + r"\BLENDER\proyectos\zombie.blend",
@@ -195,6 +224,43 @@ if giro_x or giro_y:
     bpy.ops.object.transform_apply(rotation=True)
     ob.rotation_euler = (0, math.radians(giro_y), 0)
     bpy.ops.object.transform_apply(rotation=True)
+
+POSE = M.get("pose")
+if POSE:
+    # DOBLAR UNA PARTE DE LA MALLA, con rampa. Va DESPUES del giro -para poder
+    # razonar en el marco de NMS, con Y arriba y Z el fondo- y ANTES de la
+    # escala, para que el alto de 2,85 m se mida sobre la malla ya doblada.
+    #
+    # La rampa es un smoothstep para que la tangente sea cero en los dos
+    # extremos: sin eso queda un pliegue justo en la frontera, que es lo que
+    # el suavizado de los pesos NO puede deshacer porque es geometria.
+    co = np.array([tuple(v.co) for v in ob.data.vertices])
+    lo_p, hi_p = co.min(axis=0), co.max(axis=0)
+    tam_p = np.maximum(hi_p - lo_p, 1e-9)
+    z = (co[:, 2] - lo_p[2]) / tam_p[2]
+    u = np.clip((POSE["desde"] - z) / (POSE["desde"] - POSE["hasta"]), 0.0, 1.0)
+    t = u * u * (3.0 - 2.0 * u)
+    # El pivote: el centro de la seccion que hay JUSTO en `desde`, que es
+    # donde el cuello se mete en el pecho. Se coge una banda estrecha y no un
+    # solo vertice para que no lo mande el ruido del decimador.
+    banda = np.abs(z - POSE["desde"]) < 0.02
+    assert banda.sum() >= 20, f"la banda del pivote solo tiene {banda.sum()} vertices"
+    pivote = co[banda].mean(axis=0)
+    ang = math.radians(POSE["grados"]) * t
+    dy, dz = co[:, 1] - pivote[1], co[:, 2] - pivote[2]
+    ca, sa = np.cos(ang), np.sin(ang)
+    co[:, 1] = pivote[1] + dy * ca - dz * sa
+    co[:, 2] = pivote[2] + dy * sa + dz * ca
+    for v, nuevo in zip(ob.data.vertices, co):
+        v.co = mathutils.Vector(nuevo)
+    ob.data.update()
+    movidos = int((t > 1e-6).sum())
+    lo_d, hi_d = co.min(axis=0), co.max(axis=0)
+    print(f"doblez {POSE['grados']:.0f} grados en X sobre {movidos} vertices "
+          f"({100 * movidos / len(co):.1f}%), pivote "
+          f"{tuple(round(float(v), 4) for v in pivote)}")
+    print(f"  caja {tuple(round(float(v), 4) for v in (hi_p - lo_p))}"
+          f" -> {tuple(round(float(v), 4) for v in (hi_d - lo_d))}")
 
 if M["alto"]:
     co = [v.co for v in ob.data.vertices]

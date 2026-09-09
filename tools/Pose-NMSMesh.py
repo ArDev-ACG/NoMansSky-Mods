@@ -96,6 +96,37 @@ MODELOS = {
         blend=RAIZ / "BLENDER" / "proyectos" / "warriorbug_nms.blend",
         objeto="ArthropodThorax",
     ),
+    # LO QUE SE ENTREGA, y no el vanilla: escena, bind y clips salen de la
+    # carpeta cosida, o sea de los mismos archivos que van al .lua. Es la
+    # unica forma de medir un retarget, porque `Retarget-NMSRig.py` cambia
+    # justo las tres cosas que los otros modelos dan por buenas del juego.
+    "crywolf06": dict(
+        pesos=RAIZ / "work" / "models" / "crywolfmesh" / "pesos.json",
+        raiz=RAIZ / "work" / "models" / "crywolfmesh_anim6",
+        scene="FIEND.SCENE.MXML",
+        geometria="FIEND.GEOMETRY.MXML",
+        anims="ANIM_CRYWOLF",
+        clips=("FIENDWALK.ANIM", "FIENDRUN.ANIM",
+               "FIENDATTACK.ANIM", "FIENDIDLE.ANIM"),
+        blend=RAIZ / "BLENDER" / "proyectos" / "crywolf_nms.blend",
+        objeto="_Fiend_Body",
+    ),
+    # LO QUE SE ENTREGA EN LA PRUEBA07, y por eso lleva las raices partidas:
+    # la escena y el bind salen de la carpeta cosida -o sea de los mismos
+    # archivos que van al .lua- y los clips del VANILLA, porque esta prueba
+    # no entrega ni un .ANIM. Es justo lo que el juego va a leer.
+    "crywolf07": dict(
+        pesos=RAIZ / "work" / "models" / "crywolfmesh_anim7" / "pesos.json",
+        raiz=RAIZ / "work" / "models" / "crywolfmesh_anim7",
+        scene="FIEND.SCENE.MXML",
+        geometria="FIEND.GEOMETRY.MXML",
+        anims_raiz=RAIZ / "work" / "models" / "vanilla_fiend",
+        anims="models/planets/creatures/spiderrig/anim",
+        clips=("fiendwalk.anim", "fiendrun.anim",
+               "fiendattack.anim", "fiendidle.anim"),
+        blend=RAIZ / "BLENDER" / "proyectos" / "crywolf_nms.blend",
+        objeto="_Fiend_Body",
+    ),
     "crywolf": dict(
         pesos=RAIZ / "work" / "models" / "crywolfmesh" / "pesos.json",
         raiz=RAIZ / "work" / "models" / "vanilla_fiend",
@@ -279,17 +310,40 @@ def main(argv):
     assert not sin_bind, f"sin JointBinding en el vanilla: {sin_bind}"
     invbind = np.stack([binds[n] for n in nombres])
 
-    # COMPROBACION 1: que el JOINTINDEX y la transpuesta sean los buenos. Al
-    # menos un hueso tiene que casar con la inversa del reposo del .SCENE; si
-    # no casara ninguno, el mapeo estaria mal y no se veria.
+    # COMPROBACION 1: que el JOINTINDEX y la transpuesta sean los buenos.
+    #
+    # La regla es que el bind TIENE que ser la inversa de la pose de mundo en
+    # la que se peso la malla, asi que en ESA pose `mundo * bind` da la
+    # identidad. Lo que no se puede dar por sabido es CUAL es esa pose: hasta
+    # la PRUEBA05 era el reposo del .SCENE, porque el bind se copiaba del
+    # vanilla; desde que `Patch-NMSGraft.py --bind` existe puede ser un
+    # fotograma de un clip, y entonces con el reposo no casa NI UNO -medido,
+    # y el assert viejo abortaba una entrega buena-.
+    #
+    # Asi que se busca la pose de referencia en vez de suponerla. Si no
+    # aparece en ninguna, el JOINTINDEX o la transpuesta estan mal, que es
+    # justo lo que este assert existe para cazar.
     q0, p0 = apilar(huesos, nombres, {}, {}, 1)
-    reposo = _a_matriz(q0[:, 0, :], p0[:, 0, :])
-    casan = [n for i, n in enumerate(nombres)
-             if np.abs(np.linalg.inv(reposo[i]) - invbind[i]).max() < 1e-4]
-    assert casan, ("ningun hueso casa con el reposo del .SCENE: el JOINTINDEX "
-                   "o la transpuesta estan mal")
-    print(f"bind leido del vanilla; casan con el reposo del .SCENE "
-          f"{len(casan)} de {len(nombres)}: {', '.join(casan)}")
+    candidatas = [("el reposo del .SCENE", _a_matriz(q0[:, 0, :], p0[:, 0, :]))]
+    for clip in clips:
+        giros, trasl, _ = sway.leer_anim(
+            asegurar_anim(M.get("anims_raiz", M["raiz"]), M["anims"], clip))
+        n = len(next(iter(giros.values())))
+        q, p = apilar(huesos, nombres, giros, trasl, n)
+        for f in range(n):
+            candidatas.append((f"{clip} fotograma {f}",
+                               _a_matriz(q[:, f, :], p[:, f, :])))
+    mejor = (0, None)
+    for etiqueta, mundo in candidatas:
+        casan = [n for i, n in enumerate(nombres)
+                 if np.abs(np.linalg.inv(mundo[i]) - invbind[i]).max() < 1e-4]
+        if len(casan) > mejor[0]:
+            mejor = (len(casan), (etiqueta, casan))
+    assert mejor[1], ("el bind no es la inversa de ninguna pose de mundo: el "
+                      "JOINTINDEX o la transpuesta estan mal")
+    etiqueta, casan = mejor[1]
+    print(f"bind: es la inversa de {etiqueta} en {len(casan)} de "
+          f"{len(nombres)} huesos: {', '.join(casan)}")
 
     # Vecinos por distancia sobre la malla en reposo. Una "lamina tensada" ES
     # un par de vertices vecinos que se van uno del otro; sin topologia, los
@@ -312,7 +366,7 @@ def main(argv):
     print(f"{'clip':22} {'fot':>4} {'tension':>8} {'flex':>6} {'abre':>7} "
           f"{'viaje':>7} {'alto':>7}  donde")
     for clip in clips:
-        mxml = asegurar_anim(M["raiz"], M["anims"], clip)
+        mxml = asegurar_anim(M.get("anims_raiz", M["raiz"]), M["anims"], clip)
         giros, trasl, _ = sway.leer_anim(mxml)
         n = len(next(iter(giros.values())))
         pose = apilar(huesos, nombres, giros, trasl, n)

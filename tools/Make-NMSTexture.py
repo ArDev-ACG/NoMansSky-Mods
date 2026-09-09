@@ -34,6 +34,11 @@ Uso:
     --invertir  da la vuelta al valor (255-x) antes de codificar. Para cuando el
                 mapa de un canal viene al reves de lo que espera el shader,
                 rugosidad frente a suavidad
+    --tamano N  escribe el .DDS a NxN en vez de al tamano del vanilla, parcheando
+                ancho, alto, mips y linearSize de la cabecera copiada. El formato
+                y los flags siguen siendo los del vanilla. Existe por `Q-TEXBUG`:
+                el atlas del warrior bug guarda a 512 unos PNG de 2048, y la unica
+                forma de darle mas pixeles sin tocar una UV es subir el .DDS
 
 Requiere: Pillow, numpy. Y scipy, pero solo con --rellenar.
 """
@@ -274,6 +279,26 @@ def main():
 
     head, width, height, mips, formato = read_dds_header(vanilla)
 
+    tamano = opcion("tamano")
+    if tamano:
+        # La cabecera se copia del vanilla y con ella vienen sus dimensiones.
+        # Subir el atlas exige parchear cuatro campos y NADA mas: formato,
+        # flags y el bloque DX10 se quedan como estan.
+        #
+        #   +12 alto   +16 ancho   +20 linearSize   +28 mips
+        #
+        # `linearSize` en un formato de bloques es el tamano del mip 0: los
+        # bloques de 4x4 por 16 bytes en BC7 y BC5, por 8 en BC4. Y los mips
+        # bajan hasta 1x1, o sea log2(N)+1.
+        n = int(tamano)
+        assert n and n & (n - 1) == 0, f"--tamano {n} no es potencia de dos"
+        head = bytearray(head)
+        bloque = 8 if formato == "BC4" else 16
+        struct.pack_into("<2I", head, 12, n, n)
+        struct.pack_into("<I", head, 20, (n // 4) * (n // 4) * bloque)
+        struct.pack_into("<I", head, 28, n.bit_length())
+        head, width, height, mips = bytes(head), n, n, n.bit_length()
+
     # RGBA desde el principio: los iconos de UI llevan fondo transparente y
     # convertir a RGB primero lo aplastaba a negro opaco. Un JPG sin alfa entra
     # igual con alfa 255, asi que el flujo de pieles no cambia.
@@ -337,7 +362,12 @@ def main():
     if invertir:
         detalle += ", invertido"
     print(f"{dst}: {got} bytes ({width}x{height}, {mips} mips, {detalle})")
-    print(f"vanilla: {ref} bytes  ->  {'IGUAL' if ref == got else 'DISTINTO (revisar)'}")
+    if width != struct.unpack_from("<I", read_dds_header(vanilla)[0], 16)[0]:
+        print(f"vanilla: {ref} bytes  ->  {got}, y DISTINTO A PROPOSITO "
+              f"(--tamano {width})")
+    else:
+        print(f"vanilla: {ref} bytes  ->  "
+              f"{'IGUAL' if ref == got else 'DISTINTO (revisar)'}")
 
 
 if __name__ == "__main__":

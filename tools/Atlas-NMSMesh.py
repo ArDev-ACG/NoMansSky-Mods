@@ -83,8 +83,19 @@ MODELOS = {
         objeto="warriorbug",
         salida_blend=RAIZ + r"\BLENDER\proyectos\warriorbug_atlas.blend",
         salida_png=RAIZ + r"\work\textures\WARRIORBUG.BASE.PNG",
-        atlas=2048,
-        celda=512,
+        # 4096 CON CELDA DE 1024 DESDE LA PRUEBA05, Y ES `Q-TEXBUG`.
+        # La rejilla sigue siendo 4x4 -LADO = atlas//celda- y `rect` se
+        # calcula en FRACCION del atlas, asi que LAS UV SALEN IDENTICAS y no
+        # se toca un vertice: lo unico que cambia es cuantos pixeles caben en
+        # cada celda. Los once PNG de origen son de 2048 y a celda 512 se
+        # tiraban 15 de cada 16 pixeles; a 1024 se tiran 3 de cada 4.
+        # Medido el 03/09 sobre el atlas de la PRUEBA04: 73,4% negro puro,
+        # 81,9% por debajo de 6, LA FILA DE ARRIBA ENTERA VACIA y la mejor
+        # celda al 64,7%. O sea que lo pintado ocupa el 18% de los cuatro
+        # millones de pixeles, menos de lo que tiene el ARTHROPOD vanilla
+        # en su atlas de 1024.
+        atlas=4096,
+        celda=1024,
         texturas={
             "telo":         "telo.png",
             "telo niz":     "telo niz.png",
