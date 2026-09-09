@@ -390,7 +390,20 @@ foreach ($mod in $mods) {
     # 5) comprimir el CONTENIDO del stage, no el stage
     $zip = Join-Path $destino "${release}_v$Version.zip"
     if (Test-Path $zip) { Remove-Item $zip -Force }
-    Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -CompressionLevel Optimal
+    # Ni Compress-Archive ni ZipFile::CreateFromDirectory sirven aqui: los dos
+    # escriben el nombre de entrada con "\", y fuera de Windows eso no separa
+    # carpetas. El zip se extrae como archivos planos con las barras dentro del
+    # nombre. La spec (APPNOTE 4.4.17.1) manda "/", asi que se nombra a mano.
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $raiz = (Resolve-Path $stage).Path.TrimEnd('\') + '\'
+    $zf = [System.IO.Compression.ZipFile]::Open($zip, 'Create')
+    try {
+        foreach ($f in Get-ChildItem $stage -Recurse -File) {
+            $rel = $f.FullName.Substring($raiz.Length).Replace('\', '/')
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                $zf, $f.FullName, $rel, 'Optimal') | Out-Null
+        }
+    } finally { $zf.Dispose() }
 
     $kb = [math]::Round((Get-Item $zip).Length / 1KB, 1)
     $n  = (Get-ChildItem $copiado -Recurse -File).Count
