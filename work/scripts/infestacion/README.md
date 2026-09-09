@@ -3,7 +3,7 @@
 **El mod completo: contiene al mod 1 y le añade el mundo infestado.** Es el que se instala y
 se juega.
 
-Versión **0.5.0**. Changelog propio:
+Versión **0.9.0**. Changelog propio:
 [`../../../docs/CHANGELOG-MOD2.md`](../../../docs/CHANGELOG-MOD2.md)
 
 ## La relación entre los dos mods — decidida el 2026-08-09
@@ -12,7 +12,7 @@ Versión **0.5.0**. Changelog propio:
 
 | | Mod 1 · `HorribleTerror_Predators` | Mod 2 · `HorribleTerror_Infestation` |
 |---|---|---|
-| Versión | 2.0.0 | **0.5.0** |
+| Versión | 2.0.0 | **0.9.0** |
 | Qué es | la conducta sola, como producto aparte | **la conducta + el mundo + (pronto) los modelos** |
 | Instalado | **no** | **sí** |
 | Rutas | 7 | **12** |
@@ -148,6 +148,11 @@ mod 1 + 10 (y + 40 en Hardcore, que además lleva los edificios).
 
 0.5.0 vuelve a los números de 0.3.3 porque vuelve a contener al mod 1. **0.4.0 no se
 considera una versión jugada:** se construyó, se desplegó y se retiró sin partida.
+
+> ⚠️ **Esta cuenta se dejó de llevar en la 0.5.0.** De la `0.6.0` a la `0.9.0` el recuento por
+> tier no se ha vuelto a hacer, y **la lista viva de campos vive en
+> [`../../../docs/MODIFICACIONES.md`](../../../docs/MODIFICACIONES.md)**, que sí está al día.
+> Para dar un número de aquí hay que volver a contarlo contra el `.lua`, no estimarlo.
 
 ## Rutas que toca — 12
 
