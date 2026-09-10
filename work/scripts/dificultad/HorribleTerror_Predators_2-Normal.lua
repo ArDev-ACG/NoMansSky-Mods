@@ -35,7 +35,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Predators_2-Normal",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[NORMAL] Conducta: 27% de planetas hostiles, manadas de 1-2, deteccion a 50 m. Los Horrores Biologicos te ven a 65 m, eclosionan mas juntos, se acercan mas derechos y en grupo, y saltan cada 1.8 s.",
 ["MODIFICATIONS"]   =
   {

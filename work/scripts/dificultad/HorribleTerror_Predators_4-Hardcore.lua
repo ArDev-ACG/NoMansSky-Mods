@@ -57,7 +57,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Predators_4-Hardcore",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[HARDCORE] Conducta: manadas de 5-7, te detectan a 80 m y te persiguen 150. Los Horrores Biologicos te ven a 120 m, no llevan marcador, eclosionan de golpe, cargan sin acechar, se multiplican al rugir, las crias pegan igual que sus padres y no pierden el interes. Los nidos de carguero reaccionan a la linterna y a los disparos.",
 ["MODIFICATIONS"]   =
   {

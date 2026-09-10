@@ -8,7 +8,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Predators_1-Facil",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[FACIL] Conducta: depredadores mas agresivos, manadas de 1-2, deteccion a 45 m, sin tocar que planetas son hostiles. Los Horrores Biologicos se quedan en vanilla en esta configuracion.",
 ["MODIFICATIONS"]   =
   {

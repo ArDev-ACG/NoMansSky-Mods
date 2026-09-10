@@ -40,7 +40,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Predators_3-Dificil",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[DIFICIL] Conducta: 99% de planetas hostiles, manadas de 3-5, deteccion a 60 m, nunca huyen. Los Horrores Biologicos sin marcador de UI, te ven a 70 m, eclosionan en oleada, cargan sin acechar y pegan 3-5 golpes por racha.",
 ["MODIFICATIONS"]   =
   {

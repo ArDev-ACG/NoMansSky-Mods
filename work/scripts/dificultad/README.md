@@ -127,6 +127,9 @@ Si `REPORT` no da estos números, **no se despliega**.
 | 3 Difícil | **40** | 5 + 2+2 + 25 + — + — + 2 + 4 |
 | 4 Hardcore | **61** | 5 + 2+2 + 34 + 2+2 + 1 + 2 + 11 |
 
+**Revalidado el 2026-09-09** contra NMS **178763 (7.0 Cosmos)** / MBINCompiler
+**7.00.0-pre1**: los cuatro dan los mismos 10 / 35 / 40 / 61 con 0 errores y 0 warnings.
+
 **La suma con el mod 2 tiene que dar los totales de antes del reparto** — es la comprobación
 de que la mudanza no perdió ni duplicó nada:
 
@@ -135,7 +138,12 @@ de que la mudanza no perdió ni duplicó nada:
 | Fácil | 10 | 20 | **+10** |
 | Normal | 35 | 45 | **+10** |
 | Difícil | 40 | 50 | **+10** |
-| Hardcore | 61 | 71 | **+10** |
+| Hardcore | 61 | 83 | **+22** |
+
+> **El +10 de Hardcore ya no aplica, y es esperado.** El mod 2 siguió creciendo por su
+> cuenta de la 0.4.0 a la 0.9.1 —5 palancas más en `globals`, 6 más en `datatable` y un
+> tercer bloque de nidos—; los otros tres tiers siguen clavados en +10, que es lo que
+> comprueba que la mudanza no perdió nada.
 
 > **Medido el 2026-08-18, los ocho builds del mismo día.** La comprobación ya no es contra
 > los totales de `Infestation 0.3.3` —el mod 2 se movió a la 0.6.x y devolvió campos a

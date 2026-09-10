@@ -9,6 +9,55 @@ Formato: [Keep a Changelog](https://keepachangelog.com/). Versionado: SemVer.
 Cada entrada de release debe anotar la **versión de NMS** contra la que se probó —
 los updates del juego rompen mods y sin ese dato no se puede diagnosticar nada.
 
+## [2.1.1] — 2026-09-09 · mod 1 · NMS 178763 (7.0 Cosmos)
+
+**Reconstrucción por la actualización del juego. Ni un valor cambia.**
+
+NMS pasó a **7.0 Cosmos** (build 178763) y los MBIN de la 2.1.0 quedaron con plantilla
+vieja: de los archivos que toca este mod, **`GCCREATUREGLOBALS` y `GCUIGLOBALS` cambiaron
+de `TemplateGUID`**. Ninguna ruta desapareció, así que el script no se tocó — solo el
+`NMS_VERSION` de los cuatro `.lua`, de `6.45` a `7.00`.
+
+### El compilador
+
+`MBINCompiler v7.01.0-pre1` **no descompila `GCUIGLOBALS.GLOBAL.MBIN`**
+(`MbinException: Non-negative number required`), y ese archivo solo lo toca Hardcore. Se
+construye con **`v7.00.0-pre1`**, que se traga los nueve. Detalle en
+[`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) §0.9.1.
+
+### Conteo contra 7.0 — idéntico al de 6.45
+
+| Config | Total | Desglose |
+|---|---:|---|
+| 1 Fácil | **10** | 4 + 2+2 + 2 |
+| 2 Normal | **35** | 5 + 2+2 + 24 + 1 + 1 |
+| 3 Difícil | **40** | 5 + 2+2 + 25 + 2 + 4 |
+| 4 Hardcore | **61** | 5 + 2+2 + 34 + 2+2 + 1 + 2 + 11 |
+
+**10 / 35 / 40 / 61, los mismos cuatro números que contra 6.45**, con 0 errores y 0
+warnings. Es la prueba de que 7.0 no movió ninguno de los campos que este mod escribe.
+
+### Fixed — los zips ya no llevan EXML delta
+
+La duda roja de [`NEXUS.md`](NEXUS.md) queda cerrada por el camino corto: **los cuatro zips
+de 2.1.1 llevan `.MBIN`**, sacados de `ModBackups` —con los `GLOBALS` devueltos a su
+carpeta— en vez del `.EXML` anotado de `CreatedMODS` que se subió en 2.1.0. Cero `.EXML` en
+los cuatro archivos, verificado abriéndolos.
+
+**Los nombres de carpeta no cambian** (`HorribleTerror_Predators_<tier>`): el mod está
+publicado con ellos y extraer encima sobrescribe limpio. Ver `NEXUS.md` §nombres.
+
+### Verificado
+
+Descompilado el `GCCREATUREGLOBALS.MBIN` empaquetado de Hardcore con el compilador 7.00:
+percepción 80, 70 criaturas vivas, memoria de disparo 60, `PredatorBoredomDistance` en el
+**80 vanilla** —el gemelo subido a 150 es exclusivo del mod 2, y ahí sigue— y
+`ShowOnscreenPredatorMarkers` en `false`.
+
+**Sin probar in-game**: el mod 1 no está instalado, y no se instala mientras el 2 lo esté.
+
+---
+
 ## [2.1.0] — 2026-08-18 · mod 1
 
 **Fácil y Normal dejan de ser abrumadores.** Corrige la queja de Nexus: *«even on easy,

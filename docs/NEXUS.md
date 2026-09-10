@@ -12,7 +12,7 @@ Lista de comprobación. **Cada punto se ha roto al menos una vez en este proyect
 - [x] **Probado in-game.** No "construido sin errores" — jugado. `0 [ERROR] detected`
       no prueba que el mod haga lo correcto; ya nos pasó (§8c del doc de proyecto).
 - [x] **Cada configuración probada por separado.** Las cuatro, no solo los extremos.
-- [x] Anotada la **versión exacta de NMS** contra la que se probó: **170671**
+- [x] Anotada la **versión exacta de NMS** contra la que se probó: **178763 / 7.0 Cosmos**
       (leída de `Binaries\NMS.exe`), rama Public. Sin ese dato no se puede
       diagnosticar nada cuando el juego se actualice.
 - [x] Probado con la carpeta de mods **limpia** de los otros 87, para descartar que
@@ -38,27 +38,13 @@ ancho, así que **no** se usa de imagen principal: esa debe ir a 1920×1080.
 
 ---
 
-> 🔴 **SIN VERIFICAR, Y HAY QUE VERIFICARLO: los zips publicados llevan `.EXML` delta, no
-> `.MBIN`.** Visto el 2026-09-05 al empaquetar los mods nuevos. Abierto
-> `releases\2.1.0\HorribleTerror_Predators_4-Hardcore_v2.1.0.zip`: **cero `.MBIN`**, sólo los
-> `.EXML` de `CreatedMODS`, y el de `GCCREATUREGLOBALS` trae **34 marcas `!# CHANGED`** al
-> final de línea. Esta misma documentación llama a eso un **informe** —§«Las cuatro trampas»
-> de [`README.md`](README.md), y `C5` en [`ACUERDOS.md`](ACUERDOS.md)—, y en esta máquina lo
-> que corre son `.MBIN`.
->
-> **Lo que NO está probado, y por eso esto no dice «roto»:** que NMS rechace ese delta. El
-> `.EXML` a secas sí es un formato válido —**55 de los 88 mods instalados son sólo `.EXML`** y
-> funcionan—, pero los suyos van **limpios, sin una sola marca** (comprobado contra *Asteroid
-> Ribbons*). La duda es el delta anotado, no el `.EXML`.
->
-> **Cómo se cierra, y es media hora:** extraer el zip publicado tal cual en `GAMEDATA\MODS`,
-> con la carpeta de mods limpia, arrancar por Steam y mirar si los valores llegan. Si no
-> llegan, `Package-Release.ps1` tiene que empaquetar desde `ModBackups` como hace
-> [`Package-SinFuente.ps1`](../tools/Package-SinFuente.ps1) —incluido el arreglo de los
-> `GLOBALS` que caen en la raíz— y volver a subir los cuatro archivos.
->
-> Los ocho zips de la tanda del 05/09 (modelos e Infestation) **no tienen este problema**:
-> llevan `.MBIN` y cero `.EXML`. Ver [`NEXUS-BETA.md`](NEXUS-BETA.md).
+> ✅ **CERRADO en 2.1.1 (2026-09-09): los zips ya llevan `.MBIN`.** El aviso rojo que
+> estaba aquí describía los zips de **2.1.0**, que subían el `.EXML` delta de
+> `CreatedMODS` —con 34 marcas `!# CHANGED` en el `GCCREATUREGLOBALS`—. No se llegó a
+> probar si NMS los rechaza: se arregló por el camino corto. Los cuatro archivos de
+> **2.1.1** se empaquetan desde `ModBackups`, con los `GLOBALS` devueltos a su carpeta,
+> y llevan **cero `.EXML`** (verificado abriendo los cuatro zips). Si alguien reporta
+> que la 2.1.0 no le hacía nada, esta es la causa probable.
 
 ---
 
@@ -225,10 +211,10 @@ Un solo mod con **cuatro Main Files**. No cuatro páginas, y sin optional files.
 
 | Nexus File | Archivo |
 |---|---|
-| Main File — 1. Easy | `HorribleTerror_Predators_1-Facil_v2.1.0.zip` |
-| Main File — 2. Normal | `HorribleTerror_Predators_2-Normal_v2.1.0.zip` |
-| Main File — 3. Hard | `HorribleTerror_Predators_3-Dificil_v2.1.0.zip` |
-| Main File — 4. Hardcore | `HorribleTerror_Predators_4-Hardcore_v2.1.0.zip` |
+| Main File — 1. Easy | `HorribleTerror_Predators_1-Facil_v2.1.1.zip` |
+| Main File — 2. Normal | `HorribleTerror_Predators_2-Normal_v2.1.1.zip` |
+| Main File — 3. Hard | `HorribleTerror_Predators_3-Dificil_v2.1.1.zip` |
+| Main File — 4. Hardcore | `HorribleTerror_Predators_4-Hardcore_v2.1.1.zip` |
 
 **Desde 1.1.0 los `.lua` fuente sí se suben**, en `Source\`. Es el patrón de muchos
 mods de NMS (Asteroid Ribbons, Better Scan Rewards, 10x Industrial Waste). Ver la
@@ -352,6 +338,10 @@ start pulling their weight.
 smell you coming.
 
 [size=5]Too much? Say so[/size]
+
+[b]2.1.1 rebuilds the mod for 7.0 Cosmos.[/b] Nothing else changed - the 2.1.0 files
+carried pre-7.0 templates. This release also ships proper .MBIN files instead of the
+annotated .EXML the previous one shipped. Delete the old folder, then extract this one.
 
 [b]2.1.0 tones down Easy and Normal.[/b] Easy no longer changes which planets are
 hostile, so the planet your save sits on will not turn on you. Normal goes from half
