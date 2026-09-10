@@ -41,7 +41,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_3-Dificil",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[DIFICIL] Terror 0.5.0: contiene el mod de conducta (99% de planetas hostiles, manadas de 3-5, nunca huyen, Horrores sin marcador que eclosionan en oleada y pegan 3-5 golpes por racha) y ademas siembra el mundo con huevos x20 y gusanos x20. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {

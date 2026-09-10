@@ -192,6 +192,70 @@ error 4,4e-08 —que es la precisión `float32` del binario—, y md5 idéntico 
 
 ---
 
+## [0.9.1] — 2026-09-09 · NMS 178763 (7.0 Cosmos)
+
+**Reconstrucción por la actualización del juego. Ni un valor cambia.**
+
+NMS pasó a **7.0 Cosmos** (build 178763) el 09/09 y los MBIN de la 0.9.0 quedaron con
+plantilla vieja. Comparados los `TemplateGUID` de los 11 archivos del mod contra el vanilla
+recién extraído de los `.pak` nuevos, **tres cambiaron de estructura**:
+
+| Archivo | Plantilla en 7.0 |
+|---|---|
+| `GLOBALS\GCCREATUREGLOBALS` | **cambió** |
+| `GLOBALS\GCUIGLOBALS.GLOBAL` | **cambió** |
+| `RARE\FIENDEGGS` + `RARE\INFESTATION` | **cambió** |
+| los otros 7 | iguales |
+
+Ninguna ruta desapareció ni se renombró: el script no necesitó un solo retoque de lógica.
+
+### El compilador: 7.01 no vale, 7.00 sí
+
+`MBINCompiler v7.01.0-pre1` **no descompila `GCUIGLOBALS.GLOBAL.MBIN`** —
+`[MbinException]: Non-negative number required (Parameter 'value')`—, y como ese archivo solo
+lo toca Hardcore, la build salía con 3 errores en Hardcore y limpia en los otros tres. Con
+`v7.00.0-pre1` los 11 archivos descompilan sin una queja. **Se construye con 7.00.** El 6.45
+queda guardado en `MODBUILDER\_backup_6.45.0.1`.
+
+### Conteo contra 7.0
+
+| Tier | gen | med | large | globals | nidos | uigl | árbol | datatable | eggs | infest | Total |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 Fácil | 4 | 2 | 2 | 2 | — | — | — | — | 4 | 6 | **20** |
+| 2 Normal | 5 | 2 | 2 | 24 | — | — | 1 | 1 | 4 | 6 | **45** |
+| 3 Difícil | 5 | 2 | 2 | 25 | — | — | 2 | 4 | 4 | 6 | **50** |
+| 4 Hardcore | 5 | 2 | 2 | 39 | 2+2+1 | 1 | 2 | 17 | 4 | 6 | **83** |
+
+0 errores, 0 warnings en los cuatro. Normal y Difícil dan **45 / 50**, los mismos números que
+contra 6.45: prueba de que 7.0 no movió nada de lo que el mod escribe.
+
+> **La tabla vieja del README (23 / 45 / 50 / 101) estaba desfasada y se ha corregido.** Los
+> `10+10+10` del L-System que pedía en Hardcore **no existen en el script desde la 0.4.0**, y
+> el 23 del Fácil contaba 5 en `gen` y 4 en `globals` cuando ese `.lua` declara 4 y 2. No
+> faltó ninguna búsqueda: cada `Looking for` del REPORT tiene su `exchanged`.
+
+### Verificado en el MBIN desplegado
+
+Descompilado `GAMEDATA\MODS\HorribleTerror_Infestation_4-Hardcore\` con el compilador 7.00:
+
+| campo | valor |
+|---|---:|
+| `PredatorRegainInterestTime` / `PlayerPredatorRegainInterestTime` | 2 |
+| `PredatorBoredomDistance` / `PlayerPredatorBoredomDistance` | 150 |
+| `FiendBeingShotMemoryTime` | 60 |
+| `PredatorPerceptionDistance` | 80 |
+| `MaxEcosystemCreaturesNormal` | 70 |
+| `ShowOnscreenPredatorMarkers` | false |
+
+Las tres palancas de interés de la 0.9.0 llegan intactas a 7.0.
+
+### Sin probar in-game
+
+Save respaldado: `NMS_saves_2026-09-09_2255`. Falta arrancar desde **Steam** y comprobar que
+`DisableAllMods` sigue en `false` después de la primera sesión.
+
+---
+
 ## [0.9.0] — 2026-09-05 · NMS 170671
 
 **La primera vuelta que toca el interés en vez de la presión.**

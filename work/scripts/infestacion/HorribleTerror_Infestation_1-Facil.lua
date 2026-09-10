@@ -9,7 +9,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_1-Facil",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[FACIL] Terror 0.6.4: contiene el mod de conducta (depredadores mas agresivos, manadas de 1-2, deteccion a 45 m, sin tocar que planetas son hostiles) y ademas siembra el mundo con huevos de Horror Biologico x2 y gusanos de arena x2. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {

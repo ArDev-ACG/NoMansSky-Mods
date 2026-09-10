@@ -3,7 +3,7 @@
 **El mod completo: contiene al mod 1 y le añade el mundo infestado.** Es el que se instala y
 se juega.
 
-Versión **0.9.0**. Changelog propio:
+Versión **0.9.1**. Changelog propio:
 [`../../../docs/CHANGELOG-MOD2.md`](../../../docs/CHANGELOG-MOD2.md)
 
 ## La relación entre los dos mods — decidida el 2026-08-09
@@ -12,7 +12,7 @@ Versión **0.9.0**. Changelog propio:
 
 | | Mod 1 · `HorribleTerror_Predators` | Mod 2 · `HorribleTerror_Infestation` |
 |---|---|---|
-| Versión | 2.0.0 | **0.9.0** |
+| Versión | 2.0.0 | **0.9.1** |
 | Qué es | la conducta sola, como producto aparte | **la conducta + el mundo + (pronto) los modelos** |
 | Instalado | **no** | **sí** |
 | Rutas | 7 | **12** |
@@ -106,15 +106,19 @@ no se puede atribuir. **El paso previo es extraer un descriptor y buscar un ejem
 
 Si `REPORT` no da estos números, **no se despliega**.
 
-| Config | Total | Desglose (gen + predtables + globals + nidos + uiglobals + árbol + datatable + lsystem ×3 + eggs + infest) |
+| Config | Total | Desglose (gen + predtables + globals + nidos + uiglobals + árbol + datatable + eggs + infest) |
 |---|---:|---|
-| 1 Fácil | **23** | 5 + 2+2 + 4 + — + — + — + — + — + 4 + 6 |
-| 2 Normal | **45** | 5 + 2+2 + 24 + — + — + 1 + 1 + — + 4 + 6 |
-| 3 Difícil | **50** | 5 + 2+2 + 25 + — + — + 2 + 4 + — + 4 + 6 |
-| 4 Hardcore | **101** | 5 + 2+2 + 34 + 2+2 + 1 + 2 + 11 + 10+10+10 + 4 + 6 |
+| 1 Fácil | **20** | 4 + 2+2 + 2 + — + — + — + — + 4 + 6 |
+| 2 Normal | **45** | 5 + 2+2 + 24 + — + — + 1 + 1 + 4 + 6 |
+| 3 Difícil | **50** | 5 + 2+2 + 25 + — + — + 2 + 4 + 4 + 6 |
+| 4 Hardcore | **83** | 5 + 2+2 + 39 + 2+2+1 + 1 + 2 + 17 + 4 + 6 |
 
-**Verificado el 2026-08-09** contra NMS 170671 / MBINCompiler 6.45.0.1: los cuatro dan
-23 / 45 / 50 / 101 con **0 errores**.
+**Verificado el 2026-09-09** contra NMS **178763 (7.0 Cosmos)** / MBINCompiler **7.00.0-pre1**:
+los cuatro dan 20 / 45 / 50 / 83 con **0 errores y 0 warnings**.
+
+> La tabla anterior decía 23 / 45 / 50 / 101 y estaba desfasada: contaba un L-System ×3 que el
+> script no declara desde la 0.4.0, y para Fácil 5 en `gen` y 4 en `globals` cuando ese `.lua`
+> pide 4 y 2. Normal y Difícil no se movieron ni con el cambio de versión del juego.
 
 **Estos totales son idénticos a los de 0.3.3**, y eso es la verificación: 0.5.0 no cambia ni
 un valor respecto a 0.3.3, solo reordena de dónde sale cada bloque. Si un tier no da su

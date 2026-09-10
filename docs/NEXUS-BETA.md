@@ -39,8 +39,8 @@ linterna y romper uno te llama a los Horrores encima, en un pasillo, sin sitio d
 
 | Nexus File | Archivo | Qué es |
 |---|---|---|
-| **Main File 1** | `infested_v0.9.0.zip` (40 KB) | El fuerte. **Sin etiqueta de nivel** |
-| **Main File 2** | `infestedEasy_v0.9.0.zip` (9 KB) | El Easy |
+| **Main File 1** | `infested_v0.9.1.zip` (38 KB) | El fuerte. **Sin etiqueta de nivel** |
+| **Main File 2** | `infestedEasy_v0.9.1.zip` (8 KB) | El Easy |
 | Optional 1 | `infestedCryWolf_v0.1.0.zip` (6,1 MB) | Modelo del Horror grande |
 | Optional 2 | `infestedWarriorBug_v0.1.0.zip` (6,7 MB) | Modelo de las crías |
 | Optional 3 | `infestedSkullCrawler_v0.1.0.zip` (11,4 MB) | Modelo del Horror del carguero |
@@ -54,12 +54,12 @@ instale el combinado y luego un modelo suelto acaba con dos carpetas escribiendo
 juego carga una **en silencio**. Quien quiera todo, descarga lo que quiera — la descripción lo
 dice.
 
-**Versión de la página: `0.9.0`**, la del archivo fuerte. El Easy va internamente por `0.6.4` y
+**Versión de la página: `0.9.1`**, la del archivo fuerte. El Easy va internamente por `0.6.4` y
 los modelos por `0.1.0`; el campo de versión de Nexus es uno solo. Es el mismo patrón que el mod
 1 en 2.1.0, donde Hard y Hardcore no cambiaron y la página subió igual.
 
 ```powershell
-.\tools\Package-SinFuente.ps1 -Grupo infestation -Version 0.9.0
+.\tools\Package-SinFuente.ps1 -Grupo infestation -Version 0.9.1
 .\tools\Package-SinFuente.ps1 -Grupo models      -Version 0.1.0
 ```
 
@@ -326,12 +326,16 @@ assets are redistributed - everything here is a new model, a new texture, or a c
 
 [size=5]Tested on[/size]
 
-No Man's Sky 170671 (Public branch). Infested 0.9.0, Easy 0.6.4, models 0.1.0.
+No Man's Sky 178763 / 7.0 Cosmos (Public branch). Infested 0.9.1, Easy 0.6.4, models 0.1.0.
 ```
 
 ## CHANGELOG de Nexus
 
 ```bbcode
+[b]0.9.1 - rebuilt for 7.0 Cosmos[/b]
+Rebuilt against NMS 7.0 (build 178763) with MBINCompiler 7.00. No values changed - the 0.9.0
+files carried pre-7.0 templates and would not load.
+
 [b]0.9.0 - first public beta[/b]
 [list]
 [*]Two gameplay files: [b]Infested[/b], tuned at the hard end, and [b]Infested - Easy[/b], which

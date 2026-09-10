@@ -36,7 +36,7 @@ NMS_MOD_DEFINITION_CONTAINER =
 {
 ["MOD_FILENAME"]    = "HorribleTerror_Infestation_2-Normal",
 ["MOD_AUTHOR"]      = "AldrichDDD",
-["NMS_VERSION"]     = "6.45",
+["NMS_VERSION"]     = "7.00",
 ["MOD_DESCRIPTION"] = "[NORMAL] Terror 0.6.4: contiene el mod de conducta (27% de planetas hostiles, manadas de 1-2, Horrores que te ven a 65 m, eclosionan mas juntos y vienen derechos y en grupo) y ademas siembra el mundo con huevos x5 y gusanos x5. No instalar junto al mod Horrible Terror - Predators: este ya lo incluye.",
 ["MODIFICATIONS"]   =
   {
