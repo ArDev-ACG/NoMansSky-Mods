@@ -501,8 +501,9 @@ funcionan. Lo que no vale es el **delta anotado**.
   **Límite honesto:** los `.GEOMETRY` y `.DDS` que sí viajan **son** los modelos, y cualquiera con
   MBINCompiler y NMSDK los importa. Quitar el `.lua` esconde el método, no la malla.
 - ~~**`2-Normal` y `3-Dificil`.**~~ **Se publican desde la `0.9.2`** (2026-09-10), ya no en
-  0.6.4 y 0.5.0 sino puestos al día y escalados entre el Easy y el fuerte. Siguen **sin jugarse**,
-  y eso va escrito en sus dos `README.txt` y en la descripción, igual que en el Easy.
+  0.6.4 y 0.5.0 sino puestos al día y escalados entre el Easy y el fuerte. Siguen **sin jugarse**;
+  a diferencia del Easy, **eso no se dice en su `README.txt` ni en la descripción** — decidido el
+  10/09. Sus `KNOWN ISSUES` hablan sólo de dónde cae el nivel y de lo que cuesta en FPS.
 - **Los 30 cambios del `LSYSTEM`** (huevos dentro de los edificios abandonados): están escritos y
   **no funcionan**. No se mencionan en la página.
 
@@ -517,6 +518,6 @@ funcionan. Lo que no vale es el **delta anotado**.
 2. ✅ Reconstruidos contra el `.lua` del momento: se les bajaron, escaladas, las palancas de la
    `0.7.0`, la `0.8.0` y la `0.9.0` que sólo tenía el Hardcore. La tabla de a cuánto queda cada
    una está en [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md), entrada `0.9.2`.
-3. ❌ **No se han jugado**, ni uno ni otro. Se sube igual, con el aviso escrito donde se ve —es
-   lo mismo que se hizo con el Easy—, y lo que reporten los Posts decide si se mueven.
+3. ❌ **No se han jugado**, ni uno ni otro, y **eso no va en la página**: decidido el 10/09, al
+   revés que con el Easy. Lo que reporten los Posts es lo que decide si se mueven.
 4. Dónde caen exactamente lo sigue diciendo el hilo de Posts, no el criterio de casa.

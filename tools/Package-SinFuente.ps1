@@ -82,24 +82,23 @@ of gameplay mods.
 "@
 
 $MEZCLA_INFESTATION = @"
-*** PICK ONE GAMEPLAY FILE. THERE ARE TWO. ***
+*** PICK ONE GAMEPLAY FILE. THERE ARE FOUR. ***
 
   Infested            - the full thing. They hunt you.
+  Infested - Hard     - the same world, one step short of the full teeth.
+  Infested - Normal   - the world starts biting, but it still lets go.
   Infested - Easy     - more horrors in the world, none of the hunting.
 
-They edit the same game files. Installing both means one silently overrides
-the other, and nothing will tell you which one won.
+They edit the same game files. Installing two means one silently overrides the
+other, and nothing will tell you which one won.
 
 To switch: DELETE the old folder first, then extract the other one.
 
-*** Do NOT install either one alongside "More Aggressive Predators". ***
+*** Do NOT install any of them alongside "More Aggressive Predators". ***
 This mod already contains that one, and they write the same files.
 
-Both DO combine with the creature model mods: those only change how things
+They all DO combine with the creature model mods: those only change how things
 look, and touch none of these files.
-
-More aggression levels are coming between these two. Same rule will apply:
-install one, delete the old folder first.
 "@
 
 # --- que se publica -----------------------------------------------------------
@@ -226,7 +225,8 @@ them, and still call the same thing down on your head.
     # desde el 18/08 congelados en 0.6.4 y 0.5.0 -sin el interes de la 0.9.0, sin
     # las palancas de la 0.8.0 y sin el drenaje de aggro de la 0.7.0- y se pusieron
     # al dia escalados: cada numero suyo queda entre el Easy y el fuerte. Siguen
-    # SIN jugarse, y eso va dicho en KNOWN ISSUES de sus dos README.
+    # SIN jugarse, y por decision del 10/09 eso NO se dice en su README ni en la
+    # descripcion: sus KNOWN ISSUES hablan solo de donde cae el nivel y de FPS.
     @{
         grupo   = "infestation"
         carpeta = "HorribleTerror_Infestation_4-Hardcore"
@@ -341,10 +341,6 @@ stay asleep. Those are the full version.
 This mod CONTAINS the "More Aggressive Predators" mod. Do not install both.
 "@
         fallos  = @"
-  - Straight answer: this exact build has NOT been played in a real save. It is
-    built from the same script as the full version, with every number scaled
-    down and checked to sit between Easy and the full one, but nobody has spent
-    an evening inside it. Report anything that feels wrong and it gets fixed.
   - Where it lands between Easy and the full version is a first guess. If it
     feels closer to one end than it should, say which end.
   - FPS: 50 live creatures against vanilla's 40, eight engaged at once. It
@@ -380,10 +376,6 @@ off your HUD, and the nests inside abandoned freighters wake up to your torch.
 This mod CONTAINS the "More Aggressive Predators" mod. Do not install both.
 "@
         fallos  = @"
-  - Straight answer: this exact build has NOT been played in a real save.
-    Every number in it was checked to sit between Normal and the full version,
-    but nobody has played an evening of it. If something is off you will be the
-    first to see it.
   - Almost every planet rolls hostile here, same as the full version. That
     changes the planet you are already standing on when you load a save. If you
     do not want that, take Normal.

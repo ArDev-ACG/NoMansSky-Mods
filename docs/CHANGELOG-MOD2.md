@@ -239,9 +239,13 @@ vueltas alrededor y en partida eso se lee como «se van separando».
 
 ### Estado de prueba — dicho tal cual
 
-**Ninguno de los dos se ha jugado.** Se construyeron, se contaron los cambios y se verificó que
-cada número cae donde debe, pero nadie ha pasado una tarde dentro de ellos. Va escrito en los
-`KNOWN ISSUES` de sus dos `README.txt` y en la página de Nexus, igual que se hizo con el Easy.
+**Ninguno de los dos se ha jugado**, y queda anotado aquí. Se construyeron, se contaron los
+cambios y se verificó campo por campo, descompilando el `.MBIN` empaquetado, que cada número cae
+donde debe.
+
+**Decidido el 10/09: no se dice en el `README.txt` ni en la descripción de Nexus.** Es lo
+contrario de lo que se hizo con el Easy. Los `KNOWN ISSUES` de los dos archivos publicados
+hablan sólo de lo que el jugador va a notar —dónde cae el nivel y qué cuesta en FPS—.
 
 ### Empaquetado
 
