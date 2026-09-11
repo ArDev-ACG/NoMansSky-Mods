@@ -192,6 +192,65 @@ error 4,4e-08 —que es la precisión `float32` del binario—, y md5 idéntico 
 
 ---
 
+## [0.9.2] — 2026-09-10 · NMS 178763 (7.0 Cosmos)
+
+**Los dos niveles del medio, que llevaban desde el 18/08 congelados, se ponen al día. Sólo
+cambian `2-Normal` y `3-Dificil`: el `1-Facil` y el `4-Hardcore` no se tocan.**
+
+El `2-Normal` iba en `0.6.4` y el `3-Dificil` en `0.5.0`. Entre aquel 18/08 y hoy el Hardcore
+se llevó tres vueltas enteras —la `0.7.0` (el aggro que se drenaba solo), la `0.8.0` (seis
+palancas de agresividad) y la `0.9.0` (el interés)— y **ninguna de las tres bajó al medio**.
+El hueco no era de matiz: el Normal tenía ocho Horrores comprometidos y sólo tres pegando, que
+es exactamente el bug que la `0.7.0` diagnosticó y arregló arriba.
+
+### Regla con la que se escalaron
+
+**Cada número de Normal queda entre el Fácil y el Difícil, y cada número del Difícil entre el
+Normal y el Hardcore.** Ninguno los cruza. Lo que es exclusivo del Hardcore por diseño —que se
+multipliquen al rugir (`AllowSpawnBrood`), las crías, el marcador de depredador apagado y los
+nidos del carguero— **sigue siendo exclusivo del Hardcore**.
+
+| Palanca | Vanilla | Normal | Difícil | Hardcore |
+|---|---:|---:|---:|---:|
+| `PlayerPredatorBoredomDistance` y `PredatorBoredomDistance` | 80 | **100** | **120** | 150 |
+| `PlayerPredatorRegainInterestTime` y `PredatorRegainInterestTime` | 30 | **15** | **8** | 2 |
+| `FiendMaxAttackers` / `FiendMaxEngaged` / `MaxFiendsToSpawn` | 2 / 6 / 6 | **8 / 8 / 8** | **12 / 12 / 12** | 24 / 24 / 24 |
+| `FiendAggroDecreasePerSpawn` | 0.1 | **0.08** | **0.05** | 0.02 |
+| `FiendAggroIncreaseDamageEgg` y `...DestroyEgg` | 1.0 | **1.5** | **2.0** | 3.0 |
+| `FiendBeingShotMemoryTime` | 10 | **20** | **35** | 60 |
+| `FiendDespawnDistance` | 150 | **180** | **220** | 300 |
+| `FiendPounceDistanceModifier` | 1.7 | **2.0** | **2.4** | 3.0 |
+| `FiendMaxVerticalForPounce` | 0.3 | **0.5** | **0.7** | 1.0 |
+| `AllowSpitAlways` | `false` | *(sin tocar)* | **`true`** | `true` |
+| `DelayBetweenSpitAttacks` | 1.0 | **0.9** | **0.75** | 0.6 |
+| `TurnToFaceTime` | 0.3 | **0.25** | **0.2** | 0.15 |
+
+Los tres contadores van **a la par** dentro de cada nivel, que es la regla de la `0.3.1` y la
+lección de la `0.7.0`: si caben doce comprometidos y sólo pegan cuatro, los otros ocho dan
+vueltas alrededor y en partida eso se lee como «se van separando».
+
+### Lo que NO se tocó
+
+- **`1-Facil` y `4-Hardcore`**: ni un valor, ni un `.lua`. Sus zips de la `0.9.1` siguen
+  siendo válidos y **no se resuben**.
+- **`FiendDistToConsiderTargetSwtich`** (el typo es del juego) sigue fuera de los cuatro
+  niveles. La `0.10.0` se reserva para él: su signo no está claro y va solo.
+- Ni una malla, ni una textura, ni el árbol de comportamiento.
+
+### Estado de prueba — dicho tal cual
+
+**Ninguno de los dos se ha jugado.** Se construyeron, se contaron los cambios y se verificó que
+cada número cae donde debe, pero nadie ha pasado una tarde dentro de ellos. Va escrito en los
+`KNOWN ISSUES` de sus dos `README.txt` y en la página de Nexus, igual que se hizo con el Easy.
+
+### Empaquetado
+
+Entran dos entradas nuevas en `$MODS` de `tools\Package-SinFuente.ps1`: `infestedNormal` y
+`infestedHard`. **`infested` e `infestedEasy` no se renombran ni se vuelven a subir**: sus
+carpetas ya están extraídas en máquinas ajenas y renombrarlas dejaría dos peleándose.
+
+---
+
 ## [0.9.1] — 2026-09-09 · NMS 178763 (7.0 Cosmos)
 
 **Reconstrucción por la actualización del juego. Ni un valor cambia.**

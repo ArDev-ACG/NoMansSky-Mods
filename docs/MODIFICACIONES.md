@@ -124,22 +124,23 @@ Son 4 cambios: los dos campos × los dos archivos (MED y LARGE).
 | 9 | `PredatorRunAwayHealthPercent` | % de vida al que huye. 0 = pelea hasta morir | Depredadores | 40 | — | 25 | **0** | **0** |
 | 10 | `PercentagePlayerPredators` | Fracción de depredadores que atacan al jugador en vez de cazar fauna | Depredadores | 0.5 | — | 0.6 | **1.0** | **1.0** |
 | 11 | `MaxEcosystemCreaturesNormal` | Tope duro de criaturas vivas a la vez. Entero | **Todas las criaturas** | 40 | 45 | 50 | 60 | 70 |
-| 12 | `PlayerPredatorBoredomDistance` | A qué distancia se aburren y te sueltan | Depredadores | 80 | — | — | — | **150** |
-| 🆕 75 | `PredatorBoredomDistance` | Lo mismo que #12 **para el otro temperamento.** El juego trae dos, `TEMPERAMENT_PREDATOR` y `TEMPERAMENT_PLAYERPREDATOR`, y hasta la `0.9.0` sólo se le había subido a uno | Depredadores | 80 | — | — | — | **150** ⬆️ `0.9.0` |
-| 🆕 76 | `PlayerPredatorRegainInterestTime` | **Segundos que te ignora antes de volver a fijarse en ti.** Treinta segundos es lo que en partida se lee como «se van y no vuelven» | Depredadores | 30 | — | — | — | **2** ⬇️ `0.9.0` |
-| 🆕 77 | `PredatorRegainInterestTime` | Igual que #76, en el otro temperamento | Depredadores | 30 | — | — | — | **2** ⬇️ `0.9.0` |
+| 12 | `PlayerPredatorBoredomDistance` | A qué distancia se aburren y te sueltan | Depredadores | 80 | — | 100 ⬆️ `0.9.2` | 120 ⬆️ `0.9.2` | **150** |
+| 🆕 75 | `PredatorBoredomDistance` | Lo mismo que #12 **para el otro temperamento.** El juego trae dos, `TEMPERAMENT_PREDATOR` y `TEMPERAMENT_PLAYERPREDATOR`, y hasta la `0.9.0` sólo se le había subido a uno | Depredadores | 80 | — | 100 ⬆️ `0.9.2` | 120 ⬆️ `0.9.2` | **150** ⬆️ `0.9.0` |
+| 🆕 76 | `PlayerPredatorRegainInterestTime` | **Segundos que te ignora antes de volver a fijarse en ti.** Treinta segundos es lo que en partida se lee como «se van y no vuelven» | Depredadores | 30 | — | 15 ⬆️ `0.9.2` | 8 ⬆️ `0.9.2` | **2** ⬇️ `0.9.0` |
+| 🆕 77 | `PredatorRegainInterestTime` | Igual que #76, en el otro temperamento | Depredadores | 30 | — | 15 ⬆️ `0.9.2` | 8 ⬆️ `0.9.2` | **2** ⬇️ `0.9.0` |
 
 > Interacción: con percepción 80 y aburrimiento 150 el margen para escapar es de 70 m. Si
 > escapar se vuelve imposible, la corrección es subir el aburrimiento, **no** bajar la
-> percepción. Fácil/Normal/Difícil no lo escriben porque 80 ya es el valor vanilla.
+> percepción. **Desde la `0.9.2` Normal y Difícil también los escriben** (100/15 y 120/8), y el
+> margen sale igual de la resta: 50 m en Normal y 60 m en Difícil. El Fácil sigue en vanilla.
 
 ### 3b · Fiends — cantidad (0.1.0)
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 13 | `FiendMaxAttackers` | Cuántos te pegan **a la vez**. Entero | **Fiend** | 2 | — | 3 | 4 | **24** ⬆️ `0.8.0` |
-| 14 | `FiendMaxEngaged` | Cuántos están en combate contigo. Entero | Fiend | 6 | — | 8 | 10 | **24** ⬆️ `0.8.0` |
-| 15 | `MaxFiendsToSpawn` | Tope de Fiends generados por un evento. Entero | Fiend | 6 | — | 8 | 10 | **24** ⬆️ `0.8.0` |
+| 13 | `FiendMaxAttackers` | Cuántos te pegan **a la vez**. Entero | **Fiend** | 2 | — | 8 ⬆️ `0.9.2` | 12 ⬆️ `0.9.2` | **24** ⬆️ `0.8.0` |
+| 14 | `FiendMaxEngaged` | Cuántos están en combate contigo. Entero | Fiend | 6 | — | 8 ⬆️ `0.9.2` | 12 ⬆️ `0.9.2` | **24** ⬆️ `0.8.0` |
+| 15 | `MaxFiendsToSpawn` | Tope de Fiends generados por un evento. Entero | Fiend | 6 | — | 8 ⬆️ `0.9.2` | 12 ⬆️ `0.9.2` | **24** ⬆️ `0.8.0` |
 | 16 | `FiendAggroTime` | Segundos que te persiguen tras perderte de vista | Fiend | 45 | — | 60 | 90 | **600** |
 
 > Hardcore sube estos cuatro en **0.3.1**. `MaxFiendsToSpawn` tiene que ir a la par de
@@ -197,15 +198,16 @@ Vanilla extraído de `NMSARC.globals.pak` el 2026-08-04, **no** de los backups d
 
 ### 3e · Fiends — que no suelten la presa (0.3.1)
 
-Solo Hardcore. Estos cinco campos son el diagnóstico de «unos vienen y otros se van».
+Hardcore desde la `0.7.0`; **Normal y Difícil desde la `0.9.2`**, escalados. Estos cinco campos
+son el diagnóstico de «unos vienen y otros se van».
 
 | # | Campo | Qué hace | En qué monstruo | Vanilla | Fácil | Normal | Difícil | Hardcore |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| 53 | `FiendAggroDecreasePerSpawn` | **Cuánto aggro gasta cada Fiend al nacer.** Romper un huevo suma +3.0, pero cada bicho que sale resta 0.1, así que una oleada la vacía ella sola. Estuvo en **0.0** desde la `0.3.1`, volvió a **0.1** en la `0.6.2` para desatascar la puerta del carguero, y desde la `0.7.0` va a un quinto de vanilla | **Fiend** | 0.1 | — | — | — | **0.02** ⬇️ `0.7.0` |
-| 54 | `FiendAggroIncreaseDamageEgg` | Aggro que suma **rozar** un huevo | Fiend | 1.0 | — | — | — | **3.0** |
-| 55 | `FiendAggroIncreaseDestroyEgg` | Aggro que suma **romperlo** | Fiend | 1.0 | — | — | — | **3.0** |
-| 56 | `FiendBeingShotMemoryTime` | Segundos que recuerda que le disparaste | Fiend | 10 | — | — | — | **60** |
-| 57 | `FiendDespawnDistance` | A cuántos metros se evapora si te alejas | Fiend | 150 | — | — | — | **300** |
+| 53 | `FiendAggroDecreasePerSpawn` | **Cuánto aggro gasta cada Fiend al nacer.** Romper un huevo suma +3.0, pero cada bicho que sale resta 0.1, así que una oleada la vacía ella sola. Estuvo en **0.0** desde la `0.3.1`, volvió a **0.1** en la `0.6.2` para desatascar la puerta del carguero, y desde la `0.7.0` va a un quinto de vanilla | **Fiend** | 0.1 | — | 0.08 ⬇️ `0.9.2` | 0.05 ⬇️ `0.9.2` | **0.02** ⬇️ `0.7.0` |
+| 54 | `FiendAggroIncreaseDamageEgg` | Aggro que suma **rozar** un huevo | Fiend | 1.0 | — | 1.5 ⬆️ `0.9.2` | 2.0 ⬆️ `0.9.2` | **3.0** |
+| 55 | `FiendAggroIncreaseDestroyEgg` | Aggro que suma **romperlo** | Fiend | 1.0 | — | 1.5 ⬆️ `0.9.2` | 2.0 ⬆️ `0.9.2` | **3.0** |
+| 56 | `FiendBeingShotMemoryTime` | Segundos que recuerda que le disparaste | Fiend | 10 | — | 20 ⬆️ `0.9.2` | 35 ⬆️ `0.9.2` | **60** |
+| 57 | `FiendDespawnDistance` | A cuántos metros se evapora si te alejas | Fiend | 150 | — | 180 ⬆️ `0.9.2` | 220 ⬆️ `0.9.2` | **300** |
 
 > 🔴 **`0.9.0` — los tres campos de interés (#75-77) NO eran la causa, medido el 05/09.**
 > Primera vuelta que tocaba el interés y no la presión. Se quedan puestos porque no hacen daño,
@@ -306,11 +308,11 @@ archivo, así que `ONCE` refuerza el ancla.
 | 24 | `MaxFlurryHits` | Golpes máximos por racha. Entero | Solo `FIEND` | 4 | — | — | 5 | **8** ⬆️ `0.8.0` |
 | 25 | `DelayBetweenPounceAttacks` | Segundos entre saltos sobre ti | Solo `FIEND` | 2.0 | — | 1.8 | 1.5 | **0.7** ⬆️ `0.8.0` |
 | 26 | `AnimSpeedModifier` | Velocidad de la animación de ataque. **No toca el daño** | Solo `FIEND` | 1.0 | — | — | 1.1 | 1.2 |
-| 🆕 70 | `AllowSpitAlways` | Escupe **sin condición previa**, no sólo tras acercarse. **`BUGFIEND` ya lo trae en `true` de vanilla**: esto le copia al padre lo que el juego le da al hijo | Solo `FIEND` | `false` | — | — | — | **`true`** ⬆️ `0.8.0` |
-| 🆕 71 | `DelayBetweenSpitAttacks` | Segundos entre escupitajos | `FIEND` y `BUGFIEND` | 1.0 | — | — | — | **0.6** ⬆️ `0.8.0` |
-| 🆕 72 | `TurnToFaceTime` | Lo que tarda en encararte antes de pegar. Es tiempo muerto puro | `FIEND` y `BUGFIEND` | 0.3 | — | — | — | **0.15** ⬆️ `0.8.0` |
-| 🆕 73 | `FiendPounceDistanceModifier` | **Alcance del salto**, en globals. La palanca que más cambia la sensación y no cuesta un frame | Todos los Fiend | 1.7 | — | — | — | **3.0** ⬆️ `0.8.0` |
-| 🆕 74 | `FiendMaxVerticalForPounce` | **Desnivel máximo** que salva el salto, en metros. Con 0.3 subirte a una roca te salvaba | Todos los Fiend | 0.3 | — | — | — | **1.0** ⬆️ `0.8.0` |
+| 🆕 70 | `AllowSpitAlways` | Escupe **sin condición previa**, no sólo tras acercarse. **`BUGFIEND` ya lo trae en `true` de vanilla**: esto le copia al padre lo que el juego le da al hijo | Solo `FIEND` | `false` | — | — | **`true`** ⬆️ `0.9.2` | **`true`** ⬆️ `0.8.0` |
+| 🆕 71 | `DelayBetweenSpitAttacks` | Segundos entre escupitajos | `FIEND` y `BUGFIEND` | 1.0 | — | 0.9 ⬆️ `0.9.2` | 0.75 ⬆️ `0.9.2` | **0.6** ⬆️ `0.8.0` |
+| 🆕 72 | `TurnToFaceTime` | Lo que tarda en encararte antes de pegar. Es tiempo muerto puro | `FIEND` y `BUGFIEND` | 0.3 | — | 0.25 ⬆️ `0.9.2` | 0.2 ⬆️ `0.9.2` | **0.15** ⬆️ `0.8.0` |
+| 🆕 73 | `FiendPounceDistanceModifier` | **Alcance del salto**, en globals. La palanca que más cambia la sensación y no cuesta un frame | Todos los Fiend | 1.7 | — | 2.0 ⬆️ `0.9.2` | 2.4 ⬆️ `0.9.2` | **3.0** ⬆️ `0.8.0` |
+| 🆕 74 | `FiendMaxVerticalForPounce` | **Desnivel máximo** que salva el salto, en metros. Con 0.3 subirte a una roca te salvaba | Todos los Fiend | 0.3 | — | 0.5 ⬆️ `0.9.2` | 0.7 ⬆️ `0.9.2` | **1.0** ⬆️ `0.8.0` |
 | 27 | `AllowSpawnBrood` | Activa que el bicho **pare crías mientras luchas** | Solo `FIEND` | `false` | — | — | — | **`true`** ✅ |
 | 28 | `SpawnBroodID` | Qué grupo pare. Copiado de `BUGQUEEN` vanilla | Solo `FIEND` → pare **`BUGFIENDS`** | *(vacío)* | — | — | — | `BUGFIENDS` ✅ |
 | 29 | `SpawnBroodTimer` | Segundos entre partos. `BUGQUEEN` usa 30; bajado para que se vea | Solo `FIEND` | 0.0 | — | — | — | **5** ⬆️ `0.8.0` |

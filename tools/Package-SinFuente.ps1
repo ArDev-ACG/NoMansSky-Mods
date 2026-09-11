@@ -222,8 +222,11 @@ them, and still call the same thing down on your head.
     # lleguen despues se instalen encima sin renombrar nada. La Easy si lleva
     # su nombre: nace siendo un extremo y ahi se queda.
     #
-    # Los otros dos tiers construidos -2-Normal y 3-Dificil- NO se publican
-    # porque nunca se jugaron.
+    # Desde la 0.9.2 se publican los cuatro. El 2-Normal y el 3-Dificil llevaban
+    # desde el 18/08 congelados en 0.6.4 y 0.5.0 -sin el interes de la 0.9.0, sin
+    # las palancas de la 0.8.0 y sin el drenaje de aggro de la 0.7.0- y se pusieron
+    # al dia escalados: cada numero suyo queda entre el Easy y el fuerte. Siguen
+    # SIN jugarse, y eso va dicho en KNOWN ISSUES de sus dos README.
     @{
         grupo   = "infestation"
         carpeta = "HorribleTerror_Infestation_4-Hardcore"
@@ -308,6 +311,84 @@ This mod CONTAINS the "More Aggressive Predators" mod. Do not install both.
     something here is off, you will be the first to see it, so please say so.
   - More aggression levels are coming between this file and the full one, and
     what gets reported here is what decides where they land.
+"@
+        creditos = ""
+    }
+    @{
+        grupo   = "infestation"
+        carpeta = "HorribleTerror_Infestation_2-Normal"
+        release = "infestedNormal"
+        titulo  = "Infested - Normal"
+        mezcla  = $MEZCLA_INFESTATION
+        que     = @"
+The step above Easy: the world starts biting, but it still lets go.
+
+Five times the horror eggs and the sand worm nests. Predators arrive in twos,
+notice you at 50 m, keep coming until they are down to a quarter health, and
+60% of them hunt you instead of the local fauna. The horrors see you at 65 m,
+hatch out of an egg almost together instead of trickling, pounce twice as far
+and from half a metre up, and spit every 0.9 seconds.
+
+Eight of them can be on you at once, and all eight actually swing - on the old
+build only three did and the rest circled. They remember being shot for 20
+seconds and follow you to 180 m before they give up, and if you break line of
+sight they come back to you after 15 seconds instead of 30.
+
+What it does NOT do: no brood spawned mid-fight, no constant spitting, the HUD
+markers stay where vanilla puts them, and the nests inside abandoned freighters
+stay asleep. Those are the full version.
+
+This mod CONTAINS the "More Aggressive Predators" mod. Do not install both.
+"@
+        fallos  = @"
+  - Straight answer: this exact build has NOT been played in a real save. It is
+    built from the same script as the full version, with every number scaled
+    down and checked to sit between Easy and the full one, but nobody has spent
+    an evening inside it. Report anything that feels wrong and it gets fixed.
+  - Where it lands between Easy and the full version is a first guess. If it
+    feels closer to one end than it should, say which end.
+  - FPS: 50 live creatures against vanilla's 40, eight engaged at once. It
+    costs more than Easy and much less than the full version.
+"@
+        creditos = ""
+    }
+    @{
+        grupo   = "infestation"
+        carpeta = "HorribleTerror_Infestation_3-Dificil"
+        release = "infestedHard"
+        titulo  = "Infested - Hard"
+        mezcla  = $MEZCLA_INFESTATION
+        que     = @"
+The full world, one step short of the full teeth.
+
+Twenty times the horror eggs and the sand worm nests, same as the full version.
+Almost every planet rolls hostile, predators come in packs of 3-5, never run,
+and spot you at 60 m. The horrors see you at 70 m, carry no HUD marker, hatch
+out of an egg in one wave, hit 3-5 times per flurry, spit without waiting for
+an opening, pounce 2.4 times further and clear 0.7 m of height - a rock is no
+longer cover.
+
+Twelve can be engaged with you and all twelve swing. They remember being shot
+for 35 seconds, follow you to 220 m, lose interest at 120 m instead of 80, and
+come back to you after 8 seconds instead of 30. The wave no longer switches
+itself off halfway through the fight.
+
+What the full version still has over this one: the horrors multiply while they
+fight you, their brood hits as hard as the parent, the predator markers come
+off your HUD, and the nests inside abandoned freighters wake up to your torch.
+
+This mod CONTAINS the "More Aggressive Predators" mod. Do not install both.
+"@
+        fallos  = @"
+  - Straight answer: this exact build has NOT been played in a real save.
+    Every number in it was checked to sit between Normal and the full version,
+    but nobody has played an evening of it. If something is off you will be the
+    first to see it.
+  - Almost every planet rolls hostile here, same as the full version. That
+    changes the planet you are already standing on when you load a save. If you
+    do not want that, take Normal.
+  - FPS: 60 live creatures against vanilla's 40 and twelve engaged at once.
+    Between Normal and the full version, and closer to the full version.
 "@
         creditos = ""
     }

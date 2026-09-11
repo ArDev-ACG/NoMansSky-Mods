@@ -3,7 +3,7 @@
 **El mod completo: contiene al mod 1 y le añade el mundo infestado.** Es el que se instala y
 se juega.
 
-Versión **0.9.1**. Changelog propio:
+Versión **0.9.2**. Changelog propio:
 [`../../../docs/CHANGELOG-MOD2.md`](../../../docs/CHANGELOG-MOD2.md)
 
 ## La relación entre los dos mods — decidida el 2026-08-09
@@ -12,7 +12,7 @@ Versión **0.9.1**. Changelog propio:
 
 | | Mod 1 · `HorribleTerror_Predators` | Mod 2 · `HorribleTerror_Infestation` |
 |---|---|---|
-| Versión | 2.0.0 | **0.9.1** |
+| Versión | 2.1.1 | **0.9.2** |
 | Qué es | la conducta sola, como producto aparte | **la conducta + el mundo + (pronto) los modelos** |
 | Instalado | **no** | **sí** |
 | Rutas | 7 | **12** |
@@ -109,12 +109,19 @@ Si `REPORT` no da estos números, **no se despliega**.
 | Config | Total | Desglose (gen + predtables + globals + nidos + uiglobals + árbol + datatable + eggs + infest) |
 |---|---:|---|
 | 1 Fácil | **20** | 4 + 2+2 + 2 + — + — + — + — + 4 + 6 |
-| 2 Normal | **45** | 5 + 2+2 + 24 + — + — + 1 + 1 + 4 + 6 |
-| 3 Difícil | **50** | 5 + 2+2 + 25 + — + — + 2 + 4 + 4 + 6 |
+| 2 Normal | **58** ⬆️ `0.9.2` | 5 + 2+2 + 35 + — + — + 1 + 3 + 4 + 6 |
+| 3 Difícil | **64** ⬆️ `0.9.2` | 5 + 2+2 + 36 + — + — + 2 + 7 + 4 + 6 |
 | 4 Hardcore | **83** | 5 + 2+2 + 39 + 2+2+1 + 1 + 2 + 17 + 4 + 6 |
 
-**Verificado el 2026-09-09** contra NMS **178763 (7.0 Cosmos)** / MBINCompiler **7.00.0-pre1**:
-los cuatro dan 20 / 45 / 50 / 83 con **0 errores y 0 warnings**.
+**Verificado el 2026-09-10** contra NMS **178763 (7.0 Cosmos)**: Fácil 20, Normal **58** y Difícil
+**64**, los tres con **0 errores y 0 warnings**. Normal y Difícil suben de 45 y 50 porque la
+`0.9.2` les baja, escaladas, las palancas que sólo tenía el Hardcore: +11 en `globals` y +2 / +3
+en el `datatable` de cada uno.
+
+> ⚠️ **El Hardcore dio 82, no 83, en esa misma vuelta, y no es del mod.** El MBINCompiler
+> instalado es el **7.0.0.1**, que **no descompila `GCUIGLOBALS.GLOBAL`** —`MbinException:
+> Non-negative number required`— y ese archivo sólo lo toca el Hardcore. Se construye con
+> **7.00.0-pre1** cuando haya que rehacerlo. No afecta a la `0.9.2`: el Hardcore no se resube.
 
 > La tabla anterior decía 23 / 45 / 50 / 101 y estaba desfasada: contaba un L-System ×3 que el
 > script no declara desde la 0.4.0, y para Fácil 5 en `gen` y 4 en `globals` cuando ese `.lua`

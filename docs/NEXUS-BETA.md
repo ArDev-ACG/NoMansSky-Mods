@@ -35,31 +35,35 @@ linterna y romper uno te llama a los Horrores encima, en un pasillo, sin sitio d
 
 ---
 
-## Los 6 archivos
+## Los 8 archivos
 
 | Nexus File | Archivo | Qué es |
 |---|---|---|
 | **Main File 1** | `infested_v0.9.1.zip` (38 KB) | El fuerte. **Sin etiqueta de nivel** |
-| **Main File 2** | `infestedEasy_v0.9.1.zip` (8 KB) | El Easy |
+| **Main File 2** | `infestedHard_v0.9.2.zip` | El Difícil. **Nuevo en `0.9.2`** |
+| **Main File 3** | `infestedNormal_v0.9.2.zip` | El Normal. **Nuevo en `0.9.2`** |
+| **Main File 4** | `infestedEasy_v0.9.1.zip` (8 KB) | El Easy. **No se resube**: no cambió |
 | Optional 1 | `infestedCryWolf_v0.1.0.zip` (6,1 MB) | Modelo del Horror grande |
 | Optional 2 | `infestedWarriorBug_v0.1.0.zip` (6,7 MB) | Modelo de las crías |
 | Optional 3 | `infestedSkullCrawler_v0.1.0.zip` (11,4 MB) | Modelo del Horror del carguero |
 | Optional 4 | `infestedMarkerEgg_v0.1.0.zip` (3,4 MB) | Modelo de los huevos |
 
-Los dos de conducta son **excluyentes entre sí**; los cuatro modelos conviven con cualquiera de
-los dos y entre ellos. Ninguno de los dos convive con *More Aggressive Predators*.
+Los **cuatro** de conducta son **excluyentes entre sí**; los cuatro modelos conviven con
+cualquiera de ellos y entre ellos. Ninguno de los cuatro convive con *More Aggressive Predators*.
 
 **Sin paquete «todo en uno», y a propósito.** Enviaría los mismos archivos dos veces: quien
 instale el combinado y luego un modelo suelto acaba con dos carpetas escribiendo lo mismo y el
 juego carga una **en silencio**. Quien quiera todo, descarga lo que quiera — la descripción lo
 dice.
 
-**Versión de la página: `0.9.1`**, la del archivo fuerte. El Easy va internamente por `0.6.4` y
-los modelos por `0.1.0`; el campo de versión de Nexus es uno solo. Es el mismo patrón que el mod
-1 en 2.1.0, donde Hard y Hardcore no cambiaron y la página subió igual.
+**Versión de la página: `0.9.2`**, la de los dos niveles nuevos. El fuerte sigue internamente en
+`0.9.1`, el Easy en `0.6.4` y los modelos en `0.1.0`; el campo de versión de Nexus es uno solo.
+Es el mismo patrón que el mod 1 en 2.1.0, donde Hard y Hardcore no cambiaron y la página subió
+igual. **`infested` e `infestedEasy` no se vuelven a subir**: sus archivos de la `0.9.1` siguen
+siendo los buenos.
 
 ```powershell
-.\tools\Package-SinFuente.ps1 -Grupo infestation -Version 0.9.1
+.\tools\Package-SinFuente.ps1 -Grupo infestation -Version 0.9.2 -Solo infestedNormal,infestedHard
 .\tools\Package-SinFuente.ps1 -Grupo models      -Version 0.1.0
 ```
 
@@ -70,9 +74,10 @@ infested        <- el fuerte, SIN nivel en el nombre
 infestedEasy    <- el Easy, con su nombre
 ```
 
-El fuerte es **el techo** y ahí se queda: los niveles que lleguen se meten *entre* los dos, así
-que su carpeta no se renombra nunca y el jugador extrae encima y sobrescribe. El Easy es el otro
-extremo y también es definitivo, por eso sí lleva nombre propio.
+El fuerte es **el techo** y ahí se queda: los dos niveles de la `0.9.2` se metieron *entre* los
+dos con carpeta propia —`infestedNormal` e `infestedHard`—, sin tocar las dos carpetas que ya
+están extraídas en máquinas ajenas. El Easy es el otro extremo y también es definitivo, por eso
+sí lleva nombre propio.
 
 Renombrar una carpeta ya publicada deja **las dos** en `GAMEDATA\MODS` —la vieja no se borra
 sola—, escribiendo los mismos archivos, con el juego cargando una sin avisar. Es la excepción que
@@ -495,22 +500,23 @@ funcionan. Lo que no vale es el **delta anotado**.
   peso, y en el archivo fuerte 25 KB de `MOD_DESCRIPTION` con el razonamiento entero.
   **Límite honesto:** los `.GEOMETRY` y `.DDS` que sí viajan **son** los modelos, y cualquiera con
   MBINCompiler y NMSDK los importa. Quitar el `.lua` esconde el método, no la malla.
-- **`2-Normal` y `3-Dificil`.** Construidos el 18/08 y **nunca jugados**, en niveles internos
-  0.6.4 y 0.5.0. Son justo el hueco que los niveles nuevos van a llenar, así que no tiene sentido
-  publicar los viejos ahora.
+- ~~**`2-Normal` y `3-Dificil`.**~~ **Se publican desde la `0.9.2`** (2026-09-10), ya no en
+  0.6.4 y 0.5.0 sino puestos al día y escalados entre el Easy y el fuerte. Siguen **sin jugarse**,
+  y eso va escrito en sus dos `README.txt` y en la descripción, igual que en el Easy.
 - **Los 30 cambios del `LSYSTEM`** (huevos dentro de los edificios abandonados): están escritos y
   **no funcionan**. No se mencionan en la página.
 
 ---
 
-## Cuando lleguen los niveles intermedios
+## Los niveles intermedios — llegaron en la `0.9.2` (2026-09-10)
 
-1. Entradas nuevas en `$MODS` de
-   [`../tools/Package-SinFuente.ps1`](../tools/Package-SinFuente.ps1), con nombre propio y **sin
-   tocar** `infested` ni `infestedEasy`: son los dos extremos y
-   sus carpetas ya están en manos de la gente.
-2. Antes de publicar ninguno: **jugarlo**. Es el motivo de que hoy suban dos y no cuatro.
-3. Reconstruirlos contra el `.lua` del momento: `2-Normal` y `3-Dificil` están en 0.6.4 y 0.5.0,
-   dos y cuatro versiones por detrás.
-4. El sitio donde caen lo dice el hilo de Posts, no el criterio de casa. Para eso se publican los
-   dos extremos primero.
+1. ✅ Entradas nuevas en `$MODS` de
+   [`../tools/Package-SinFuente.ps1`](../tools/Package-SinFuente.ps1), `infestedNormal` e
+   `infestedHard`, con nombre propio y **sin tocar** `infested` ni `infestedEasy`: son los dos
+   extremos y sus carpetas ya están en manos de la gente.
+2. ✅ Reconstruidos contra el `.lua` del momento: se les bajaron, escaladas, las palancas de la
+   `0.7.0`, la `0.8.0` y la `0.9.0` que sólo tenía el Hardcore. La tabla de a cuánto queda cada
+   una está en [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md), entrada `0.9.2`.
+3. ❌ **No se han jugado**, ni uno ni otro. Se sube igual, con el aviso escrito donde se ve —es
+   lo mismo que se hizo con el Easy—, y lo que reporten los Posts decide si se mueven.
+4. Dónde caen exactamente lo sigue diciendo el hilo de Posts, no el criterio de casa.
