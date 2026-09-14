@@ -64,6 +64,12 @@ PRESUPUESTOS = {
     # El cry wolf trae 18920 entre sus dos mallas, o sea que este numero NO
     # DECIMA NADA y esta puesto de tope, igual que en el skrullcrawler.
     "crywolf": 30000,
+    # El huevo releva al marker en el FIENDEGG, que es un prop ESTATICO: no
+    # lleva piel ni huesos, asi que el techo de 65536 vertices del formato le
+    # sobra de largo. El presupuesto se pone por coste de dibujado, no por
+    # encaje: el marker que hay puesto son 822 vertices y del huevo hay
+    # cientos por pantalla en un planeta infestado.
+    "facehuggeregg": 6000,
 }
 
 MODELOS = {
@@ -81,6 +87,8 @@ MODELOS = {
         RAIZ + r"\warriorbug\source\bug_anim.fbx"),
     "crywolf": (
         RAIZ + r"\crywolf\source\Cry Wolf SETS.fbx"),
+    "facehuggeregg": (
+        RAIZ + r"\facehugger-egg\source\xenoEgg.fbx"),
 }
 
 

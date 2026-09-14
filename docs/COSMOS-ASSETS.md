@@ -15,22 +15,42 @@ Método abajo, para repetirlo en la siguiente actualización.
 
 **Los cuatro nodos que tocamos no cambiaron de nombre.**
 
-| Rig | Archivos nuevos | Archivos retirados |
-|---|---|---|
-| `SPIDERRIG` (`FIEND`, `FREIGHTERFIEND`) | **0** | 0 |
-| `ARTHROPOD` (`BUGFIEND`) | **0** | 0 |
+| Rig | Archivos nuevos | Archivos retirados | |
+|---|---|---|---|
+| `SPIDERRIG` (`FIEND`, `FREIGHTERFIEND`) | **0** | 0 | esqueleto igual: 765 `InvBindMatrix` |
+| `ARTHROPOD` (`BUGFIEND`) | **0** | 0 | sin medir por dentro |
 | `RARERESOURCE\GROUND\FIENDEGG` | 0 | 0 |
-| `DIPLORIG` | 13 (`diplo` + 7 `.ANIM`) | 0 |
+| `DIPLORIG` | 13 (`diplo` + 7 `.ANIM`) | 0 | el único rig con archivos nuevos |
 
 O sea: **la [receta de piel](RECETA-PIEL.md) sigue valiendo tal cual** y los cuatro
 modelos publicados no hay que replantearlos. El único rig que Hello Games tocó es
 el del diplo.
 
-> ⚠️ **El diff es por nombre de archivo, no por contenido.** Un `.GEOMETRY` que
-> siga llamándose igual pero haya cambiado por dentro **no sale aquí**. La
-> comprobación que sí lo vería es comparar el hash de los cuatro nodos, y **está
-> sin hacer**. Que la `0.9.1` se reconstruyera contra 7.0 sin mover un valor es
-> evidencia a favor, no prueba.
+> ⚠️ **El diff es por nombre de archivo, y el nombre no basta.** Comprobado el
+> mismo día sobre el `FIENDEGG`, que es el único de los cuatro del que
+> guardábamos el vanilla de 6.45 (`work/models/eggmesh/`):
+>
+> | Archivo | 6.45 | 7.0 Cosmos | |
+> |---|---:|---:|---|
+> | `FIENDEGG.SCENE.MBIN` | 1 711 B | **1 859 B** | distinto |
+> | `FIENDEGG.GEOMETRY.MBIN.PC` | 5 266 B | **2 129 B** | distinto |
+> | `FIENDEGG.GEOMETRY.DATA.MBIN.PC` | 14 913 B | 14 913 B | mismo tamaño, **hash distinto** |
+>
+> Y no es cosmético: **el `.SCENE` de 6.45 ya no descompila** con el compilador
+> 7.00 —`File not recognized`— así que injertar sobre la copia vieja no es que
+> quede desactualizado, es que **falla**. El huevo del 13/09 hubo que
+> reinjertarlo contra el vanilla reextraído de los PAK de hoy, que está guardado
+> en `work/models/vanilla_7.0_fiendegg/`.
+>
+> **De los otros tres no se puede decir lo mismo ni lo contrario: no guardábamos
+> su vanilla de 6.45.** Lo único medido es que el esqueleto del `FIEND` no ha
+> cambiado de tamaño —765 `InvBindMatrix` en el vanilla de Cosmos y los mismos
+> 765 en nuestro injerto de agosto—, que es la señal que importa para la piel.
+>
+> **La lección, y es una regla nueva:** extraer y guardar el vanilla de cada
+> nodo que tocamos **antes** de cada actualización de NMS, junto a la
+> instantánea de `filenames.json`. Sin esa copia no hay diff de contenido
+> posible, solo de nombres.
 
 ---
 

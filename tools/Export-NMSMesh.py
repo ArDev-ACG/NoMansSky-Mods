@@ -74,6 +74,41 @@ MODELOS = {
         giro=(0, 0),
         alto=None,
     ),
+    # EL QUE RELEVA AL MARKER en el FIENDEGG. Estatico: ni piel, ni pesos, ni
+    # Weight-/Skin-/Check-NMSGraft. Solo los pasos 0a, 0c y 0d.
+    #
+    # NO entra por `fbx` como el marker, sino por `origen`: el marker importa
+    # el FBX directo porque ya venia con el eje alto en Y, y este NO -sale de
+    # Decimate-NMSMesh.py, que importa con el eje alto en Z de Blender-. De
+    # ahi el giro en X.
+    #
+    # EL GIRO EN Y SE DEJA EN 0 Y ESTA SIN COMPROBAR EN PARTIDA. El huevo es
+    # casi de revolucion, asi que el volcado no distingue el frente; lo unico
+    # que lo distingue es por donde abre. Si en partida abre hacia el lado
+    # equivocado, esto es lo que se toca.
+    #
+    # ALTO = 0.761688, medido en el AABB del nodo FiendEgg vanilla
+    # (work/models/eggmesh/FIENDEGG.SCENE.MXML: AABBMAXY 0.708496 menos
+    # AABBMINY -0.053192). No se elige: es el tamano del huevo del juego.
+    "facehuggeregg": dict(
+        origen=RAIZ + r"\BLENDER\proyectos\facehuggeregg.blend",
+        objeto="facehuggeregg",
+        blend=RAIZ + r"\BLENDER\proyectos\facehuggeregg_nms.blend",
+        salida=RAIZ + r"\BLENDER\FIENDEGG",
+        nodo="FiendEgg",
+        escena="FIENDEGG",
+        material=(r"MODELS\PLANETS\BIOMES\COMMON\RARERESOURCE\GROUND\FIENDEGG"
+                  r"\EGGSHELL_MAT.MATERIAL.MBIN"),
+        giro=(-90, 0),
+        # 1,11% contra el 0,1% por defecto, y el assert es el que esta mal
+        # calibrado, no la malla: son 102 aristas de costura sobre 9192, la
+        # mas larga mide 0,174 -cabe en una celda del atlas de 0,25- y
+        # correlacionan 0,825 con la arista en 3D. La malla NO se decimo
+        # (3064 -> 3064), asi que tampoco es el colapso. Ver el porque
+        # completo en _medir_uv.
+        tope_uv=1.5,
+        alto=0.761688,
+    ),
     "necromorph": dict(
         origen=RAIZ + r"\BLENDER\proyectos\necromorph_atlas.blend",
         objeto="necromorph",
@@ -455,7 +490,33 @@ def _medir_uv(verts, uvs, indexes):
     # malla mal indexada.
     #
     # 0,1% deja 137 veces de margen contra el caso malo mas suave medido.
-    TOPE = 0.1
+    #
+    # PERO EL TOPE ES UN PORCENTAJE Y ESO LO HACE DEPENDER DEL TAMANO DE LA
+    # MALLA, que es un fallo del propio assert y se vio con el huevo el
+    # 2026-09-13. El 0,1% se calibro contra el warrior bug, 108000 triangulos:
+    #
+    #     warriorbug      108000 tris   324000 aristas   0,1% = 324 aristas
+    #     necromorph       59384 tris   178152 aristas   0,1% = 178 aristas
+    #     skrullcrawler     9592 tris    28776 aristas   0,1% =  29 aristas
+    #     facehuggeregg     3064 tris     9192 aristas   0,1% =   9 aristas
+    #
+    # O sea: el mismo punado de aristas de costura que en el warrior bug se
+    # perdona -324 de margen- en una malla treinta y cinco veces mas pequena
+    # no cabe. El huevo trae 102, que en el warrior bug serian el 0,0315% y
+    # pasarian sin mirarlas.
+    #
+    # Lo que SI distingue los dos casos y no depende del tamano son las otras
+    # dos senales que ya estan medidas arriba:
+    #   - la arista UV mas larga cabe en UNA celda del atlas (< 0,25). El
+    #     index buffer mal indexado cruza el atlas entero.
+    #   - la correlacion con la arista en 3D es alta -0,825 en el huevo-, o
+    #     sea que las aristas UV largas son aristas largas de verdad. En una
+    #     malla mal indexada no hay correlacion, el emparejamiento es azar.
+    #
+    # Mientras esas dos aguanten, el tope por modelo es legitimo. `tope_uv`
+    # en MODELOS lo sube solo para el modelo que lo declare; el resto sigue
+    # en 0,1 y el assert sigue cazando lo que caza.
+    TOPE = M.get("tope_uv", 0.1)
     assert rotas <= TOPE, (
         f"{rotas:.4f}% de las aristas cruzan mas del 10% del atlas, por "
         f"encima del {TOPE}%: eso ya no es el decimador, es el index buffer "

@@ -17,6 +17,12 @@ Los parámetros de verdad están en `tools/Export-NMSMesh.py` (`MODELOS`) y en
 | [warriorBug](warriorBug.md) | `BUGFIEND` | `ARTHROPOD` | las crías que el horror grande escupe en combate |
 | [markerEgg](markerEgg.md) | `FIENDEGG` | — (estático) | los huevos del suelo infestado |
 
+## El que está en el juego pero sin probar
+
+| Ficha | Sustituye a | Estado |
+|---|---|---|
+| [facehuggerEgg](facehuggerEgg.md) | `FIENDEGG` — **releva al markerEgg** | construido, desplegado y verificado por MBIN el **2026-09-13**. **Falta jugarlo**: ancho, giro en Y y apoyo sin comprobar |
+
 ## Los retirados — sirvieron para aprender, no se publicaron
 
 | Ficha | Ocupaba | Por qué se retiró |
@@ -28,8 +34,7 @@ Los parámetros de verdad están en `tools/Export-NMSMesh.py` (`MODELOS`) y en
 
 | Modelo | Entra como | Estado |
 |---|---|---|
-| `xeno-cuadripedo` | `FIEND` — releva al cry wolf | pendiente. El asset es **`.glb` con animación**, no FBX |
-| `facehugger-egg` | `FIENDEGG` — releva al marker | pendiente |
+| `xeno-cuadripedo` | `FIEND` — releva al cry wolf | **pendiente**. El asset es un **`.glb` con animación**, no un FBX: hay que importarlo y quedarse con la malla antes de entrar en `Decimate-NMSMesh.py`. Y lleva piel, o sea los once pasos enteros |
 | `xeno-raven`, `facehugger01`, `monster-eggs`, `alien-egg`, `xenomorph-egg` | sin asignar | en `asset/Modelos 3D` |
 
 ## Las capturas

@@ -40,7 +40,17 @@ TECHO_16BIT = 65536
 
 # Un array por malla tiene una entrada por cada nodo MESH.
 POR_MALLA = ["MeshAABBMin", "MeshAABBMax", "MeshVertRStart", "MeshVertREnd",
-             "BoundHullVertSt", "BoundHullVertEd", "MeshBaseSkinMat"]
+             "BoundHullVertSt", "BoundHullVertEd"]
+
+# MeshBaseSkinMat va aparte porque SOLO aplica si el modelo tiene huesos.
+#
+# Medido el 2026-09-13 con el huevo: el FIENDEGG vanilla de 7.0 trae
+# `<Property name="MeshBaseSkinMat" />`, o sea el array VACIO, con su nodo de
+# malla y todo. Es un prop estatico: cero nodos JOINT, stride 8, canales [2,3]
+# y ninguna matriz de piel que indexar. Exigirle una entrada por malla daba un
+# "FUERA DE RANGO -- el juego cierra al usarlo" que es falso, y el marker, que
+# es el mismo caso, lleva publicado desde agosto sin cerrar nada.
+POR_MALLA_CON_HUESOS = ["MeshBaseSkinMat"]
 
 # Cada atributo del nodo de malla cierra un rango dentro de un array del
 # .GEOMETRY, y el fin es EXCLUSIVO en los dos, pese al nombre de `LASTSKINMAT`:
@@ -335,6 +345,15 @@ def revisar(carpeta):
         if largo(nombre) < len(mallas):
             fallos.append(f"{nombre}: {largo(nombre)} entradas para "
                           f"{len(mallas)} mallas")
+
+    if huesos:
+        for nombre in POR_MALLA_CON_HUESOS:
+            if largo(nombre) < len(mallas):
+                fallos.append(f"{nombre}: {largo(nombre)} entradas para "
+                              f"{len(mallas)} mallas")
+    else:
+        print("  sin nodos JOINT: es un prop estatico, "
+              "MeshBaseSkinMat vacio es lo que trae el vanilla\n")
 
     vertices = int(geo.get("VertexCount", 0))
     indices = int(geo.get("IndexCount", 0))
