@@ -33,7 +33,11 @@ work/pcbanks/
 BankSignatures.bin
 # Indice de rutas de los .pak que vuelca MBINCompiler. 15 MB, se regenera
 # en un rato, y lleva dentro la ruta local de la instalacion de Steam.
+# El filenames-<compilador>-<fecha>.json es la instantanea anterior, que hay
+# que guardar en disco antes de cada actualizacion de NMS para poder diffear.
+# Ver docs/COSMOS-ASSETS.md §4.
 filenames.json
+filenames-*.json
 
 # --- Backups de partidas (datos personales, nunca a git) ---
 backups/
@@ -136,3 +140,9 @@ Desktop.ini
 # logseq-graph/pages es un junction NTFS a docs/: los .md reales ya estan
 # versionados ahi. Aqui solo hay metadatos e indices de Logseq.
 logseq-graph/
+
+# --- Excepcion: las capturas de las fichas de modelo ---
+# Son renders NUESTROS de mallas NUESTRAS, no arte de terceros, y sin ellas
+# las fichas de docs/MODELOS/ no se entienden.
+!docs/MODELOS/img/
+!docs/MODELOS/img/*.png

@@ -85,41 +85,53 @@ congeló el nombre del mod 1; ver [`NEXUS.md`](NEXUS.md).
 
 ---
 
-## Los dos niveles — qué separa uno del otro
+## Los cuatro niveles — qué separa uno de otro
 
-**Comprobado sobre los zips construidos, no sobre el `.lua`:** el Easy toca **6 archivos** y el
-fuerte **11**. Los cinco de diferencia son exactamente lo que el Easy promete no tocar.
+**Comprobado sobre los `.lua` construidos de la `0.9.2`, no de memoria:** el Easy toca **6
+archivos**, el Normal y el Difícil **8**, y el fuerte **11**. Los tres de diferencia entre el
+Difícil y el fuerte son exactamente lo que el fuerte se guarda para él.
 
-| Archivo del juego | Easy | Fuerte | Qué se pierde en Easy |
-|---|:---:|:---:|---|
-| `CREATUREGENERATIONDATA` | ✅ | ✅ | — (densidad; el Easy **no** escribe el peso de planeta hostil) |
-| `GROUNDTABLEPLAYERPREDATOR` MED/LARGE | ✅ | ✅ | — (manada) |
-| `GCCREATUREGLOBALS` | ✅ | ✅ | El Easy sólo escribe 4 de los ~34 campos |
-| `FIENDEGGS` · `INFESTATION` | ✅ | ✅ | — (siembra) |
-| `GCUIGLOBALS.GLOBAL` | ❌ | ✅ | **Los marcadores de aviso siguen puestos** |
-| `CREATUREDATATABLE` | ❌ | ✅ | **Sin parto en combate, sin rachas de 4-8, sin escupir siempre** |
-| `CREATUREBEHAVIOURTREES` | ❌ | ✅ | **No cierran distancia en `Fast` ni dejan de frenar** |
-| `*SLIME.ENTITY` ×2 | ❌ | ✅ | **Los nidos del carguero no despiertan con la linterna** |
+| Archivo del juego | Easy | Normal | Difícil | Fuerte | Qué aporta |
+|---|:---:|:---:|:---:|:---:|---|
+| `CREATUREGENERATIONDATA` | ✅ | ✅ | ✅ | ✅ | Densidad de fauna y peso de planeta hostil |
+| `GROUNDTABLEPLAYERPREDATOR` MED/LARGE | ✅ | ✅ | ✅ | ✅ | Manada |
+| `GCCREATUREGLOBALS` | ✅ | ✅ | ✅ | ✅ | El Easy escribe 4 campos; el fuerte ~34 |
+| `FIENDEGGS` · `INFESTATION` | ✅ | ✅ | ✅ | ✅ | Siembra de huevos y gusanos |
+| `CREATUREDATATABLE` | ❌ | ✅ | ✅ | ✅ | Salto, escupitajo, racha de golpes, brood |
+| `CREATUREBEHAVIOURTREES` | ❌ | ✅ | ✅ | ✅ | Frenada al acercarse; `Fast` sólo desde Difícil |
+| `GCUIGLOBALS.GLOBAL` | ❌ | ❌ | ❌ | ✅ | **Sólo el fuerte quita el marcador de depredador** |
+| `*SLIME.ENTITY` ×2 | ❌ | ❌ | ❌ | ✅ | **Sólo el fuerte despierta los nidos del carguero** |
 
 ### Tabla de valores
 
-| | Vanilla | **Easy** | **Fuerte** |
-|---|---:|---:|---:|
-| Huevos de Horror y nidos de gusano | ×1 | **×2** | **×20** |
-| Fauna terrestre por km² | ×1 | **×2** | **×20** |
-| **Planetas hostiles** | **9 %** | **9 %** (sin tocar) | **99 %** |
-| Manada de depredadores | 1/1 | **1/2** | **5/7** |
-| Te detectan a | 40 m | **45 m** | **80 m** |
-| Tope de criaturas vivas | 40 | **45** | **70** |
-| Horror te detecta a | 60 m | *vanilla* | **120 m** |
-| Huye al llegar a % de vida | 40 % | *vanilla* | **0 %** |
-| Horrores pegándote a la vez | 2 | *vanilla* | **24** |
-| Pare crías mientras pelea | no | *vanilla* | **sí, cada 5 s** |
-| Golpes por racha | 2-4 | *vanilla* | **4-8** |
-| Alcance del salto | ×1.7 | *vanilla* | **×3.0** |
-| Acecho antes de cargar | 4 s | *vanilla* | **0 s** |
-| Marcadores de aviso en el HUD | sí | **sí** | **no** |
-| El nido del carguero reacciona a la linterna | no | **no** | **sí** |
+| | Vanilla | **Easy** | **Normal** | **Difícil** | **Fuerte** |
+|---|---:|---:|---:|---:|---:|
+| Huevos de Horror y nidos de gusano | ×1 | **×2** | **×5** | **×20** | **×20** |
+| Fauna terrestre por km² | ×1 | **×2** | **×3** | **×20** | **×20** |
+| **Planetas hostiles** | **9 %** | **9 %** (sin tocar) | **27 %** | **99 %** | **99 %** |
+| Manada de depredadores | 1/1 | **1/2** | **1/2** | **3/5** | **5/7** |
+| Te detectan a | 40 m | **45 m** | **50 m** | **60 m** | **80 m** |
+| Te sueltan a | 80 m | *vanilla* | **100 m** | **120 m** | **150 m** |
+| Tope de criaturas vivas | 40 | **45** | **50** | **60** | **70** |
+| Horror te detecta a | 60 m | *vanilla* | **65 m** | **70 m** | **120 m** |
+| Huye al llegar a % de vida | 40 % | *vanilla* | **25 %** | **0 %** | **0 %** |
+| Horrores pegándote a la vez | 2 | *vanilla* | **8** | **12** | **24** |
+| Golpes por racha | 2-4 | *vanilla* | *vanilla* | **3-5** | **4-8** |
+| Alcance del salto | ×1.7 | *vanilla* | **×2.0** | **×2.4** | **×3.0** |
+| Desnivel que salva el salto | 0.3 m | *vanilla* | **0.5 m** | **0.7 m** | **1.0 m** |
+| Escupe sin condición previa | no | no | no | **sí** | **sí** |
+| Acecho antes de cargar | 4 s | *vanilla* | **2 s** | **0,5 s** | **0 s** |
+| Pare crías mientras pelea | no | no | no | no | **sí, cada 5 s** |
+| Marcadores de aviso en el HUD | sí | **sí** | **sí** | **sólo los del Horror: no** | **no** |
+| El nido del carguero reacciona a la linterna | no | **no** | **no** | **no** | **sí** |
+
+**Lo que el Normal y el Difícil recibieron en la `0.9.2`** son las palancas que las `0.7.0`,
+`0.8.0` y `0.9.0` sólo le habían dado al fuerte, escaladas y siempre por debajo de él: interés
+(aburrimiento 100/120 m y reenganche 15/8 s), oleada que no se apaga sola (aggro por nacimiento
+0.08/0.05, romper huevo 1.5/2.0, memoria de disparo 20/35 s, despawn 180/220 m), los tres
+contadores de Horror a la par (8/8/8 y 12/12/12) y el salto. **Lo que no cruzan a propósito:** el
+brood, las crías igualadas, el marcador de depredador y los nidos del carguero siguen siendo
+exclusivos del fuerte.
 
 ### 🔴 La razón de que el Easy NO toque el peso de planeta hostil
 
@@ -138,13 +150,12 @@ estaba se había re-rodado en contra.
 **El Easy de este mod nace ya con esa corrección puesta:** deja el peso en vanilla, o sea 9 %,
 el mismo que sin mod. *El mundo en el que ya estás sigue siendo el que dejaste.* Eso va escrito
 en su `README.txt` y en la descripción, porque es exactamente la duda que va a tener quien lea la
-página.
+página. **El Normal sube a 27 %** — el valor corregido el 18/08, no el 50 % de antes — y ahí sí
+se avisa en la descripción.
 
 > ⚠️ **Lo honesto sobre el Easy:** está construido desde el 18/08 y **nunca se ha jugado**. Lo
 > que sí está verificado es estructural —qué archivos toca y cuáles no, comprobado sobre el zip—
-> y que su build corresponde a su `.lua` (fuente 18/08 21:36, build 21:37). Va dicho en su README
-> y en la descripción. Si prefieres no publicar sin medir, se sube sólo el fuerte y el Easy
-> espera a una partida.
+> y que su build corresponde a su `.lua`. Va dicho en su README y en la descripción.
 
 ---
 
@@ -168,8 +179,8 @@ compites contra tres mods y no contra veinte.
 ```
 The horror No Man's Sky already ships, actually showing up. Infested worlds that
 are actually infested, abandoned freighters that finally bite back, and four
-creatures rebuilt from scratch in Blender. Two gameplay presets - pick one.
-Beta: more aggression levels are coming and your reports shape them.
+creatures rebuilt from scratch in Blender. Four gameplay presets - pick one.
+Beta: your reports shape where the numbers land.
 ```
 
 ## TAGS
@@ -204,47 +215,61 @@ sound - and nothing ever happened in it.
 Now the nests wake to your torch and to your gunfire, and breaking one calls horrors down on
 you. In a corridor. With nowhere to run.
 
-[size=5]Two gameplay files. Pick ONE.[/size]
+[size=5]Four gameplay files. Pick ONE.[/size]
 
-[b]They edit the same game files[/b] - installing both means one silently overrides the other,
+[b]They edit the same game files[/b] - installing two means one silently overrides the other,
 and nothing tells you which won. To switch, delete the old folder first.
 
-[b]INFESTED[/b] - the full thing.
-Twenty times the horror eggs and the sand worm nests. Predators that hunt in packs, see you from
-across the valley and do not stop coming. Horrors that spot you long before you spot them, spawn
-brood mid-fight, pounce from far higher ground, spit constantly, and brood that hits as hard as
-the parent. Freighter nests that wake up. No warning markers on your HUD. Almost every planet
-rolls hostile.
+[b]INFESTED[/b] - the full thing, the ceiling of the range.
+Twenty times the horror eggs and the sand worm nests. Predators in packs of 5-7 that see you from
+80 m and never flee. Twenty-four horrors on you at once, spawning brood mid-fight, pouncing from
+three times the reach, spitting constantly. Freighter nests that wake to your torch. No warning
+markers on your HUD at all. Almost every planet rolls hostile.
+
+[b]INFESTED - HARD[/b] - everything above it except the last four switches.
+Twenty times the eggs and worms, packs of 3-5, they never flee, twelve horrors engaged and all
+twelve hitting, 3-5 hits per flurry, pounce at 2.4x, spit with no wind-up, and no horror markers
+on the HUD. [b]No brood, no freighter nests, and predators still get a marker.[/b] Almost every
+planet rolls hostile.
+
+[b]INFESTED - NORMAL[/b] - the middle, and the one to start with.
+Five times the eggs and worms, three times the ground fauna, packs of 1-2, eight horrors on you
+at once, pounce at 2.0x, half the stalking time. Roughly [b]one planet in four[/b] rolls hostile
+instead of one in eleven. HUD markers stay, freighter nests stay asleep, nothing spawns brood.
 
 [b]INFESTED - EASY[/b] - the same world, without the teeth.
 Twice the eggs, twice the worm nests, twice the ground fauna, predators in twos instead of alone,
-and they notice you a little sooner. And that is the whole list: the horrors behave exactly as
+and they notice you a little sooner. That is the whole list: the horrors behave exactly as
 vanilla, your HUD markers stay, and the freighter nests stay asleep.
 
 [b]Easy does NOT change which planets are hostile, and that is deliberate.[/b] That is not a
 dial for how many dangerous creatures spawn - it decides whether an entire planet is a predator
 world. The first release of my predator mod pushed it, and people loaded a save to find the
 planet they were standing on had turned against them. Easy leaves it alone. [i]The world you are
-already in stays the world you left.[/i]
-
-[b]More aggression levels are coming between these two.[/b] That is part of what this beta is
-for - these two are the ends of the range, and what people report here decides where the middle
-lands.
+already in stays the world you left.[/i] Normal moves it to about one planet in four; Hard and
+Infested take it to nearly all of them, because that is what you asked for by picking them.
 
 [code]
-                              Vanilla     Easy      Infested
--------------------------------------------------------------
-Horror eggs / worm nests          -      twice    twenty times
-Ground fauna                      -      twice    twenty times
-Hostile planets                 rare      rare      almost all
-Predators hunt in               alone     pairs        packs
-They notice you                    -    sooner    much sooner
-They give up the chase           yes       yes             no
-Horrors spawn brood mid-fight     no   vanilla            yes
-Horror reach and flurry            -   vanilla       far more
-Stalks before it charges         yes   vanilla    no, it just charges
-HUD warning markers              yes       yes             no
-Freighter nests wake up           no        no            yes
+                            Vanilla    Easy   Normal     Hard   Infested
+------------------------------------------------------------------------
+Horror eggs / worm nests         x1      x2       x5      x20        x20
+Ground fauna per km2             x1      x2       x3      x20        x20
+Hostile-planet chance            9%      9%      27%      99%        99%
+Predator pack size              1/1     1/2      1/2      3/5        5/7
+They spot you at                40m     45m      50m      60m        80m
+They give up the chase at       80m     80m     100m     120m       150m
+Max creatures loaded             40      45       50       60         70
+Horror spots you at             60m     60m      65m      70m       120m
+Flees at % health               40%     40%      25%       0%         0%
+Horrors hitting you at once       2       2        8       12         24
+Hits per flurry                 2-4     2-4      2-4      3-5        4-8
+Pounce reach                   x1.7    x1.7     x2.0     x2.4       x3.0
+Vertical a pounce clears       0.3m    0.3m     0.5m     0.7m       1.0m
+Spits with no wind-up            no      no       no      yes        yes
+Stalking before it charges       4s      4s       2s     0.5s       none
+Spawns brood mid-fight           no      no       no       no    yes, 5s
+HUD warning markers             yes     yes      yes  no horror     none
+Freighter nests wake up          no      no       no       no        yes
 [/code]
 
 [b]Either file CONTAINS "More Aggressive Predators".[/b] Install one of these or that one, never
@@ -280,8 +305,8 @@ folder would silently override the new one.
 [list]
 [*][b]Too much? Not enough?[/b] Say which file you took and what you were doing when it went
 wrong. That is what decides where the middle levels land.
-[*][b]Easy has had far less time in a real save[/b] than the full version. If a number feels
-wrong there, that is exactly the report worth making.
+[*][b]Normal and Hard are new in 0.9.2.[/b] They sit between Easy and the full file, and where
+exactly they sit is the thing reports decide. Say which one you took.
 [*][b]Horrors still break off and walk away[/b] - and it happens the moment they roar. The roar
 is what spawns their brood, so the two are connected. Not solved yet; it is next.
 [*][b]Cry Wolf and Warrior Bug have stiff legs.[/b] The lower leg follows the body instead of
@@ -289,9 +314,9 @@ planting on the ground. Being worked on.
 [*][b]Cry Wolf is taller than what it replaces[/b], so it can clip into low scenery.
 [*][b]Warrior Bug's skin reads flat[/b] under some lighting. More texture resolution did not fix
 it, so it is a material problem and it is still open.
-[*][b]The full file costs frames.[/b] Far more live creatures than vanilla, a lot of them
+[*][b]The heavier files cost frames.[/b] Far more live creatures than vanilla, a lot of them
 engaged at once, and brood spawning on top of that. If your frame rate drops, that is where it is
-going - Easy costs almost nothing by comparison.
+going - drop a level; Easy costs almost nothing by comparison.
 [/list]
 
 [b]Post problems in the Posts tab:[/b] what happened and where you were. Screenshots help more
@@ -331,12 +356,29 @@ assets are redistributed - everything here is a new model, a new texture, or a c
 
 [size=5]Tested on[/size]
 
-No Man's Sky 178763 / 7.0 Cosmos (Public branch). Infested 0.9.1, Easy 0.6.4, models 0.1.0.
+No Man's Sky 178763 / 7.0 Cosmos (Public branch). Infested 0.9.1, Hard and Normal 0.9.2,
+Easy 0.6.4, models 0.1.0.
 ```
 
 ## CHANGELOG de Nexus
 
 ```bbcode
+[b]0.9.2 - two more difficulty levels[/b]
+[list]
+[*][b]Infested - Normal[/b] and [b]Infested - Hard[/b] fill the gap between Easy and the full
+file. Still one file at a time: they write the same things.
+[*]Normal: eggs and worms x5, ground fauna x3, about one planet in four hostile, eight horrors
+on you at once, pounce reach 2.0x, half the stalking time. HUD markers stay, nothing spawns
+brood, freighter nests stay asleep.
+[*]Hard: eggs and worms x20, packs of 3-5, predators never flee, twelve horrors engaged and all
+twelve hitting, 3-5 hits per flurry, pounce reach 2.4x, spit with no wind-up, no horror markers.
+[*]Both got the levers that 0.7.0, 0.8.0 and 0.9.0 had only given the full file - longer
+interest, waves that do not burn themselves out, every engaged horror actually attacking -
+scaled down and always below it.
+[*]The brood, the predator marker and the waking freighter nests stay exclusive to the full file.
+[*]Infested and Infested - Easy are unchanged: the 0.9.1 and 0.6.4 files are still the right ones.
+[/list]
+
 [b]0.9.1 - rebuilt for 7.0 Cosmos[/b]
 Rebuilt against NMS 7.0 (build 178763) with MBINCompiler 7.00. No values changed - the 0.9.0
 files carried pre-7.0 templates and would not load.

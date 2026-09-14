@@ -1795,7 +1795,7 @@ el `GcAlienPodComponentData` entero y el `DestroyedModel` que suelta los MiniFie
 
 ### ✅ Probado el 2026-08-09 — NMS 170671
 
-Plan de prueba: [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md).
+Plan de prueba: [`CHECKLIST-0.3.2.md`](_archivo/CHECKLIST-0.3.2.md).
 
 | Qué | Veredicto |
 |---|---|
@@ -1818,7 +1818,7 @@ Plan de prueba: [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md).
   empaquetar el DDS **vanilla sin tocar** y ver si sigue blanco.
 
 De la 0.3.1 se cierra además **`AllowSpawnBrood`**: funciona. Ver la entrada 0.3.3 arriba y
-[`CHECKLIST-0.3.1.md`](CHECKLIST-0.3.1.md) §4.1. Del resto de 0.3.1 sigue casi todo
+[`CHECKLIST-0.3.1.md`](_archivo/CHECKLIST-0.3.1.md) §4.1. Del resto de 0.3.1 sigue casi todo
 pendiente.
 
 ---

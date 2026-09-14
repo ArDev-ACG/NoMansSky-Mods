@@ -803,7 +803,7 @@ el mismo resultado aparente.
 | 6 | Salas `BUG` en `FREIGHTERDUNGEONSTABLE` | ✅ `HorribleTerror_DerelictBugs` 0.1.0, 57 cambios |
 | 7 | ¿Sirve podar el descriptor de un depredador? | ✅ mecánicamente sí · `HT_PredatorParts_PRUEBA01` |
 
-Todo eso está **sin jugar**. Plan de prueba: [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md).
+Todo eso está **sin jugar**. Plan de prueba: [`CHECKLIST-0.3.2.md`](_archivo/CHECKLIST-0.3.2.md).
 
 ### Lo siguiente, según qué salga
 

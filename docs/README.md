@@ -13,6 +13,9 @@ Destino: Nexus Mods, categoría Creatures.
 | [`ACUERDOS.md`](ACUERDOS.md) | **Lo ya aprobado en partida y que no se toca**, con quién lo comprueba. Se lee antes de cambiar cualquier constante |
 | [`MODIFICACIONES.md`](MODIFICACIONES.md) | «¿Qué campo toca el mod y sobre qué bicho?» — tabla viva |
 | [`ASSETS.md`](ASSETS.md) | «¿Cómo cambio el aspecto?» — texturas, colores, partes, y **Blender + NMSDK** en §4 |
+| [`MODELOS/`](MODELOS/README.md) | «¿Qué malla metimos, a quién sustituye y qué salió mal?» — una ficha por modelo, con captura de Blender. La receta general está en [`RECETA-PIEL.md`](RECETA-PIEL.md) |
+| [`RECETA-PIEL.md`](RECETA-PIEL.md) | «¿Cómo pego nuestra malla al esqueleto del bicho vanilla?» — los once pasos, medidos |
+| [`COSMOS-ASSETS.md`](COSMOS-ASSETS.md) | «¿Qué trajo 7.0 y qué nos sirve?» — el diff de los PAK: los puestos infestados, los huevos de carne nuevos, y la comprobación de que **ningún rig nuestro cambió** |
 | [`../BLENDER/README.md`](../BLENDER/README.md) | «¿Qué carpeta abro para ver el modelo que hay en el juego?» — banco de Blender, la vuelta completa y el prefijo que hay que quitar |
 | [`COMPORTAMIENTO.md`](COMPORTAMIENTO.md) | «¿Qué campo controla percepción / acecho / ataque?» |
 | [`IDEAS.md`](IDEAS.md) | Mapa de spawn y cola de ideas sin comprometer |
@@ -27,8 +30,7 @@ Destino: Nexus Mods, categoría Creatures.
 |---|---|
 | [`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md) | **Mod 2 (Infestation), el que se está tocando.** Versiones y sesiones de prueba, lo nuevo arriba |
 | [`CHANGELOG.md`](CHANGELOG.md) | Proyecto y mod 1 (Predators) |
-| [`CHANGELOG-MOD3.md`](CHANGELOG-MOD3.md) | Mod 3 (Mapa Galáctico a Pie), cerrado |
-| [`CHECKLIST-0.3.1.md`](CHECKLIST-0.3.1.md) · [`CHECKLIST-0.3.2.md`](CHECKLIST-0.3.2.md) | Listas de prueba de esas dos versiones, ya cerradas |
+| [`_archivo/`](_archivo/) | Lo cerrado: mod 3, y las listas de prueba de la 0.3.1 y la 0.3.2. No se lee salvo para buscar un porqué viejo |
 
 > **Cada mod se versiona aparte.** El mod 2 **contiene** al mod 1: se instala uno o el otro,
 > nunca los dos. Doc de diseño: [`../proyecto_mod_nms_zombies.md`](../proyecto_mod_nms_zombies.md)
@@ -90,8 +92,8 @@ de la `PRUEBA06` se midió sin un solo mod cargado.
 
 | Cosa | Valor |
 |---|---|
-| NMS | **rama Public**, versión 170671 |
-| MBINCompiler | 6.45.0.1 |
+| NMS | **rama Public**, versión **178763 (7.0 Cosmos)** |
+| MBINCompiler | **7.00.0-pre1**. El **7.01.0-pre1 no vale**: no descompila `GCUIGLOBALS.GLOBAL.MBIN` |
 | AMUMSS | v5.6.2.0W, modo FULL |
 | Blender / NMSDK | ≥ 4.2 / `0.10.0-alpha13` |
 | Mods instalados | ~90 vía Vortex. **Los nuestros no los gestiona Vortex**: se copian a mano y se arranca por Steam |
