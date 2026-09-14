@@ -44,7 +44,7 @@ import bpy
 import mathutils
 import numpy as np
 
-RAIZ = os.path.expanduser(r"~\NMS_MOD_ZOMBIES")
+RAIZ = os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES")
 
 # Lo que cambia de un modelo a otro, y nada mas.
 #

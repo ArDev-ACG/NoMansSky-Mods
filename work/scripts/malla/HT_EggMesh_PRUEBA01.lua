@@ -1,4 +1,4 @@
-RAIZ = os.getenv("USERPROFILE") .. [[\NMS_MOD_ZOMBIES\work\models\eggmesh]]
+RAIZ = os.getenv("USERPROFILE") .. [[\MODS\NMS_MOD_ZOMBIES\work\models\eggmesh]]
 
 DESTINO = [[MODELS\PLANETS\BIOMES\COMMON\RARERESOURCE\GROUND]]
 

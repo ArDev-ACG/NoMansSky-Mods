@@ -601,7 +601,7 @@ from pathlib import Path
 
 import bpy
 
-RAIZ = Path(os.path.expanduser(r"~\NMS_MOD_ZOMBIES"))
+RAIZ = Path(os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES"))
 BLEND = RAIZ / "BLENDER" / "proyectos" / "scuttler.blend"
 VANILLA = (RAIZ / "work" / "models" / "vanilla_freighterfiend" / "models" /
            "planets" / "creatures" / "spiderrig" / "freighterfiend.scene.mbin")

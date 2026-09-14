@@ -47,7 +47,7 @@ import sys
 
 import bpy
 
-RAIZ = os.path.expanduser(r"~\NMS_MOD_ZOMBIES")
+RAIZ = os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES")
 MODS3D = RAIZ + r"\asset\Modelos Descomprimidos"
 
 # Lo que cambia de un modelo a otro.

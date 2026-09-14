@@ -77,7 +77,7 @@ from mathutils import Matrix
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import nmsskin
 
-RAIZ = Path(os.path.expanduser(r"~\NMS_MOD_ZOMBIES"))
+RAIZ = Path(os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES"))
 # Lo que cambia de un modelo a otro, y nada mas. Se elige con `-- <modelo>`,
 # los mismos nombres que en tools/Export-NMSMesh.py.
 #

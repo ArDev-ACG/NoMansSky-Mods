@@ -1,4 +1,4 @@
-RAIZ_MALLA = os.getenv("USERPROFILE") .. [[\NMS_MOD_ZOMBIES\work\models\scuttlermesh]]
+RAIZ_MALLA = os.getenv("USERPROFILE") .. [[\MODS\NMS_MOD_ZOMBIES\work\models\scuttlermesh]]
 
 DESTINO_MALLA = [[MODELS\PLANETS\CREATURES\SPIDERRIG]]
 

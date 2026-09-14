@@ -243,7 +243,7 @@ def _revisar_acordados(raiz_escena):
     return fallos
 
 
-def _revisar_material(carpeta, temporal):
+def _revisar_material(carpeta, temporal, con_huesos=True):
     """El flag de piel y los samplers, que se pierden al recoser.
 
     Existe por la PRUEBA05 de los dos bipedos. `Skin-NMSGeometry.py` COPIA la
@@ -275,7 +275,15 @@ def _revisar_material(carpeta, temporal):
           f"_F02_SKINNED")
 
     fallos = []
-    if "_F02_SKINNED" not in flags:
+    # EL FLAG SOLO APLICA SI EL MODELO TIENE HUESOS.
+    #
+    # Medido el 2026-09-13 con el huevo, y es el mismo falso positivo que
+    # MeshBaseSkinMat: un prop estatico -cero nodos JOINT, stride 8- no tiene
+    # esqueleto que aplicar, asi que _F02_SKINNED no pinta nada y el vanilla
+    # tampoco lo trae. Exigirlo daba "ACUERDOS PERDIDOS" y salida 1 sobre un
+    # injerto sano. El marker, que es el mismo caso, lleva publicado desde
+    # agosto sin entrar rigido: no hay nada que poner rigido.
+    if con_huesos and "_F02_SKINNED" not in flags:
         fallos.append(
             "el .MATERIAL no declara _F02_SKINNED, asi que el juego NO aplica "
             "el esqueleto y el bicho entra RIGIDO -y como no se deforma, "
@@ -393,7 +401,7 @@ def revisar(carpeta):
 
     with tempfile.TemporaryDirectory(prefix="check-nmsgraft-") as temporal:
         fallos += _revisar_piel(carpeta, geo, mallas, temporal)
-        perdidos = _revisar_material(carpeta, temporal)
+        perdidos = _revisar_material(carpeta, temporal, con_huesos=bool(huesos))
     return fallos, _revisar_acordados(raiz_escena) + perdidos
 
 

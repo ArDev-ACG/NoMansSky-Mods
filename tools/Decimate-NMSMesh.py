@@ -22,8 +22,8 @@ import os
 import bpy
 import sys
 
-RAIZ = os.path.expanduser(r"~\NMS_MOD_ZOMBIES\asset\Modelos Descomprimidos")
-PROYECTOS = os.path.expanduser(r"~\NMS_MOD_ZOMBIES\BLENDER\proyectos")
+RAIZ = os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES\asset\Modelos Descomprimidos")
+PROYECTOS = os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES\BLENDER\proyectos")
 
 PRESUPUESTO = 6000
 

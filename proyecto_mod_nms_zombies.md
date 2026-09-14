@@ -316,10 +316,10 @@ Encaja perfecto con la Ruta A.
 
 ## 6. Estructura de carpetas de trabajo
 
-CREADA. Ruta real: `C:\Users\<usuario>\NMS_MOD_ZOMBIES\` — sin acentos, fuera de OneDrive. OK para AMUMSS.
+CREADA. Ruta real: `C:\Users\<usuario>\MODS\NMS_MOD_ZOMBIES\` — sin acentos, fuera de OneDrive. OK para AMUMSS.
 
 ```
-C:\Users\<usuario>\NMS_MOD_ZOMBIES\
+C:\Users\<usuario>\MODS\NMS_MOD_ZOMBIES\
 ├── .git\                # repo local (solo fuentes propias)
 ├── .gitignore
 ├── tools\               [no-git]
@@ -755,7 +755,7 @@ explícito en dos puntos:
 
 Rutas a excluir, en orden de preferencia:
 
-1. Carpeta completa: `C:\Users\<usuario>\NMS_MOD_ZOMBIES\tools\AMUMSS`
+1. Carpeta completa: `C:\Users\<usuario>\MODS\NMS_MOD_ZOMBIES\tools\AMUMSS`
 2. Si McAfee solo admite archivos sueltos (varias versiones lo hacen), excluir:
    - `MODBUILDER\hgpaktool.exe`
    - `MODBUILDER\psarc.exe`
