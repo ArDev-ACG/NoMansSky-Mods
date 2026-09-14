@@ -35,6 +35,20 @@ Destino: Nexus Mods, categoría Creatures.
 > **Cada mod se versiona aparte.** El mod 2 **contiene** al mod 1: se instala uno o el otro,
 > nunca los dos. Doc de diseño: [`../proyecto_mod_nms_zombies.md`](../proyecto_mod_nms_zombies.md)
 
+## Dónde vive esto
+
+**`C:\Users\<usuario>\MODS\NMS_MOD_ZOMBIES`** desde el **2026-09-13**. Antes estaba en
+`C:\Users\<usuario>\NMS_MOD_ZOMBIES`.
+
+Lo que se reescribió al mover: las rutas clavadas de `tools/*.py`, los `.lua` de
+`work/scripts/`, `docs/`, `.claude/settings.local.json`, y el junction de
+`logseq-graph/pages`. **Lo que NO se tocó**: `tools/AMUMSS/log.lua`, `REPORT.lua`,
+`CreatedMODS/`, `ModBackups/`, `build/` y `releases/`. Esos son el registro de lo
+que pasó y llevan dentro la ruta que tenían entonces; reescribirlos sería
+falsificarlos.
+
+Los modelos 3D que no usa ningún mod están en `C:\Users\<usuario>\MODS\Assets globales\`.
+
 ## Qué hay en este repo
 
 Solo fuentes propias: `work/scripts/` (los `.lua` de AMUMSS — el mod real vive ahí),
