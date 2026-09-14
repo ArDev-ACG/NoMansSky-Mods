@@ -23,6 +23,7 @@ el resto, en `GAMEDATA\MODS_Retirados\`.
 | `HT_EggMesh_PRUEBA03` | La misma malla **+ sus texturas**, y el material reapuntado | ¿Se le puede poner textura propia a una malla nuestra? | 🔴 **retirado.** Heredaba la malla incompleta de la `PRUEBA02` |
 | `HT_EggMesh_PRUEBA04` | La malla **triangulada y entera** (822 vértices, 1636 triángulos) + las texturas | ¿Sale el obelisco completo, y con su textura? | ✅ **pasó el 13/08** — completo y texturado. Pero salía **de 163 m** |
 | `HT_EggMesh_PRUEBA05` | La misma, **con la escala aplicada** | ¿Mide 1,64 m, algo más del doble del huevo vanilla? | 🏁 **pasó el 13/08. Cierra la Etapa 2**: malla completa, tamaño correcto y texturas propias |
+| `HT_FacehuggerEgg_PRUEBA01` | El **huevo cerrado del facehugger** (`xenoEgg`) en el sitio del obelisco, 3 064 triángulos y 1 881 vértices **sin decimar**, alto `0.761688` leído del AABB del nodo `FiendEgg` vanilla | ¿Aguanta el conducto corto —sin piel, sin pesos, sin atlas— un modelo nuevo entero, e injertado contra el vanilla de **7.0**? | ⬜ **construido y desplegado el 13/09, sin jugar.** 0 errores de AMUMSS, `Check-NMSGraft` a 0 y el MBIN desplegado descompila con `VertexCount` 1881. Falta el ancho, el giro en Y y la altura de apoyo → `docs/MODELOS/facehuggerEgg.md` |
 
 > **Dos fallos del exportador, uno escondiendo al otro.** La malla de la `PRUEBA02` y la `03`
 > repartía 1098 de sus 1636 triángulos, porque NMSDK toma otro camino cuando hay quads. Y la

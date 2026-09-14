@@ -9,6 +9,17 @@ toque. Si buscas *por qué* se hizo algo, está en
 es el nombre del `.lua` cuando la prueba tiene uno (`HT_EggMesh_PRUEBA03`), y un código corto
 cuando es una pregunta y no un mod (`N1`, `Q-GLOW`).
 
+Actualizado: **2026-09-14** (decimocuarta vuelta, y **no mide nada**: es de papeleo. El repo se
+mudó a `C:\Users\<usuario>\MODS\NMS_MOD_ZOMBIES` el 13/09, y ese mismo día entró el **huevo del
+facehugger** en el `FIENDEGG`, que **releva al marker** —los dos escriben los mismos archivos—.
+Esta lista llevaba desde el 05/09 sin tocarse y decía dos cosas que ya no son verdad: que el
+`HT_EggMesh_PRUEBA05` sigue desplegado, y que lo nuestro en el juego son ocho carpetas. **Leído
+de `GAMEDATA\MODS` el 14/09, carpeta por carpeta**: el `EggMesh` ya no está y el facehugger sí.
+Lo que hay que mirar en partida son ahora **dos** filas en §1).
+
+<details>
+<summary>Lo que decía la cabecera anterior</summary>
+
 Actualizado: **2026-09-05** (decimotercera vuelta, y **es la de cerrar**: se miden seis
 pruebas de una sentada y cuatro salen de aquí para no volver. La **malla del cry wolf se
 congela** en la `PRUEBA07` —«dejamos el lobo como está ahorita in game»—; la **piel del warrior
@@ -17,9 +28,6 @@ bug se congela** y `Q-TEXBUG` cierra por descarte, porque el atlas a 4096 no se 
 que queda vivo es lo que la partida pidió a cambio: **mapear las patas** para las animaciones
 —`M6-PATAS`—, y el desenganche, que sigue abierto con **un solo sospechoso nombrado**:
 «siguen alejándose en cuanto rugen», y el rugido **es** el parto).
-
-<details>
-<summary>Lo que decía la cabecera anterior</summary>
 
 Actualizado: **2026-09-03** (duodécima vuelta, y **es la primera que mide conducta**: entran a
 la vez las tres cosas que la partida pidió. El **cry wolf** vuelve en `PRUEBA04` con el mismo
@@ -53,19 +61,21 @@ en adelante solo se trabajan esos dos**; lo demás baja a §5 hasta que cierren)
 
 ## 1 · En el juego ahora, sin medir
 
-**Queda una sola fila, y lleva ahí desde el 21/08.** La vuelta del 05/09 vació esta sección:
+**Quedan dos filas.** La vuelta del 05/09 vació esta sección:
 la malla del cry wolf y la piel del warrior bug **se congelan**, la `0.8.0` cierra, la `0.9.0`
 dice que el interés no era y el mod 4 se descarta. Los seis veredictos, en
-[`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md), entrada del 05/09.
+[`CHANGELOG-MOD2.md`](CHANGELOG-MOD2.md), entrada del 05/09. **La otra fila es nueva**: el
+**huevo del facehugger**, desplegado el 13/09 y todavía sin una sola lectura.
 
 | ID | Qué mirar |
 |---|---|
 | `HT_CeilingPlague_PRUEBA03` | **¿Brota el nido del techo?** Desplegado el **21/08** y todavía sin una sola lectura. **Buscado el 05/09 y no apareció, y eso no es un veredicto**: el nido colgante del carguero abandonado es un hallazgo raro, así que la fila se queda esperando a que salga uno. El detalle, en §5.1 |
+| `HT_FacehuggerEgg_PRUEBA01` | **¿Sale bien puesto el huevo nuevo del suelo?** Desplegado el **13/09**, **releva al marker** (`HT_EggMesh_PRUEBA05`, que sale de `GAMEDATA\MODS` porque los dos escriben los mismos archivos). **Tres cosas y sólo tres**, ya escritas en el `.lua`: el **ancho** —1,113 contra 0,643 del vanilla, o sea **1,7 veces más ancho a la misma altura**, y puede clavarse en el decorado o solaparse con el de al lado—; el **giro en Y**, que se dejó en **0** porque el huevo es casi de revolución y lo único que lo orienta es por dónde abre; y la **altura de apoyo**, que se apoya en `Y = 0` mientras la vanilla se hunde 5 cm, así que puede flotar. La ficha, en [`MODELOS/facehuggerEgg.md`](MODELOS/facehuggerEgg.md) |
 
 > **Lo que está desplegado y ya no se mide** porque cerró: `HT_CryWolf_PRUEBA07` (malla
 > congelada), `HT_WarriorBug_PRUEBA05` (piel congelada), `HorribleTerror_Infestation_4-Hardcore`
 > `0.9.0` (contiene la `0.8.0`, que cerró; los tres campos de interés se quedan puestos aunque
-> no fueran la causa), `HT_EggMesh_PRUEBA05`, `HT_ScuttlerMesh_PRUEBA17`, `HT_DerelictBugs_PRUEBA02`
+> no fueran la causa), `HT_ScuttlerMesh_PRUEBA17`, `HT_DerelictBugs_PRUEBA02`
 > y `HT_PredatorParts_PRUEBA03`. La lista completa, en §3.
 
 ---
@@ -154,18 +164,24 @@ dice que el interés no era y el mod 4 se descarta. Los seis veredictos, en
 
 ---
 
-## 3 · Qué está instalado — 2026-09-05 (con la malla y la piel congeladas)
+## 3 · Qué está instalado — 2026-09-14 (con la malla y la piel congeladas)
 
-Todo se mide con **`HorribleTerror_Infestation_4-Hardcore` 0.9.0**, que contiene al mod 1.
+Todo se mide con **`HorribleTerror_Infestation_4-Hardcore` 0.9.1**, que contiene al mod 1.
+**Aquí ponía `0.9.0` y llevaba desfasado desde el 09/09**: lo desplegado son los `.MBIN` del
+09/09 —la `0.9.1`, que es la `0.9.0` **reconstruida para 7.0 Cosmos sin tocar un valor**—. La
+`0.9.2` del 10/09 **no cambia nada aquí**: sólo tocó `2-Normal` y `3-Dificil`, y el Hardcore se
+quedó donde estaba.
 `HorribleTerror_Predators` **no debe estar instalado**: escriben los mismos archivos.
 
-**Leído de `GAMEDATA\MODS` el 2026-09-05, carpeta por carpeta.** Nuestros pasan de nueve a
-**ocho**: sale `MOD4_Contenedores_PRUEBA01`, que se descartó ese mismo día.
+**Leído de `GAMEDATA\MODS` el 2026-09-14, carpeta por carpeta.** Siguen siendo **ocho**, pero
+no son las mismas ocho que el 05/09: **sale `HT_EggMesh_PRUEBA05` y entra
+`HT_FacehuggerEgg_PRUEBA01`**, que escribe los mismos archivos y por eso lo releva. El
+05/09 ya había salido `MOD4_Contenedores_PRUEBA01`, descartado ese día.
 
 | Mod | Qué entrega | |
 |---|---:|---|
-| `HorribleTerror_Infestation_4-Hardcore` **0.9.0** | 11 MBIN | ✅ la `0.8.0` que contiene **cerró** el 05/09 |
-| `HT_EggMesh_PRUEBA05` — obelisco entero, con textura **y a su tamaño** | 1 + 5 `ADD_FILES` | |
+| `HorribleTerror_Infestation_4-Hardcore` **0.9.1** | 11 MBIN | ✅ la `0.8.0` que contiene **cerró** el 05/09. Los `.MBIN` desplegados son del **09/09** |
+| **`HT_FacehuggerEgg_PRUEBA01`** — el **huevo cerrado del facehugger** sustituye al obelisco del marker en el `FIENDEGG`; prop estático, sin piel ni pesos | 1 + 5 `ADD_FILES` | desplegado el 13/09, **sin medir**: §1. Injertado contra el **vanilla de 7.0**, que es el único que descompila |
 | **`HT_ScuttlerMesh_PRUEBA17`** — la `16` con el `AttackLight` de vuelta a cero | **8** `ADD_FILES` | ✅ **medida y CONGELADA el 28/08**: ojo apagado y espalda limpia. **No se toca más** — es la versión buena del SkrullCrawler |
 | **`HT_CryWolf_PRUEBA07`** — el **cuadrúpedo de cuello largo** sustituye al necromorfo en el `FIEND`; bind por `--bind fiendwalk#24` | **7** `ADD_FILES` | ✅ **malla congelada** el 05/09 |
 | **`HT_WarriorBug_PRUEBA05`** — el **bicho de Starship Troopers** sustituye al zombie en el `BUGFIEND`; atlas a **4096** | **7** `ADD_FILES` | ✅ **piel congelada** el 05/09 |
