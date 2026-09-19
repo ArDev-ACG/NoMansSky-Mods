@@ -397,6 +397,112 @@ MODELOS = {
         # deja pasar por caer en `tronco`.
         sin_claves=("NewBack1JNT",),
     ),
+    # ALTERNATIVA al cry wolf en el mismo hueco. Lo que lo justifica es LA COLA.
+    #
+    # El FIEND vanilla tiene seis huesos de cola y LOS MUEVE: medido con
+    # Sway-NMSJoint.py el 18/09, NewTail5JNT da 38,7 grados de giro de mundo en
+    # fiendfastwalk y 45,4 en fiendattack, con latigazo creciente hacia la punta.
+    #
+    # Y EL CRY WOLF NO LO APROVECHA: su mapa no nombra ni un NewTail*JNT, asi que
+    # su grupa y su cola caen en el ("RootJNT", True) del final, y RootJNT gira
+    # 2,4 / 4,1 / 18,9. Por eso va con la cola muerta. Aqui se nombran, y esa
+    # es la diferencia visible entre los dos modelos del hueco.
+    "xenodog": dict(
+        blend=RAIZ / "BLENDER" / "proyectos" / "xenodog_nms.blend",
+        # EL VANILLA DE AGOSTO, y es a proposito. El plan decia 7.0 porque
+        # creia que NMSDK descompila con el MBINCompiler actual: NO lo hace,
+        # trae su propio lector, y el que NO puede leer es el de 7.0 -revienta
+        # con UnicodeDecodeError en TkSceneNodeData.Type, offset 0x730-.
+        #
+        # Da igual, y se comprobo el 19/09 en vez de suponerlo: los 44 JOINT
+        # del .SCENE salen en el mismo orden y con las 495 cifras de Trans/Rot/
+        # Scale IDENTICAS en las dos versiones, y el SkinMatrixLayout del
+        # .GEOMETRY tambien -42 entradas iguales-. De aqui solo se lee el
+        # esqueleto y la paleta, y ninguno de los dos cambio en Cosmos.
+        vanilla=(RAIZ / "work" / "models" / "vanilla_fiend" / "models"
+                 / "planets" / "creatures" / "spiderrig" / "fiend.scene.mbin"),
+        salida=RAIZ / "work" / "models" / "xenodogmesh" / "pesos.json",
+        objeto="_Fiend_Body",
+        giro_z=180,
+        puntas=("Leg3", "Leg4", "END"),
+        cabeza=("Head", "Jaw", "Skull"),
+        pies=("Leg4END", "Leg3END"),
+        tronco=("Root", "Back"),
+        espejo=("L", "R"),
+        escala_piel=1.0,
+        tope_reparto=0.85,
+        # LOS CORTES SALEN DEL VOLCADO DEL 19/09, NO SE ELIGIERON. Nuestra
+        # caja mide 1,556 x 2,850 x 2,302 m y sus ejes locales NO son los del
+        # FIEND: se midio por islas de malla, no por camara.
+        #     u = x  izquierda 0 -> derecha 1   (los L* del FIEND caen en u>0,5)
+        #     v = y  CABEZA 0 -> PUNTA DE COLA 1
+        #     w = z  PATAS 0 -> LOMO / ARCO DE LA COLA 1
+        # El esqueleto vanilla, metido en esta misma caja, va al reves y de
+        # canto -NewJawJNT en v 0,37 w 1,53, los cuatro pies en v 0,03-, y eso
+        # es exactamente para lo que existe este mapa: lo cruza a proposito.
+        #
+        # Los dos cortes duros salen de HUECOS VACIOS, que es lo que los hace
+        # cortes y no opiniones:
+        #   - bajo w 0,40 la franja u 0,30..0,70 esta VACIA: ahi se separan las
+        #     patas del vientre. Por eso el plano de patas es w < 0,40 y no un
+        #     numero a ojo.
+        #   - entre las patas delanteras y las traseras, la banda v 0,44..0,48
+        #     tiene 37 vertices de 12 343: ahi se parte delante de detras.
+        # La cabeza acaba en v 0,16: hasta ahi la planta mide 0,3 m de ancho
+        # -el craneo- y en v 0,19 salta al ancho entero, que son los hombros.
+        #
+        # La cola va PARTIDA EN TRES y no en seis: los seis huesos existen,
+        # pero NewTail4JNT_2 y NewTail5JNT estan casi encima el uno del otro y
+        # darles region propia parte la malla mas fino que el suavizado por
+        # aristas, que es lo que deshace las fronteras duras.
+        #
+        # La cola de ESTA malla no sale hacia atras: arranca en la grupa, sube
+        # por encima del lomo -v 0,55..0,74 con w > 0,82, y el lomo no pasa de
+        # w 0,75, asi que tambien es un hueco- y baja por detras, donde ya no
+        # hay nada mas: pasado v 0,74 todo es cola.
+        regiones=(
+            ("NewHeadJNT",     lambda u, v, w: v < 0.16),
+            ("LFirstLeg1JNT",  lambda u, v, w: v < 0.46 and w < 0.40 and u > 0.50),
+            ("RFirstLeg1JNT",  lambda u, v, w: v < 0.46 and w < 0.40),
+            ("LFourthLeg1JNT", lambda u, v, w: w < 0.40 and v <= 0.76 and u > 0.50),
+            ("RFourthLeg1JNT", lambda u, v, w: w < 0.40 and v <= 0.76),
+            ("NewTail5JNT",    lambda u, v, w: v > 0.86),
+            ("NewTail3JNT",    lambda u, v, w: v > 0.74),
+            ("NewTail1JNT",    lambda u, v, w: w > 0.82 and v > 0.55),
+            ("NewBack1JNT",    lambda u, v, w: v < 0.46),
+            ("RootJNT",        lambda u, v, w: True),
+        ),
+        # Las delanteras y la cabeza se agarran al pecho; las traseras y la
+        # cola, a la cadera. El ancla tambien necesita agarre: `alfas_de` SOLO
+        # recorre las regiones que lo tienen.
+        agarre={
+            "LFirstLeg1JNT":  "NewBack1JNT",
+            "RFirstLeg1JNT":  "NewBack1JNT",
+            "NewHeadJNT":     "NewBack1JNT",
+            "LFourthLeg1JNT": "RootJNT",
+            "RFourthLeg1JNT": "RootJNT",
+            "NewTail1JNT":    "RootJNT",
+            "NewTail3JNT":    "NewTail1JNT",
+            "NewTail5JNT":    "NewTail3JNT",
+            "NewBack1JNT":    "RootJNT",
+        },
+        giros=RAIZ / "work" / "models" / "xenodogmesh" / "giros.json",
+        clips=("fiendwalk.anim", "fiendrun.anim"),
+        # Los mismos seis del cry wolf, y por la misma razon: `roar` es
+        # `SpawnBroodAnim` del FIEND, o sea que se ve cada SpawnBroodTimer.
+        clips_tope=("fiendwalk.anim", "fiendrun.anim",
+                    "fiendidle.anim", "fiendattack.anim",
+                    "fiendroar.anim", "fiendpounce.anim"),
+        espejo_vaiven=True,
+        objetivo=110.0,
+        # MEDIDO EL 19/09 SOBRE LOS 27 CLIPS, no sobre los 3 del diseno: un
+        # hueso puede estar quieto en idle, fastwalk y attack y moverse en
+        # roar. De los 44 huesos solo estos cinco no tienen ni una clave, y
+        # NINGUNO esta en el mapa de arriba. `NewBack1JNT` -que el plan daba
+        # por quieto- si se mueve: 49,4 grados en `roar`.
+        sin_claves=("RPincer4JNT", "RPincer6END",
+                    "LPincer4JNT", "LPincer6END", "NewJawEND"),
+    ),
     "necromorph": dict(
         blend=RAIZ / "BLENDER" / "proyectos" / "necromorph_nms.blend",
         vanilla=(RAIZ / "work" / "models" / "vanilla_fiend" / "models"
