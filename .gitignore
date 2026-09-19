@@ -102,6 +102,13 @@ work/models/warriorbugmesh/*
 work/models/crywolfmesh/*
 !work/models/crywolfmesh/pesos.json
 !work/models/crywolfmesh/giros.json
+!work/models/xenodogmesh/
+work/models/xenodogmesh/*
+!work/models/xenodogmesh/pesos.json
+!work/models/xenodogmesh/giros.json
+# El volcado del 19/09: de aqui salen los cortes de `regiones` y la tupla
+# `sin_claves`, o sea que es la PRUEBA de que no se eligieron a ojo.
+!work/models/xenodogmesh/volcado.txt
 work/textures/
 # Volcados de pose de Blender: 50-60 MB cada uno, siete de ellos, y se
 # regeneran corriendo Pose-NMSMesh.py sobre los .ANIM del juego.
