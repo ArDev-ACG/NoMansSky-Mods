@@ -216,6 +216,32 @@ MODELOS = {
         pose=dict(grados=30.0, desde=0.45, hasta=0.15),
         alto=2.850,
     ),
+    # ALTERNATIVA al cry wolf en el mismo hueco, no relevo: los dos se publican
+    # y el jugador elige. Mismo rig, mismo nodo, mismo material.
+    #
+    # Entra por `origen` y no por `fbx`, como el facehuggerEgg: sale de
+    # Decimate-NMSMesh.py, que importa con el eje alto en Z de Blender. De ahi
+    # el giro en X.
+    #
+    # LOS TRES VALORES SON DE ARRANQUE Y SE RE-MIDEN CON EL VOLCADO. El 2,850
+    # es el del cry wolf, que es el unico numero de este hueco elegido EN
+    # PARTIDA y no en la mesa: el esqueleto FIEND mide 1,34 m y a 3,62 m el
+    # 59,5% de la malla quedaba por encima del ultimo hueso.
+    #
+    # `pose` NO se pone. El doblez de cuello del cry wolf arregla un defecto de
+    # postura de AQUEL asset; a este no se le inventa uno sin medirlo.
+    "xenodog": dict(
+        origen=RAIZ + r"\BLENDER\proyectos\xenodog.blend",
+        objeto="xenodog",
+        blend=RAIZ + r"\BLENDER\proyectos\xenodog_nms.blend",
+        salida=RAIZ + r"\BLENDER\FIEND",
+        nodo="_Fiend_Body",
+        escena="FIEND",
+        material=(r"MODELS\PLANETS\CREATURES\SPIDERRIG\FIEND"
+                  r"\FIEND_MAT.MATERIAL.MBIN"),
+        giro=(-90, 180),
+        alto=2.850,
+    ),
     "zombie": dict(
         origen=RAIZ + r"\BLENDER\proyectos\zombie.blend",
         objeto="zombie",
