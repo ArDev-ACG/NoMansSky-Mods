@@ -239,22 +239,34 @@ MODELOS = {
         escena="FIEND",
         material=(r"MODELS\PLANETS\CREATURES\SPIDERRIG\FIEND"
                   r"\FIEND_MAT.MATERIAL.MBIN"),
-        # EL 180 ESTABA MAL Y SE MIDIO, no se adivino. Con giro=(-90,180) el
-        # volcado de Weight-NMSMesh.py ponia NUESTRA cabeza en z' 0 y la del
-        # esqueleto FIEND en z' 1,41, o sea el bicho mirando hacia atras: la
-        # cola del FIEND caia sobre nuestra cabeza y el pesado habria colgado
-        # la cabeza de los NewTail*JNT.
+        # EL SEGUNDO NUMERO DE `giro` NO HACE NADA, y esta medido: el
+        # 2026-09-19 se corrio el bloque de rotacion aislado sobre
+        # xenodog.blend con giro_y 0 y con 180, y las dos veces salio la
+        # MISMA caja -z -0,775..+0,768- y los MISMOS conteos por extremo
+        # -5045 vertices en z'<0,08 y 787 en z'>0,92-. El segundo
+        # `transform_apply` no surte efecto.
         #
-        # Que extremo es cual se decidio MIRANDO la malla, no por el numero de
-        # vertices: en z' 0,92..1,00 hay 786 vertices en una varilla centrada
-        # de x' 0,45..0,55 -el 10% del ancho-, que es la cola; y en z' 0,00..0,08
-        # hay 5045 que ocupan el ancho entero, que son el domo, las mandibulas,
-        # los hombros y los tubos dorsales.
+        # Vale para TODOS los modelos, no solo para este: el cry wolf, el
+        # warrior bug, el skull crawler y el necromorfo declaran 180 y estan
+        # exportados como si dijeran 0. El cry wolf esta publicado y funciona,
+        # asi que el 180 nunca hizo falta; queda como bug latente.
         #
-        # OJO: esto NO lo arregla `giro_z` de Weight-NMSMesh.py. Se probo: con
-        # giro_z 0 y con 180 las z' salen IDENTICAS y lo unico que cambia es la
-        # altura -con 0 los pies quedan en y' 0,60 y la cabeza en 0,17, boca
-        # abajo-. giro_z 180 es el correcto y el desajuste es de ESTE giro.
+        # SE DEJA EN 0 porque es lo que de verdad se esta exportando, y
+        # escribir 180 seria mentir sobre lo que hace el conducto.
+        #
+        # LA ORIENTACION DE ESTA MALLA, medida el 19/09 y sin resolver:
+        # nuestra cabeza y hombros caen en z' 0,00..0,08 -5045 vertices que
+        # ocupan el ancho entero- y la cola en z' 0,92..1,00 -786 vertices en
+        # una varilla centrada de x' 0,45..0,55-, comprobado en un render.
+        # El esqueleto FIEND, en ese mismo marco, pone NewHeadJNT en z' 1,41 y
+        # la cadena NewTail*JNT bajando hasta -0,19: o sea al reves.
+        #
+        # NO se ha corregido porque el cry wolf tiene el MISMO desajuste -su
+        # mapa cuelga la cabeza de w < 0,35 y el hueso de cabeza del FIEND
+        # esta en w 1,51- y esta publicado y funcionando. Para eso existe el
+        # mapa `regiones` a mano de Weight-NMSMesh.py: cruza el desajuste a
+        # proposito. Lo decide `Pose-NMSMesh.py`, que deforma la malla con los
+        # clips del vanilla y lo ensena SIN entrar al juego.
         giro=(-90, 0),
         alto=2.850,
     ),
