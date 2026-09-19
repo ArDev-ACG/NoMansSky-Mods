@@ -127,6 +127,22 @@ MODELOS = {
         blend=RAIZ / "BLENDER" / "proyectos" / "crywolf_nms.blend",
         objeto="_Fiend_Body",
     ),
+    # El que RELEVA al cry wolf en el mismo hueco. Los clips son los mismos
+    # cuatro y los `.ANIM` se leen del vanilla de 7.0, que es de donde salio
+    # `giros.json`: el esqueleto no cambio en Cosmos -495 cifras identicas-
+    # pero se lee uno solo, y asi no hay dos verdades.
+    "xenodog": dict(
+        pesos=RAIZ / "work" / "models" / "xenodogmesh" / "pesos.json",
+        raiz=RAIZ / "work" / "models" / "xenodogmesh_anim",
+        scene="FIEND.SCENE.MXML",
+        geometria="FIEND.GEOMETRY.MXML",
+        anims_raiz=RAIZ / "work" / "models" / "vanilla_7.0_fiend",
+        anims="models/planets/creatures/spiderrig/anim",
+        clips=("fiendwalk.anim", "fiendrun.anim",
+               "fiendattack.anim", "fiendidle.anim"),
+        blend=RAIZ / "BLENDER" / "proyectos" / "xenodog_nms.blend",
+        objeto="_Fiend_Body",
+    ),
     "crywolf": dict(
         pesos=RAIZ / "work" / "models" / "crywolfmesh" / "pesos.json",
         raiz=RAIZ / "work" / "models" / "vanilla_fiend",
