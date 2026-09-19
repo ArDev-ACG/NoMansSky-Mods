@@ -70,6 +70,14 @@ PRESUPUESTOS = {
     # encaje: el marker que hay puesto son 822 vertices y del huevo hay
     # cientos por pantalla en un planeta infestado.
     "facehuggeregg": 6000,
+    # El escaneo trae 1623582 triangulos, o sea 54:1 contra este numero. Es el
+    # orden del 46:1 que puso al necromorfo a confeti, y por eso se midio ANTES
+    # de decimar (2026-09-18): la malla da 0,566 vertices por triangulo -si
+    # estuviera horneada POR TRIANGULO daria 3,00-, las UV van de 0 a 1 limpias
+    # y la arista UV mas larga de una muestra de 20000 mide 0,0065. O sea islas
+    # grandes y vertices compartidos: se puede colapsar. El 30000 es el del
+    # cryWolf, heredado del FIEND vanilla y topado de verdad por Indices16Bit=1.
+    "xenodog": 30000,
 }
 
 MODELOS = {
@@ -89,6 +97,8 @@ MODELOS = {
         RAIZ + r"\crywolf\source\Cry Wolf SETS.fbx"),
     "facehuggeregg": (
         RAIZ + r"\facehugger-egg\source\xenoEgg.fbx"),
+    "xenodog": (
+        RAIZ + r"\alien-xenodog\source\model.glb"),
 }
 
 
