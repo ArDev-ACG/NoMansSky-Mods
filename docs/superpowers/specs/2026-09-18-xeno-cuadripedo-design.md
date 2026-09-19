@@ -18,6 +18,27 @@ y **convive con el cryWolf** hasta verlo en partida.
 - **Fuera de alcance:** la feature de noches oscuras (Natural Nights). Descartada el
   2026-09-18 por riesgo de afectar demasiado; no se toca ningún archivo de iluminación.
 
+## 1 bis · La licencia, que condiciona la publicación
+
+El asset es **«Xeno Animation» de LostBoyz2078** (https://skfb.ly/oG69A), **CC BY-NC 4.0**.
+
+**Es el primer asset NonCommercial del repo**: los otros cinco son `CC BY` o `CC BY-SA`, que
+sí permiten uso comercial. El NC **se contagia al derivado**, o sea que el `xenoCuadripedo`
+entero —sus `.MBIN` y sus `.DDS`— sale bajo NC.
+
+Lo que eso obliga, y **se decide antes de construir**:
+
+- Descarga gratuita en Nexus: **encaja**, publicar gratis no es uso comercial.
+- **Donation Points y donaciones: hay que apagarlos** en la página de ese mod, o conseguir
+  permiso expreso de LostBoyz2078. Los DP son compensación monetaria por descargas y es
+  defendible que sean uso comercial de una obra NC.
+- El zip **no puede** declararse de libre reutilización comercial ni relicenciarse más
+  permisivo.
+- La atribución va **dentro del zip y en la página**, como los otros.
+
+Esto **no toca a `models-0.1.2`**: ninguno de los cinco usa este asset. Detalle en
+[`../../credits.md`](../../credits.md).
+
 ## 2 · El asset, medido
 
 `source/Xeno animation.glb`, 3,9 MB. Leído con el parser de glTF el 2026-09-18:

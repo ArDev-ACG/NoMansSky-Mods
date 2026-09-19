@@ -268,7 +268,10 @@ them, and still call the same thing down on your head.
     it may read as floating on some terrain.
 "@
         creditos = @"
-  PENDIENTE: origen y licencia del asset xenoEgg.
+  Model: "Facehugger Egg" (https://skfb.ly/pEUHF) by OrangeSauceu, licensed
+  under Creative Commons Attribution
+  (http://creativecommons.org/licenses/by/4.0/).
+  Re-textured and converted for No Man's Sky. The mesh was not decimated.
 "@
     }
 
