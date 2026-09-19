@@ -1,4 +1,4 @@
-# facehuggerEgg — `FIENDEGG` · **construido, sin probar en partida**
+# facehuggerEgg — `FIENDEGG` · **publicado en `models-0.1.2`**
 
 **Qué es.** El huevo cerrado de *"Facehugger Egg"* (`xenoEgg`), 3 MB, un solo par
 de texturas D/N de 1024².

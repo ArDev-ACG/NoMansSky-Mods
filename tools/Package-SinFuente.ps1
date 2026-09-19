@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Empaqueta para Nexus SIN publicar el .lua. Mallas y conducta.
 
@@ -76,6 +76,30 @@ Two rules:
   - Never keep two versions of the SAME creature. Delete the old folder first.
   - Any other mod that replaces the same creature's model will conflict. The
     game loads one and ignores the other, silently, with no error.
+
+Nothing here changes behaviour, spawn rates or damage, so it sits fine on top
+of gameplay mods.
+"@
+
+# Los DOS huevos escriben el mismo FIENDEGG, asi que el texto de arriba -"cada
+# uno escribe sus propios archivos"- seria MENTIRA en ellos. Bloque aparte, y es
+# lo unico que los separa del resto de la tanda.
+$MEZCLA_HUEVOS = @"
+*** PICK ONE EGG. THERE ARE TWO. ***
+
+  Marker Egg      - a carved standing monolith.
+  Facehugger Egg  - a closed xeno egg pod.
+
+Both replace the SAME game files. Installing both means one silently overrides
+the other, and nothing will tell you which one won.
+
+To switch: DELETE the old folder first, then extract the other one.
+
+Apart from that, each creature here is its own download and writes its own
+files, so eggs and creatures install side by side:
+  - Never keep two versions of the SAME creature. Delete the old folder first.
+  - Any other mod that replaces the same model will conflict. The game loads
+    one and ignores the other, silently, with no error.
 
 Nothing here changes behaviour, spawn rates or damage, so it sits fine on top
 of gameplay mods.
@@ -191,7 +215,7 @@ hits is touched.
         carpeta = "HT_EggMesh_PRUEBA05"
         release = "infestedMarkerEgg"
         titulo  = "Marker Egg"
-        mezcla  = $MEZCLA_INDEPENDIENTE
+        mezcla  = $MEZCLA_HUEVOS
         que     = @"
 Replaces the model of the eggs you find on infested planets - the ones that
 crack open and bring the horrors down on you - with a carved standing monolith.
@@ -211,6 +235,40 @@ them, and still call the same thing down on your head.
   ShareAlike, the model and texture files in THIS download stay under
   CC BY-SA 4.0: you may reuse and adapt them as long as you credit and
   share alike.
+"@
+    }
+
+    # EL QUE RELEVA AL MARKER en el FIENDEGG. Los dos escriben los mismos
+    # archivos: por eso los dos llevan $MEZCLA_HUEVOS y no el bloque normal.
+    #
+    # SU BINARIO NO SALE DE ModBackups. Ahi se quedo el .GEOMETRY en el formato
+    # de vertice viejo; lo que vale es lo desplegado en GAMEDATA\MODS, que ya
+    # lleva el repack a sem11 y es lo unico probado en partida. Verificado por
+    # md5 el 2026-09-18.
+    @{
+        grupo   = "models"
+        carpeta = "HT_FacehuggerEgg_PRUEBA01"
+        release = "infestedFacehuggerEgg"
+        titulo  = "Facehugger Egg"
+        mezcla  = $MEZCLA_HUEVOS
+        que     = @"
+Replaces the model of the eggs you find on infested planets - the ones that
+crack open and bring the horrors down on you - with a closed xeno egg pod.
+
+Model swap only. The eggs still hatch, still count as a crime when you break
+them, and still call the same thing down on your head.
+"@
+        fallos  = @"
+  - It is 1.7 times wider than the egg it replaces at the same height, so it
+    may clip into scenery or overlap a neighbouring egg.
+  - Which way it faces was never pinned down: the mesh is near enough a solid
+    of revolution that only the opening tells front from back. If yours open
+    the wrong way round, that is worth a report.
+  - Its base sits at ground level while the vanilla egg sinks 5 cm into it, so
+    it may read as floating on some terrain.
+"@
+        creditos = @"
+  PENDIENTE: origen y licencia del asset xenoEgg.
 "@
     }
 
@@ -494,6 +552,14 @@ foreach ($mod in $MODS) {
     if ($sobra) {
         $sobra | ForEach-Object { Write-Output ("  sobra: " + $_.FullName) }
         Write-Error "Hay archivos que no son binarios del juego en $($mod.release). No se empaqueta."
+        exit 1
+    }
+
+    # Un modelo de terceros sin atribucion no se sube: lo manda el checklist de
+    # docs\NEXUS-SUBIDA.md y las licencias CC de los assets. Mejor que reviente
+    # aqui que descubrirlo en la pagina de Nexus.
+    if ($mod.creditos -match "PENDIENTE") {
+        Write-Error "$($mod.release): los creditos estan sin rellenar (PENDIENTE). No se empaqueta."
         exit 1
     }
 

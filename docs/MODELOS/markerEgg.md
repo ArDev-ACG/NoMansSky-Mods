@@ -1,4 +1,7 @@
-# markerEgg — `FIENDEGG`
+# markerEgg — `FIENDEGG` · **relevado por el [facehuggerEgg](facehuggerEgg.md)**
+
+> Desde `models-0.1.2` los dos se publican. Escriben el mismo `FIENDEGG` y
+> **no se instalan a la vez**; el jugador elige uno.
 
 ![marker](img/marker.png)
 
@@ -18,7 +21,7 @@ infestados: los que se abren y te echan los horrores encima.
 | `alto` | **`None`** — no se reescala |
 | Fuente | `asset/Modelos Descomprimidos/Obelisco/source/marker_1.fbx` |
 | `.blend` | `BLENDER/proyectos/marker.blend` |
-| Publicado | `releases/models-0.1.0/infestedMarkerEgg_v0.1.0.zip` |
+| Publicado | `releases/models-0.1.1/infestedMarkerEgg_v0.1.1.zip` |
 
 ## Cómo se hizo
 
