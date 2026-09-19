@@ -18,8 +18,8 @@ otra magnitud. El porque de cada paso esta en BLENDER/README.md §2b.
 """
 
 import bmesh
-import os
 import bpy
+import os
 import sys
 
 RAIZ = os.path.expanduser(r"~\MODS\NMS_MOD_ZOMBIES\asset\Modelos Descomprimidos")
@@ -92,6 +92,23 @@ MODELOS = {
 }
 
 
+# El conducto entro por FBX hasta el 2026-09-18 y el xenodog llega en .glb.
+# Se despacha por extension y se REVIENTA con las desconocidas: importar un
+# .glb con el operador de FBX no da error, abre una escena VACIA, y el guion
+# seguiria hasta guardar un .blend valido y vacio.
+IMPORTADORES = {".fbx": "fbx", ".glb": "gltf", ".gltf": "gltf"}
+
+
+def importador_para(ruta):
+    """Devuelve el nombre del operador de bpy.ops.import_scene que toca."""
+    ext = os.path.splitext(str(ruta))[1].lower()
+    if ext not in IMPORTADORES:
+        raise ValueError(
+            f"no se de que tipo es {ext!r}; el conducto importa "
+            f"{', '.join(sorted(IMPORTADORES))}")
+    return IMPORTADORES[ext]
+
+
 def triangular(ob):
     bm = bmesh.new()
     bm.from_mesh(ob.data)
@@ -103,54 +120,60 @@ def triangular(ob):
 
 # Sin argumento corre los tres. Con "-- <modelo>" corre solo ese, que es como
 # se toca uno sin reescribir el .blend de los otros dos.
-SOLO = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else None
+if __name__ == "__main__":
+    # Blender corre los `--python` con __name__ == "__main__", asi que esto no
+    # cambia nada al usarlo. Lo que permite es IMPORTAR el modulo para probar
+    # `importador_para` sin tener Blender delante: sin el guardia, importarlo
+    # ejecuta el bucle, que revienta, y el test tendria que tragarse el error
+    # y ya no distinguiria "la funcion no existe" de "el modulo no importa".
+    SOLO = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else None
 
-for nombre, ruta in MODELOS.items():
-    if SOLO and nombre != SOLO:
-        continue
-    print("\n" + "=" * 70)
-    print(nombre)
-    bpy.ops.wm.read_homefile(use_empty=True)
-    bpy.ops.import_scene.fbx(filepath=ruta)
+    for nombre, ruta in MODELOS.items():
+        if SOLO and nombre != SOLO:
+            continue
+        print("\n" + "=" * 70)
+        print(nombre)
+        bpy.ops.wm.read_homefile(use_empty=True)
+        getattr(bpy.ops.import_scene, importador_para(ruta))(filepath=ruta)
 
-    mallas = [o for o in bpy.data.objects if o.type == "MESH"]
-    for o in list(bpy.data.objects):
-        if o.type != "MESH":
-            bpy.data.objects.remove(o, do_unlink=True)
+        mallas = [o for o in bpy.data.objects if o.type == "MESH"]
+        for o in list(bpy.data.objects):
+            if o.type != "MESH":
+                bpy.data.objects.remove(o, do_unlink=True)
 
-    bpy.context.view_layer.objects.active = mallas[0]
-    for o in mallas:
-        o.select_set(True)
-    if len(mallas) > 1:
-        bpy.ops.object.join()
-        print(f"  unidas {len(mallas)} partes en una malla")
+        bpy.context.view_layer.objects.active = mallas[0]
+        for o in mallas:
+            o.select_set(True)
+        if len(mallas) > 1:
+            bpy.ops.object.join()
+            print(f"  unidas {len(mallas)} partes en una malla")
 
-    ob = bpy.context.view_layer.objects.active
-    ob.name = nombre
-    ob.data.name = nombre
+        ob = bpy.context.view_layer.objects.active
+        ob.name = nombre
+        ob.data.name = nombre
 
-    triangular(ob)
-    antes = len(ob.data.polygons)
-
-    presupuesto = PRESUPUESTOS.get(nombre, PRESUPUESTO)
-
-    if antes > presupuesto:
-        mod = ob.modifiers.new("decimar", "DECIMATE")
-        mod.decimate_type = "COLLAPSE"
-        mod.ratio = presupuesto / antes
-        bpy.ops.object.modifier_apply(modifier=mod.name)
         triangular(ob)
+        antes = len(ob.data.polygons)
 
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        presupuesto = PRESUPUESTOS.get(nombre, PRESUPUESTO)
 
-    despues = len(ob.data.polygons)
-    lados = {len(p.vertices) for p in ob.data.polygons}
-    co = [v.co for v in ob.data.vertices]
-    alto = max(c.z for c in co) - min(c.z for c in co)
-    print(f"  {antes} -> {despues} tris  ({despues / antes:.1%})"
-          f"  lados={lados}  verts={len(ob.data.vertices)}")
-    print(f"  alto en local: {alto:.4f}   uv={len(ob.data.uv_layers)}")
+        if antes > presupuesto:
+            mod = ob.modifiers.new("decimar", "DECIMATE")
+            mod.decimate_type = "COLLAPSE"
+            mod.ratio = presupuesto / antes
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+            triangular(ob)
 
-    destino = f"{PROYECTOS}\\{nombre}.blend"
-    bpy.ops.wm.save_as_mainfile(filepath=destino)
-    print(f"  guardado en {destino}")
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+        despues = len(ob.data.polygons)
+        lados = {len(p.vertices) for p in ob.data.polygons}
+        co = [v.co for v in ob.data.vertices]
+        alto = max(c.z for c in co) - min(c.z for c in co)
+        print(f"  {antes} -> {despues} tris  ({despues / antes:.1%})"
+              f"  lados={lados}  verts={len(ob.data.vertices)}")
+        print(f"  alto en local: {alto:.4f}   uv={len(ob.data.uv_layers)}")
+
+        destino = f"{PROYECTOS}\\{nombre}.blend"
+        bpy.ops.wm.save_as_mainfile(filepath=destino)
+        print(f"  guardado en {destino}")
