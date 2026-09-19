@@ -265,6 +265,16 @@ El guion trae el `assert` que lo caza sin entrar al juego: si una arista de UV c
 > blender.exe --background --python tools/Export-NMSMesh.py -- <modelo>
 > ```
 >
+> ⚠️ **Si Blender revienta con `EXCEPTION_ACCESS_VIOLATION` en vez de dar un error,
+> mira la preferencia `mbincompiler_path` del addon NMSDK.** Vive en el `userpref.blend`
+> de la máquina, **fuera del repo y fuera de git**, y la mudanza del repo del 2026-09 no
+> la reescribió: siguió apuntando a `C:\Users\<usuario>\NMS_MOD_ZOMBIES\...`, sin `MODS`.
+> Cuando esa ruta no existe, NMSDK abre un cuadro de diálogo y llama a
+> `bpy.ops.screen.userpref_show()`, y las dos cosas **presuponen interfaz**: en
+> `--background` eso no es un mensaje, es un crash. Medido el 2026-09-19 exportando el
+> xenodog. Se arregla apuntándola al `tools\AMUMSS\MODBUILDER\MBINCompiler.exe` del repo
+> actual.
+>
 > ⚠️ **Antes hay que borrar los `.MBIN` y `.MXML` viejos de
 > `BLENDER/CUSTOMMODELS/MODELGROUP/`.** MBINCompiler **no sobrescribe**: si el `.MBIN.PC` ya
 > existe se salta la conversión sin decir nada y te llevas la malla de la vez anterior.
