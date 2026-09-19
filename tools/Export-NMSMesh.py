@@ -239,7 +239,23 @@ MODELOS = {
         escena="FIEND",
         material=(r"MODELS\PLANETS\CREATURES\SPIDERRIG\FIEND"
                   r"\FIEND_MAT.MATERIAL.MBIN"),
-        giro=(-90, 180),
+        # EL 180 ESTABA MAL Y SE MIDIO, no se adivino. Con giro=(-90,180) el
+        # volcado de Weight-NMSMesh.py ponia NUESTRA cabeza en z' 0 y la del
+        # esqueleto FIEND en z' 1,41, o sea el bicho mirando hacia atras: la
+        # cola del FIEND caia sobre nuestra cabeza y el pesado habria colgado
+        # la cabeza de los NewTail*JNT.
+        #
+        # Que extremo es cual se decidio MIRANDO la malla, no por el numero de
+        # vertices: en z' 0,92..1,00 hay 786 vertices en una varilla centrada
+        # de x' 0,45..0,55 -el 10% del ancho-, que es la cola; y en z' 0,00..0,08
+        # hay 5045 que ocupan el ancho entero, que son el domo, las mandibulas,
+        # los hombros y los tubos dorsales.
+        #
+        # OJO: esto NO lo arregla `giro_z` de Weight-NMSMesh.py. Se probo: con
+        # giro_z 0 y con 180 las z' salen IDENTICAS y lo unico que cambia es la
+        # altura -con 0 los pies quedan en y' 0,60 y la cabeza en 0,17, boca
+        # abajo-. giro_z 180 es el correcto y el desajuste es de ESTE giro.
+        giro=(-90, 0),
         alto=2.850,
     ),
     "zombie": dict(
