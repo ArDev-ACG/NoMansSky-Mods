@@ -162,7 +162,7 @@ Los binarios viejos, antes del repacado, quedan en
 
 | Modelo | Entra como | Estado |
 |---|---|---|
-| `xeno-cuadripedo` | `FIEND` — releva al cry wolf | **pendiente**. El asset es un **`.glb` con animación**, no un FBX: hay que importarlo y quedarse con la malla antes de entrar en `Decimate-NMSMesh.py`. Y lleva piel, o sea los once pasos enteros |
+| `alien-xenodog` | `FIEND` — **alternativa** al cry wolf, no relevo | **pendiente**, con spec escrito. Escaneo de **1 623 582 triángulos sin rig**: entra por `.glb`, hay que **decimar 54:1** y lleva piel, o sea los once pasos enteros |
 | `xeno-raven`, `monster-eggs`, `alien-egg`, `xenomorph-egg` | sin asignar | en `asset/Modelos 3D` |
 
 ## Las capturas

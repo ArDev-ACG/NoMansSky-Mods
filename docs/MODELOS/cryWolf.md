@@ -18,7 +18,7 @@ los planetas infestados y te persigue por la superficie.
 | `pose` | **`grados=30, desde=0.45, hasta=0.15`** — el doblez del cuello |
 | `alto` | **2.850 m** (vanilla: 1,34 m de esqueleto) |
 | `.blend` final | `BLENDER/proyectos/crywolf_nms.blend` |
-| Publicado | `releases/models-0.1.0/infestedCryWolf_v0.1.0.zip` |
+| Publicado | `releases/models-0.1.1/infestedCryWolf_v0.1.1.zip` |
 
 ## Cómo se hizo
 
@@ -59,9 +59,12 @@ aun así hizo falta: la altura rompe la vecindad aunque el tipo de animal coinci
 
 ## Lo siguiente
 
-Lo releva el **`xeno-cuadripedo`** (`asset/Modelos 3D/xeno-cuadripedo.zip`). Ojo:
-viene en **`.glb` con animación**, no en FBX — hay que importar y quedarse con la
-malla antes de entrar en `Decimate-NMSMesh.py`.
+**No lo releva nadie: sigue publicado.** Lo que viene al mismo hueco `FIEND` es el
+[xenodog](xenodog.md), como **alternativa** — los dos escriben los mismos archivos,
+así que el jugador elige uno, igual que con los dos huevos.
+
+Lo suyo propio sigue abierto: las patas que oscilan poco y la altura que se clava
+en el decorado bajo.
 
 ## Créditos
 
