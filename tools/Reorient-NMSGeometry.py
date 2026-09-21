@@ -34,16 +34,25 @@ LO QUE HACE, sobre el par .GEOMETRY(.DATA).MXML ya cosido y repackeado:
             Export-NMSMesh.py declara y no aplica. Determinante +1: no es
             espejo y el sentido de los triangulos se conserva. La cabeza,
             que estaba en y 0, cae en -Z, donde el FIEND lleva NewHeadJNT.
-  encaje    los pies al suelo -y minima 0- y en Z el centro de las patas
-            sobre el centro de las cuatro caderas del FIEND.
+  encaje    escala uniforme para que la distancia entre pisadas delanteras
+            y traseras sea la del FIEND, los pies al suelo -y minima 0- y en
+            Z las pisadas centradas sobre las cuatro puntas Leg4END.
   regiones  las MISMAS de Weight-NMSMesh.py, leidas en la caja de antes del
             giro, que es donde se midieron. Solo cambia el LADO: sale del
             signo de x en el marco final, donde el FIEND pone los L* en x
             negativa.
   pesos     uno por region y suavizado por las aristas, con las costuras de
-            UV soldadas por posicion para que no se abran.
+            UV soldadas por posicion para que no se abran. El pie de cada
+            pata va a su Leg4END, que el clip mantiene plantado.
+  caras     los triangulos al reves -el 1,9%, por los que se veia el fondo-
+            se dan la vuelta.
   bind      los JointBindings del FIEND vanilla tal cual: la malla ya esta
-            en la pose de reposo de su esqueleto.
+            en la pose de reposo de su esqueleto. DESPUES hay que pasar
+            Patch-NMSGraft.py --bind fiendidle.anim.MXML#0: el reposo del
+            FIEND no es la postura en que anda -en idle baja la cabeza 35
+            grados-, y con el bind de idle nuestra malla sale en idle tal
+            cual se modelo y los clips solo le suman lo que se separan de
+            idle. Asi los pies quedan plantados.
 
 No compila: deja los .MXML y el que llama compila. Aborta si la malla ya
 esta acostada, para que correrlo dos veces no la tumbe del otro lado.
@@ -90,6 +99,14 @@ REGIONES = (
 # vientre.
 PASADAS = 12
 RANURAS = 4
+
+# La rampa del pie, en metros sobre el suelo: en el suelo todo es Leg4END y a
+# 1,4 m -o sea por encima de la cadera- todo es la cadera. LARGA A PROPOSITO:
+# Leg1 y Leg4END giran muy distinto y una mezcla lineal corta entre los dos
+# aplasta la pata en el medio -el "envoltorio de caramelo"-. Medido el 20/09
+# con el bind de idle: 0,15..0,55 abria la espinilla; 0..0,6 da p99,9 3,54,
+# 0..1,4 da 3,44 y 0..1,8 vuelve a 3,61. El vanilla con su piel da 3,45.
+PIE = (0.0, 1.4)
 
 
 def _normales(u32):
@@ -163,15 +180,29 @@ def main(carpeta: Path) -> int:
     # El giro y el encaje, como UNA cuenta que sirve tambien para el casco.
     joints = nmsskin.leer_joints(VANILLA / "fiend.scene.MXML")
     bind_v = nmsskin.bind_mundo(VANILLA / "fiend.geometry.MXML")
-    caderas = float(np.mean([bind_v[joints[n]][2] for n in (
-        "LFirstLeg1JNT", "RFirstLeg1JNT", "LFourthLeg1JNT", "RFourthLeg1JNT")]))
-    patas = np.isin(region, [1, 2])
+    # ESCALA Y ENCAJE POR LAS PISADAS. El pie cuelga de Leg4END (ver abajo),
+    # y todo lo que nuestro pie este lejos de esa punta es palanca: medido el
+    # 20/09 con escala 1 y las patas centradas en las caderas, nuestras
+    # pisadas distaban 1,03 m de delante a detras y las del FIEND 1,24, y el
+    # pie trasero -a 0,31 m de su punta- se hundia 0,15 m al andar. Asi que la
+    # escala es la razon entre las dos distancias, y en Z se centran las
+    # pisadas sobre las puntas.
+    alto0 = v[:, 2] - v[:, 2].min()
+    pisa = alto0 < 0.12
+    delante = v[(region == 1) & pisa, 1].mean()
+    detras = v[(region == 2) & pisa, 1].mean()
+    punta_z = {n: bind_v[joints[n]][2] for n in (
+        "LFirstLeg4END", "RFirstLeg4END", "LFourthLeg4END", "RFourthLeg4END")}
+    delante_v = (punta_z["LFirstLeg4END"] + punta_z["RFirstLeg4END"]) / 2
+    detras_v = (punta_z["LFourthLeg4END"] + punta_z["RFourthLeg4END"]) / 2
+    escala = (detras_v - delante_v) / (detras - delante)
     dy = -v[:, 2].min()
-    dz = caderas - (v[patas, 1].min() + v[patas, 1].max()) / 2
+    dz = (delante_v + detras_v) / 2 - escala * (delante + detras) / 2
 
     def mover(p):
         p = np.atleast_2d(p)
-        return np.stack([-p[:, 0], p[:, 2] + dy, p[:, 1] + dz], axis=1)
+        return np.stack([-escala * p[:, 0], escala * (p[:, 2] + dy),
+                         escala * p[:, 1] + dz], axis=1)
 
     nuevo = mover(v)
 
@@ -181,21 +212,49 @@ def main(carpeta: Path) -> int:
         if "Leg" in REGIONES[k][0] else REGIONES[k][0]
         for k, x in zip(region, nuevo[:, 0])])
 
+    # EL PIE VA AL Leg4END, la punta de la pata del FIEND. Visto en partida el
+    # 20/09 con la pata entera colgada del Leg1: el vanilla deja sus cuatro
+    # puntas en y -0,02 en walk, idle y attack, y las nuestras subian a
+    # 0,15..0,66 m, porque la cadera gira y la pata rigida sube como un palo.
+    # La punta es la que el clip mantiene plantada, asi que el pie la sigue y
+    # la cadera se queda con lo de arriba; en medio, rampa suave.
+    pie = np.zeros(len(v))
+    en_pata = np.char.find(hueso, "Leg1JNT") >= 0
+    t = np.clip((nuevo[:, 1] - PIE[0]) / (PIE[1] - PIE[0]), 0.0, 1.0)
+    pie[en_pata] = 1.0 - (t * t * (3.0 - 2.0 * t))[en_pata]
+    punta = np.array([h.replace("Leg1JNT", "Leg4END") for h in hueso])
+
     palet = nmsskin.layout_paleta(geo)
+    for nombre in sorted(set(punta[en_pata])):
+        if joints[nombre] not in palet:
+            palet.append(joints[nombre])
     por_indice = {j: n for n, j in joints.items()}
     nombres_pal = [por_indice[j] for j in palet]
     faltan = set(hueso) - set(nombres_pal)
     assert not faltan, f"regiones sin hueco en la paleta: {faltan}"
 
+    # Triangulos al reves: el juego no dibuja su cara de atras y por ellos se
+    # ve el fondo -la cara y una placa del lomo, en partida-. El vanilla no
+    # tiene ninguno; aqui el decimador dejo el 1,9%. Se decide contra la
+    # normal de vertice, que si esta bien -0,996 de mediana contra la de la
+    # geometria, el vanilla 0,999-.
+    tri = np.frombuffer(s.indices, dtype="<u2").astype(np.int64).reshape(-1, 3)
+    n_v = _normales(np.frombuffer(s.vertices, dtype=np.uint8).reshape(
+        -1, 16)[:, 12:16].copy().view("<u4").ravel())
+    cara = np.cross(v[tri[:, 1]] - v[tri[:, 0]], v[tri[:, 2]] - v[tri[:, 0]])
+    al_reves = (cara * n_v[tri].sum(axis=1)).sum(axis=1) < 0
+    tri[al_reves] = tri[al_reves][:, [0, 2, 1]]
+    s.indices = tri.astype("<u2").tobytes()
+
     # Pesos: uno por region, promediados por aristas entre vertices soldados.
     _, soldado = np.unique(np.round(v, 4), axis=0, return_inverse=True)
     soldado = soldado.ravel()
     ns = int(soldado.max()) + 1
-    tri = np.frombuffer(s.indices, dtype="<u2").astype(np.int64).reshape(-1, 3)
     adj = _vecinas(tri, soldado, ns)
     grado = np.maximum(np.asarray(adj.sum(axis=1)).ravel(), 1)
     P = np.zeros((ns, len(nombres_pal)))
-    P[soldado, [nombres_pal.index(h) for h in hueso]] = 1.0
+    P[soldado, [nombres_pal.index(h) for h in hueso]] = 1.0 - pie
+    P[soldado, [nombres_pal.index(h) for h in punta]] += pie
     for _ in range(PASADAS):
         P = 0.5 * P + 0.5 * (adj @ P) / grado[:, None]
     P = P[soldado]
@@ -227,6 +286,12 @@ def main(carpeta: Path) -> int:
     _poner_xyz(r.find("Property[@name='MeshAABBMax']")[0], hi)
     for p in r.find("Property[@name='BoundHullVerts']"):
         _poner_xyz(p, mover(_xyz(p))[0])
+    capa = r.find("Property[@name='SkinMatrixLayout']")
+    for hijo in list(capa):
+        capa.remove(hijo)
+    for i, j in enumerate(palet):
+        ET.SubElement(capa, "Property", {"name": "SkinMatrixLayout",
+                                          "value": str(j), "_index": str(i)})
     suyo = ET.parse(VANILLA / "fiend.geometry.MXML").getroot()
     mio_jb = r.find("Property[@name='JointBindings']")
     suyo_jb = suyo.find("Property[@name='JointBindings']")
@@ -243,13 +308,19 @@ def main(carpeta: Path) -> int:
         if a.get("value") != "TkSceneNodeAttributeData":
             continue
         nombre = a.find("Property[@name='Name']").get("value")
+        # La paleta crece con los cuatro Leg4END, y el rango del nodo tiene
+        # que crecer con ella: si no, Check-NMSGraft avisa de indices fuera de
+        # rango, y fuera de rango el juego cierra sin avisar.
+        if nombre == "LASTSKINMAT":
+            a.find("Property[@name='Value']").set("value", str(len(palet)))
         if nombre[:7] in ("AABBMIN", "AABBMAX") and len(nombre) == 8:
             valor = (lo if nombre[4:7] == "MIN" else hi)["XYZ".index(nombre[7])]
             a.find("Property[@name='Value']").set("value", f"{valor:.6f}")
     arbol.write(escena, encoding="utf-8", xml_declaration=True)
 
     cuenta = {h: int((hueso == h).sum()) for h in nombres_pal}
-    print(f"caja {caja.round(3)} -> {(hi - lo).round(3)}, z {dz:+.3f}")
+    print(f"caja {caja.round(3)} -> {(hi - lo).round(3)}, escala {escala:.3f}, "
+          f"z {dz:+.3f}, {int(al_reves.sum())} caras dadas la vuelta")
     print("vertices por region:", cuenta)
     return 0
 
