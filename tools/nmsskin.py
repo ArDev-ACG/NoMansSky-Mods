@@ -142,6 +142,119 @@ def canales(pesos: list, palet: list, joints: dict,
     return idx, w
 
 
+# Donde viven los canales 5 y 6 segun el ancho del vertice. El de 20 es el
+# formato de 6.45 -sem2 y sem3 delante- y el de 16 el de 7.x, que los echo.
+# Ver la tabla de tools/Repack-NMSVertex.py.
+HUECOS = {20: (8, 12), 16: (0, 4)}
+
+
+def _matriz_bind(valores) -> np.ndarray:
+    """Los 16 numeros de un InvBindMatrix, como matriz 4x4.
+
+    POR COLUMNAS, y no es una eleccion: se calibro contra el FIEND vanilla,
+    que por definicion encaja sobre su propio esqueleto. De las cuatro
+    lecturas posibles -por filas o por columnas, traslacion en la ultima
+    fila o en la ultima columna- solo una deja sus 42 huesos pegados a los
+    vertices que cuelgan de ellos:
+
+        por columnas, traslacion en la ultima columna   mediana 0,12 m
+        por columnas, traslacion en la ultima fila      mediana 0,94 m
+        por filas,    traslacion en la ultima columna   mediana 0,94 m
+        por filas,    traslacion en la ultima fila      mediana 1,09 m
+
+    Un factor siete entre la primera y la siguiente, asi que no hay empate
+    que discutir.
+    """
+    return np.array(valores, dtype=np.float64).reshape(4, 4).T
+
+
+def bind_mundo(geo_mxml: Path) -> list:
+    """Donde esta cada hueso en la pose de bind, uno por JointBindings.
+
+    El InvBindMatrix lleva mundo -> hueso, asi que el hueso esta en su
+    inversa. Es rigida, o sea que la traslacion de la inversa es -R^T t y
+    no hay que invertir nada a mano.
+
+    OJO: esto va en el marco de NUESTRA malla, no en el del vanilla. El
+    paso `--bind` reescribe las matrices contra la pose elegida, asi que
+    comparar estas coordenadas con las del esqueleto vanilla no mide nada.
+    """
+    raiz = ET.parse(Path(geo_mxml)).getroot()
+    salida = []
+    for nodo in raiz.find(".//Property[@name='JointBindings']"):
+        if nodo.get("value") != "TkJointBindingData":
+            continue
+        campo = nodo.find("Property[@name='InvBindMatrix']")
+        m = _matriz_bind([float(p.get("value")) for p in campo
+                          if p.get("name") == "InvBindMatrix"])
+        salida.append(-m[:3, :3].T @ m[:3, 3])
+    return salida
+
+
+def layout_paleta(geo_mxml: Path) -> list:
+    """El SkinMatrixLayout del .GEOMETRY: hueco de paleta -> JOINTINDEX."""
+    raiz = ET.parse(Path(geo_mxml)).getroot()
+    campo = raiz.find(".//Property[@name='SkinMatrixLayout']")
+    return [int(p.get("value")) for p in campo.iter("Property")
+            if p.get("name") == "SkinMatrixLayout"
+            and (p.get("value") or "").lstrip("-").isdigit()]
+
+
+def centroides(streams, stride: int) -> dict:
+    """Hueco de paleta -> centroide, pesado, de los vertices que cuelgan.
+
+    Es la contraparte de `bind_mundo`: uno dice donde esta el hueso y el
+    otro donde esta su carne. Si los dos no caen en el mismo sitio, el
+    hueso arrastra su trozo desde fuera, y eso NO se ve en reposo: la
+    malla sale entera y se abre solo al animar.
+    """
+    if stride not in HUECOS:
+        raise ValueError(f"stride {stride} sin hueco de piel conocido")
+    o_idx, o_peso = HUECOS[stride]
+    v = np.frombuffer(streams.vertices, dtype=np.uint8).reshape(-1, stride)
+    idx = v[:, o_idx:o_idx + RANURAS].astype(np.int32)
+    peso = v[:, o_peso:o_peso + RANURAS * 2].copy().view("<f2")
+    peso = peso.astype(np.float64)
+    pos = posiciones(streams).astype(np.float64)
+    if len(pos) != len(idx):
+        raise ValueError(f"{len(pos)} posiciones y {len(idx)} vertices")
+
+    suma, masa = {}, {}
+    for ranura in range(RANURAS):
+        cuelga = peso[:, ranura] > 0.001
+        for hueco in np.unique(idx[cuelga, ranura]):
+            toca = cuelga & (idx[:, ranura] == hueco)
+            hueco = int(hueco)
+            aporte = (pos[toca] * peso[toca, ranura, None]).sum(axis=0)
+            suma[hueco] = suma.get(hueco, 0.0) + aporte
+            masa[hueco] = masa.get(hueco, 0.0) + float(peso[toca,
+                                                           ranura].sum())
+    return {h: suma[h] / masa[h] for h in suma}
+
+
+def encaje(geo_mxml: Path, streams, stride: int, joints: dict) -> list:
+    """Una fila por hueco de paleta: el hueso, y donde tiene la carne.
+
+    Devuelve dicts con `hueco`, `joint`, `nombre`, `bind`, `centroide` y
+    `distancia`. Lo consume tools/tests/test_encaje.py.
+    """
+    bind = bind_mundo(geo_mxml)
+    palet = layout_paleta(geo_mxml)
+    por_indice = {j: n for n, j in joints.items()}
+    salida = []
+    for hueco, centro in sorted(centroides(streams, stride).items()):
+        joint = palet[hueco]
+        salida.append({
+            "hueco": hueco,
+            "joint": joint,
+            "nombre": por_indice.get(joint, "?"),
+            "bind": bind[joint],
+            "centroide": centro,
+            "distancia": float(np.linalg.norm(centro - bind[joint])),
+        })
+    return salida
+
+
 def tejer(vertices: bytearray, idx: np.ndarray, w: np.ndarray,
           stride: int = 20) -> bytearray:
     """Mete los dos canales en su hueco, sin tocar normal ni tangente."""

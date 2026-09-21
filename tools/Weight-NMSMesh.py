@@ -434,12 +434,32 @@ MODELOS = {
         # LOS CORTES SALEN DEL VOLCADO DEL 19/09, NO SE ELIGIERON. Nuestra
         # caja mide 1,556 x 2,850 x 2,302 m y sus ejes locales NO son los del
         # FIEND: se midio por islas de malla, no por camara.
-        #     u = x  izquierda 0 -> derecha 1   (los L* del FIEND caen en u>0,5)
+        #     u = x  izquierda 0 -> derecha 1
         #     v = y  CABEZA 0 -> PUNTA DE COLA 1
         #     w = z  PATAS 0 -> LOMO / ARCO DE LA COLA 1
         # El esqueleto vanilla, metido en esta misma caja, va al reves y de
         # canto -NewJawJNT en v 0,37 w 1,53, los cuatro pies en v 0,03-, y eso
         # es exactamente para lo que existe este mapa: lo cruza a proposito.
+        #
+        # LOS L* VAN EN u BAJO, y hasta el 20/09 aqui ponia lo contrario -"los
+        # L* del FIEND caen en u>0,5"-. Salio en partida: el bicho andaba
+        # haciendo tijera y se abria en esquirlas. El error era leer el lado
+        # DESPUES del giro de overlay, y ese giro -`giro = Rz(GIRO_Z) @ Rx(90)`,
+        # mas abajo- existe SOLO para poder elegir las regiones con el
+        # esqueleto puesto encima de la malla. EN PARTIDA NO SE APLICA: el
+        # juego lee nuestros vertices contra el esqueleto sin girar, y el
+        # Rz(180) invierte la x, asi que el lado se da la vuelta.
+        #
+        # El lado se lee del BIND, que es lo que el juego usa. Medido el 20/09
+        # con `nmsskin.encaje` sobre el .GEOMETRY ya cosido: LFirstLeg1JNT esta
+        # en x -0,22 y LFourthLeg1JNT en x -0,15, o sea que los L* viven en x
+        # NEGATIVA. Y x negativa es u BAJO, comprobado en el mismo volcado: la
+        # region que llevaba `u > 0.50` solto sus vertices en x +0,50.
+        #
+        # El cry wolf, que si encaja, ya lo tenia bien: sus L* van en u<0,45.
+        # Lo vigila tools/tests/test_encaje.py, que sin esto se queda rojo.
+        # `TOPE_ASIMETRIA` no podia cazarlo: un espejo deja los dos lados con
+        # los mismos vertices, que es justo lo que ese tope mide.
         #
         # Los dos cortes duros salen de HUECOS VACIOS, que es lo que los hace
         # cortes y no opiniones:
@@ -462,10 +482,10 @@ MODELOS = {
         # hay nada mas: pasado v 0,74 todo es cola.
         regiones=(
             ("NewHeadJNT",     lambda u, v, w: v < 0.16),
-            ("LFirstLeg1JNT",  lambda u, v, w: v < 0.46 and w < 0.40 and u > 0.50),
-            ("RFirstLeg1JNT",  lambda u, v, w: v < 0.46 and w < 0.40),
-            ("LFourthLeg1JNT", lambda u, v, w: w < 0.40 and v <= 0.76 and u > 0.50),
-            ("RFourthLeg1JNT", lambda u, v, w: w < 0.40 and v <= 0.76),
+            ("RFirstLeg1JNT",  lambda u, v, w: v < 0.46 and w < 0.40 and u > 0.50),
+            ("LFirstLeg1JNT",  lambda u, v, w: v < 0.46 and w < 0.40),
+            ("RFourthLeg1JNT", lambda u, v, w: w < 0.40 and v <= 0.76 and u > 0.50),
+            ("LFourthLeg1JNT", lambda u, v, w: w < 0.40 and v <= 0.76),
             ("NewTail5JNT",    lambda u, v, w: v > 0.86),
             ("NewTail3JNT",    lambda u, v, w: v > 0.74),
             ("NewTail1JNT",    lambda u, v, w: w > 0.82 and v > 0.55),
