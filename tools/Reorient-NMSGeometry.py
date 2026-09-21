@@ -84,8 +84,21 @@ VANILLA = (RAIZ / "work" / "models" / "vanilla_7.0_fiend" / "models"
 # repartida se rompe en tramos y da p99,9 de 7,68 en la razon de aristas;
 # entera en Tail1 da 3,32 -el vanilla con su piel, 3,45- y sigue moviendose
 # desde la base. Colgada de RootJNT da 3,25, pero va muerta.
+#
+# LA CABEZA VA CON EL PECHO, a NewBack1JNT, y no a NewHeadJNT. Visto el 20/09
+# en `fiendroar`: la cabeza se partia en dos por la costura entre los dos
+# huesos. Medido sobre los 27 clips, NewHeadJNT gira respecto a NewBack1JNT
+# 35..75 grados en casi todos -35 dentro del mismo idle-, porque el FIEND
+# tiene un cuello largo de cuatro huesos y nuestro bicho no tiene cuello: el
+# craneo sale de los hombros y es rigido. Ninguna rampa reparte 75 grados en
+# un craneo sin doblarlo como goma.
+#
+# Y LA CABEZA EMPIEZA POR ENCIMA DE LA LINEA DE LAS PATAS, w >= 0,40. Las
+# garras delanteras asoman por delante hasta v < 0,16 y con la regla vieja
+# -solo v- 119 vertices de garra, a ras de suelo, colgaban del pecho: en
+# `fiendroar` la pata se levanta y la garra se quedaba, un estiron de 0,62 m.
 REGIONES = (
-    ("NewHeadJNT",  lambda u, v, w: v < 0.16),
+    ("NewBack1JNT", lambda u, v, w: (v < 0.16) & (w >= 0.40)),
     ("FirstLeg1",   lambda u, v, w: (v < 0.46) & (w < 0.40)),
     ("FourthLeg1",  lambda u, v, w: (w < 0.40) & (v <= 0.76)),
     ("NewTail1JNT", lambda u, v, w: (v > 0.74) | ((w > 0.82) & (v > 0.55))),
@@ -107,6 +120,10 @@ RANURAS = 4
 # con el bind de idle: 0,15..0,55 abria la espinilla; 0..0,6 da p99,9 3,54,
 # 0..1,4 da 3,44 y 0..1,8 vuelve a 3,61. El vanilla con su piel da 3,45.
 PIE = (0.0, 1.4)
+
+# La rampa de la cola, en la v de la caja de pie -cabeza 0, punta de cola 1-:
+# la cola arranca en la grupa hacia v 0,55 y termina en 1.
+COLA = (0.55, 1.0)
 
 
 def _normales(u32):
@@ -224,6 +241,18 @@ def main(carpeta: Path) -> int:
     pie[en_pata] = 1.0 - (t * t * (3.0 - 2.0 * t))[en_pata]
     punta = np.array([h.replace("Leg1JNT", "Leg4END") for h in hueso])
 
+    # LA COLA EN RAMPA, de RootJNT en la grupa a NewTail1JNT en la punta, por
+    # el mismo motivo que el pie: NewTail1JNT gira respecto a RootJNT 25..56
+    # grados segun el clip, y con la costura corta del suavizado la cola salia
+    # disparada como una lanza en `fiendroar`. Repartido por todo el largo, se
+    # dobla como un tubo. Reusa `pie` y `punta`: la cola "base" es hueso y la
+    # "punta" NewTail1JNT.
+    en_cola = hueso == "NewTail1JNT"
+    largo = np.clip((vv - COLA[0]) / (COLA[1] - COLA[0]), 0.0, 1.0)
+    pie[en_cola] = (largo * largo * (3.0 - 2.0 * largo))[en_cola]
+    hueso[en_cola] = "RootJNT"
+    punta[en_cola] = "NewTail1JNT"
+
     palet = nmsskin.layout_paleta(geo)
     for nombre in sorted(set(punta[en_pata])):
         if joints[nombre] not in palet:
@@ -274,6 +303,14 @@ def main(carpeta: Path) -> int:
     n = np.stack([-n[:, 0], n[:, 2], n[:, 1]], axis=1)
     V[:, 12:16] = _sem11(n, viejo).astype("<u4").view(np.uint8).reshape(-1, 4)
     pos[:, :3] = nuevo
+    # LA V DE LA UV, DE ARRIBA ABAJO. El juego muestrea la textura con el
+    # origen arriba y esta malla trae la V de Blender, con el origen abajo.
+    # Con una textura normal eso solo la voltearia; con la de este asset -un
+    # atlas automatico de cientos de islas- cada triangulo cae en una isla
+    # ajena, y eso eran las "esquirlas" de partida. Visto el 20/09 en un
+    # render con la textura: con la V tal cual sale identico al .glb, y con
+    # la V invertida sale el cristal roto de las capturas.
+    pos[:, 5] = 1.0 - pos[:, 5]
     s.vertices = bytes(vert)
     s.posiciones = pos.astype("<f2").tobytes()
     nmsgeom.escribir_streams(dat, s)
