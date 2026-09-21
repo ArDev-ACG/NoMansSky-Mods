@@ -77,8 +77,8 @@ VANILLA = (RAIZ / "work" / "models" / "vanilla_7.0_fiend" / "models"
 # malla DE PIE: u = x, v = y cabeza 0 -> cola 1, w = z patas 0 -> lomo 1.
 # Gana la primera que case. El lado de las patas lo pone el signo de x final.
 #
-# LA COLA ENTERA VA A NewTail1JNT, y no repartida en Tail1/3/5 como en
-# Weight-NMSMesh.py. Nuestra cola sube en arco por encima del lomo y la del
+# LA COLA ES UNA SOLA REGION, y no repartida en Tail1/3/5 por cortes como en
+# Weight-NMSMesh.py: el reparto va en rampa, ver `COLA` y main(). Nuestra cola sube en arco por encima del lomo y la del
 # FIEND sale recta hacia atras, asi que Tail3 y Tail5 quedan lejos de su
 # carne y cada uno tira su trozo hacia un lado: medido el 20/09, la cola
 # repartida se rompe en tramos y da p99,9 de 7,68 en la razon de aristas;
@@ -241,17 +241,22 @@ def main(carpeta: Path) -> int:
     pie[en_pata] = 1.0 - (t * t * (3.0 - 2.0 * t))[en_pata]
     punta = np.array([h.replace("Leg1JNT", "Leg4END") for h in hueso])
 
-    # LA COLA EN RAMPA, de RootJNT en la grupa a NewTail1JNT en la punta, por
-    # el mismo motivo que el pie: NewTail1JNT gira respecto a RootJNT 25..56
-    # grados segun el clip, y con la costura corta del suavizado la cola salia
-    # disparada como una lanza en `fiendroar`. Repartido por todo el largo, se
-    # dobla como un tubo. Reusa `pie` y `punta`: la cola "base" es hueso y la
-    # "punta" NewTail1JNT.
+    # LA COLA EN RAMPA, de RootJNT en la grupa a NewTail3JNT en la punta.
+    # Dos veces medido el 20/09:
+    #   - con costura corta a NewTail1JNT la cola salia como una lanza en
+    #     `fiendroar`, porque Tail1 gira 25..56 grados respecto a RootJNT;
+    #     repartido por todo el largo se dobla como un tubo.
+    #   - con la punta en Tail1, al encabritarse en `fiendroar` nuestra cola
+    #     -que sube en arco, la del FIEND va recta- giraba con la cadera y
+    #     atravesaba el suelo 0,34 m. Con la punta en Tail3, que el FIEND
+    #     mantiene hacia atras, se queda en -0,03 y el p99,9 del rugido es
+    #     3,25 -el vanilla con su piel, 5,04-. Tail5 lo rompe: 6,56 y 0,51 m.
+    # Reusa `pie` y `punta`: la "base" de la cola es hueso y la punta Tail3.
     en_cola = hueso == "NewTail1JNT"
     largo = np.clip((vv - COLA[0]) / (COLA[1] - COLA[0]), 0.0, 1.0)
     pie[en_cola] = (largo * largo * (3.0 - 2.0 * largo))[en_cola]
     hueso[en_cola] = "RootJNT"
-    punta[en_cola] = "NewTail1JNT"
+    punta[en_cola] = "NewTail3JNT"
 
     palet = nmsskin.layout_paleta(geo)
     for nombre in sorted(set(punta[en_pata])):
@@ -299,7 +304,21 @@ def main(carpeta: Path) -> int:
     V[:, 0:4] = orden.astype(np.uint8)
     V[:, 4:12] = peso.astype("<f2").view(np.uint8).reshape(-1, 8)
     viejo = V[:, 12:16].copy().view("<u4").ravel()
-    n = _normales(viejo)
+    # LAS NORMALES SE RECALCULAN, suaves y soldadas por posicion. Las que
+    # trae la malla vienen partidas en las costuras de UV: en cada vertice
+    # duplicado, cada copia lleva la suya, con 23 grados de mediana entre
+    # ellas y el 58% por encima de 20. El FIEND vanilla da 0. En partida eso
+    # era una linea de brillo en el borde de cada isla del atlas -las
+    # "grietas" de la cupula- y placas de reflejo con canto duro en el
+    # cuerpo; de lejos no se veia porque la linea queda por debajo del pixel.
+    # Con el triangulo ya dado la vuelta donde tocaba, la normal de cara
+    # apunta afuera; se suman por area en cada posicion soldada.
+    cara = np.cross(v[tri[:, 1]] - v[tri[:, 0]], v[tri[:, 2]] - v[tri[:, 0]])
+    suma = np.zeros((ns, 3))
+    for k in range(3):
+        np.add.at(suma, soldado[tri[:, k]], cara)
+    n = suma[soldado]
+    n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
     n = np.stack([-n[:, 0], n[:, 2], n[:, 1]], axis=1)
     V[:, 12:16] = _sem11(n, viejo).astype("<u4").view(np.uint8).reshape(-1, 4)
     pos[:, :3] = nuevo
