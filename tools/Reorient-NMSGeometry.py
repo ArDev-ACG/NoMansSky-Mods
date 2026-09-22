@@ -277,6 +277,23 @@ def main(carpeta: Path) -> int:
         -1, 16)[:, 12:16].copy().view("<u4").ravel())
     cara = np.cross(v[tri[:, 1]] - v[tri[:, 0]], v[tri[:, 2]] - v[tri[:, 0]])
     al_reves = (cara * n_v[tri].sum(axis=1)).sum(axis=1) < 0
+    # PERO SOLO SI EL SENTIDO ES INCOHERENTE. Con la malla soldada y
+    # orientada en Blender (recalc_face_normals) cada arista interior se
+    # recorre una vez en cada sentido, y la prueba de arriba se equivoca en
+    # lo fino -pinchos, laminas, garras-, donde la normal de vertice promedia
+    # caras de los dos lados: medido el 21/09, 1562 caras "al reves" en una
+    # malla sin ninguna mal orientada. Darles la vuelta ERA abrir huecos.
+    # Se suelda por valor EXACTO: redondear a 4 decimales funde vertices
+    # distintos, porque en half a 2 m el paso ya es de 1-2 mm. Y el umbral
+    # es del 1% porque el escaneo trae aristas de tres caras que nadie
+    # puede orientar: Blender deja el 0,38% repetidas.
+    _, sold = np.unique(v, axis=0, return_inverse=True)
+    t = sold.ravel()[tri]
+    dirigidas = np.concatenate([t[:, [0, 1]], t[:, [1, 2]], t[:, [2, 0]]])
+    _, veces = np.unique(dirigidas, axis=0, return_counts=True)
+    coherente = (veces > 1).mean() < 0.01
+    if coherente:
+        al_reves[:] = False
     tri[al_reves] = tri[al_reves][:, [0, 2, 1]]
     s.indices = tri.astype("<u2").tobytes()
 
@@ -320,6 +337,8 @@ def main(carpeta: Path) -> int:
     n = suma[soldado]
     n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
     n = np.stack([-n[:, 0], n[:, 2], n[:, 1]], axis=1)
+    # Un vertice sin area alrededor da normal nula, y la nula es NaN en sem11.
+    n[np.linalg.norm(n, axis=1) < 0.5] = (0.0, 1.0, 0.0)
     V[:, 12:16] = _sem11(n, viejo).astype("<u4").view(np.uint8).reshape(-1, 4)
     pos[:, :3] = nuevo
     # LA V DE LA UV, DE ARRIBA ABAJO. El juego muestrea la textura con el
