@@ -1,6 +1,6 @@
 """Soldar, decimar y hornear: el xenodog sin islas sueltas (2026-09-21).
 
-    blender -b --python tools/Weld-Bake-NMSMesh.py -- <baja.npz> <color.png> <rugosidad.png> 30000 2048
+    blender -b --python tools/Weld-Bake-NMSMesh.py -- <baja.npz> <color.png> <rugosidad.png> 36000 2048
 
 El .glb de Sketchfab viene partido en 2677 islas de UV (glTF duplica
 vertices en cada costura); soldado es UNA pieza. Decimar sin soldar encoge
@@ -8,6 +8,10 @@ cada isla por su lado: 2270 trozos con rendijas de 3-19 mm, que en partida
 eran las esquirlas y los huecos al rugir. Soldar mezcla las UV del atlas
 (camuflaje), asi que se hacen UV nuevas y se hornea color y rugosidad de la
 malla alta. Despues: tools/Inject-NMSMesh.py y Reorient-NMSGeometry.py.
+
+El presupuesto es 36000, el del FIEND vanilla, y lo topa el formato y no el
+gusto: Indices16Bit=1 son 65535 vertices y las UV nuevas parten 1,40 por
+triangulo -50414 vertices con 36000 triangulos-. Con 30000 salian 43576.
 """
 import bpy, bmesh, sys, numpy as np
 import os
